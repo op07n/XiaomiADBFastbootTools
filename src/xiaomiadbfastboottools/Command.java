@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xiaomiadbfastboottools;
 
 import java.io.File;
@@ -11,12 +6,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 import javafx.scene.control.TextInputControl;
 
-/**
- *
- * @author Saki
- */
 public class Command {
-    protected ProcessBuilder pb;
+	protected ProcessBuilder pb;
     protected Process proc;
     protected Scanner scan;
     protected String output;
@@ -27,22 +18,18 @@ public class Command {
         pb = new ProcessBuilder();
         pb.directory(new File(System.getProperty("user.dir") + "/temp"));
         tic = null;
-        if (System.getProperty("os.name").toLowerCase().contains("linux"))
-        	prefix = "";
-        else if (System.getProperty("os.name").toLowerCase().contains("mac os"))
-        	prefix = "./";
-        else prefix = "temp/";
+        if (System.getProperty("os.name").toLowerCase().contains("win"))
+        	prefix = "temp/";
+        else prefix = "./";
     }
     
     public Command(TextInputControl control){
         pb = new ProcessBuilder();
         pb.directory(new File(System.getProperty("user.dir") + "/temp"));
         tic = control;
-        if (System.getProperty("os.name").toLowerCase().contains("linux"))
-        	prefix = "";
-        else if (System.getProperty("os.name").toLowerCase().contains("mac os"))
-        	prefix = "./";
-        else prefix = "temp/";
+        if (System.getProperty("os.name").toLowerCase().contains("win"))
+        	prefix = "temp/";
+        else prefix = "./";
     }
     
     public String exec(String arg){
@@ -54,8 +41,7 @@ public class Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-            System.out.println("ERROR: Couldn't start process");
-            System.out.println(ex.getMessage());
+        	ex.getMessage();
         }
         scan = new Scanner(proc.getInputStream());
         String line;
@@ -78,8 +64,7 @@ public class Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-            System.out.println("ERROR: Couldn't start process");
-            System.out.println(ex.getMessage());
+        	ex.getMessage();
         }
         if (err)
             scan = new Scanner(proc.getErrorStream());
@@ -107,7 +92,7 @@ public class Command {
             try {
                 proc = pb.start();
             } catch (IOException ex) {
-                System.out.println("ERROR: Couldn't start process");
+            	ex.getMessage();
             }
             scan = new Scanner(proc.getInputStream());
             String line;
@@ -121,7 +106,7 @@ public class Command {
             try {
                 proc.waitFor();
             } catch (InterruptedException ex) {
-                System.out.println("ERROR: The process was interrupted.");
+            	ex.getMessage();
             }
         }
         return output;
@@ -131,7 +116,7 @@ public class Command {
         try {
             proc.waitFor();
         } catch (InterruptedException ex) {
-            System.out.println("ERROR: The process was interrupted.");
+            ex.getMessage();
         }
     }
     

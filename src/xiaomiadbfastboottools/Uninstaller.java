@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xiaomiadbfastboottools;
 
 import java.io.IOException;
@@ -10,10 +5,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import javafx.scene.control.TextInputControl;
 
-/**
- *
- * @author Saki
- */
+
 public class Uninstaller extends Command {
     
     public Uninstaller(TextInputControl control){
@@ -28,7 +20,7 @@ public class Uninstaller extends Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-            System.out.println("ERROR: Couldn't start process");
+        	ex.getMessage();
         }
         scan = new Scanner(proc.getInputStream());
         while (scan.hasNext()) {
@@ -41,7 +33,7 @@ public class Uninstaller extends Command {
         try {
             proc.waitFor();
         } catch (InterruptedException ex) {
-            System.out.println("ERROR: The process was interrupted.");
+        	ex.getMessage();
         }
     }
 }

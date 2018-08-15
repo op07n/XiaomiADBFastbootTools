@@ -173,52 +173,48 @@ public class MainWindowController implements Initializable {
         }
     }
     
-    public void createFile(String file){
-    	createFile(file, false);
-    }
-    
-    public void createFile(String file, Boolean setExecPermission){
+    public void createFile(String file, boolean exec){
         File temp = new File(System.getProperty("user.dir") + "/temp");
         temp.mkdir();
         byte[] bytes = null;
         try {
             bytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream(file));
         } catch (IOException ex) {
-            System.out.println("ERROR: Couldn't read resource.");
+        	ex.getMessage();
         }
         if (file.lastIndexOf("/") != -1)
             file = file.substring(file.lastIndexOf("/")+1);
         File newfile = new File(System.getProperty("user.dir") + "/temp/" + file);
         if (!newfile.exists()) {
             try {
-                newfile.createNewFile();
+            	newfile.createNewFile();
                 FileOutputStream fos = new FileOutputStream(newfile);
                 fos.write(bytes);
                 fos.flush();
                 fos.close();
-
-                if (setExecPermission) {
-                	newfile = new File(System.getProperty("user.dir") + "/temp/" + file);
-                	newfile.setExecutable(true);
-                }
             } catch (IOException ex) {
-                System.out.println("ERROR: Couldn't create file.");
+            	ex.getMessage();
             }
-        }
+	  }
+        newfile.setExecutable(exec, false);
     }
     
     public void setupFiles(){
         String os = System.getProperty("os.name").toLowerCase();
-        createFile("dummy.img");
+        createFile("dummy.img", false);
         if (os.contains("win")){
-            createFile("windows/adb.exe");
-            createFile("windows/fastboot.exe");
-            createFile("windows/AdbWinApi.dll");
-            createFile("windows/AdbWinUsbApi.dll");
+            createFile("windows/adb.exe", true);
+            createFile("windows/fastboot.exe", true);
+            createFile("windows/AdbWinApi.dll", false);
+            createFile("windows/AdbWinUsbApi.dll", false);
         }
         if (os.contains("mac")){
             createFile("macos/adb", true);
             createFile("macos/fastboot", true);
+        }
+        if (os.contains("linux")){
+            createFile("linux/adb", true);
+            createFile("linux/fastboot", true);
         }
     }
 
@@ -491,7 +487,7 @@ public class MainWindowController implements Initializable {
                 fw.flush();
                 fw.close();
             } catch (IOException ex) {
-                System.out.println("ERROR: Couldn't write file.");
+            	ex.getMessage();
             }
         }
     }
@@ -642,7 +638,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.0" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.2" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	
@@ -653,7 +649,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://www.reddit.com/r/Xiaomi"));
 				} catch (IOException | URISyntaxException e1) {
-					System.out.println("ERROR: Couldn't open website!");
+					e1.getMessage();
 				}
     	    }
     	});
@@ -665,7 +661,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://discord.gg/xiaomi"));
 				} catch (IOException | URISyntaxException e1) {
-					System.out.println("ERROR: Couldn't open website!");
+					e1.getMessage();
 				}
     	    }
     	});
@@ -677,7 +673,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"));
 				} catch (IOException | URISyntaxException e1) {
-					System.out.println("ERROR: Couldn't open website!");
+					e1.getMessage();
 				}
     	    }
     	});

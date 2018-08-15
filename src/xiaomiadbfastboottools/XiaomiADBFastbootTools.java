@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xiaomiadbfastboottools;
 
 import java.io.File;
@@ -15,10 +10,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 
-/**
- *
- * @author Saki
- */
+
 public class XiaomiADBFastbootTools extends Application {
     
     @Override
@@ -41,12 +33,12 @@ public class XiaomiADBFastbootTools extends Application {
         try {
             Thread.sleep(500);
         } catch (InterruptedException ex) {
-            System.out.println("ERROR: Couldn't sleep!");
+        	ex.getMessage();
         }
         try {
             FileUtils.deleteDirectory(new File(System.getProperty("user.dir") + "/temp"));
         } catch (IOException ex) {
-            System.out.println("ERROR: Couldn't delete directory!");
+        	ex.getMessage();
         }
     }
 
