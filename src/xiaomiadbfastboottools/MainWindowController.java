@@ -127,7 +127,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private Tab fastbootTab;
     
-    String image;
+    File image;
     Command comm;
     
     public void setupWidgets(){
@@ -136,7 +136,7 @@ public class MainWindowController implements Initializable {
         bootloaderLabel.setText("-");
         partitionComboBox.getItems().addAll(
         "boot","cust","modem","persist","recovery","system");
-        image = "";
+        image = null;
     }
     
     public void setLabels(String serial, String codename, String bl){
@@ -506,28 +506,28 @@ public class MainWindowController implements Initializable {
         FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Image File", "*.*");
         fc.getExtensionFilters().add(fileExtensions);
         fc.setTitle("Select an image");
-        File f = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
-        if (f != null) {
-            image = f.getAbsolutePath();
-            imageLabel.setText(image.substring(image.lastIndexOf(File.separator)+1));
+        image = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+        if (image != null) {
+            imageLabel.setText(image.getAbsolutePath().substring(image.getAbsolutePath().lastIndexOf(File.separator)+1));
         }
     }
 
     @FXML
     private void flashButtonPressed(ActionEvent event) {
-        if (image.length() > 1 && partitionComboBox.getValue() != null && partitionComboBox.getValue().trim().length() > 0 && checkFastboot()) {
+        if (image.getAbsolutePath().length() > 1 && partitionComboBox.getValue() != null && partitionComboBox.getValue().trim().length() > 0 && checkFastboot()) {
             comm = new Command(outputTextArea);
-            if (autobootCheckBox.isSelected() && partitionComboBox.getValue().trim() == "recovery")
-            	comm.exec("fastboot flash " + partitionComboBox.getValue().trim() + " " + image, "fastboot boot " + image);
-            else comm.exec("fastboot flash " + partitionComboBox.getValue().trim() + " " + image);
+            if (autobootCheckBox.isSelected() && partitionComboBox.getValue().trim() == "recovery") {
+            	comm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim(), "fastboot boot");
+            }
+            	else comm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim());
         }
     }
 
     @FXML
     private void bootButtonPressed(ActionEvent event) {
-        if (image.length() > 1 && checkFastboot()) {
+        if (image.getAbsolutePath().length() > 1 && checkFastboot()) {
             comm = new Command(outputTextArea);
-            comm.exec("fastboot boot " + image);
+            comm.exec(image, "fastboot boot");
         }
     }
 
@@ -638,7 +638,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.2" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.3" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	
