@@ -514,7 +514,7 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void flashButtonPressed(ActionEvent event) {
-        if (image.getAbsolutePath().length() > 1 && partitionComboBox.getValue() != null && partitionComboBox.getValue().trim().length() > 0 && checkFastboot()) {
+        if (image != null && image.getAbsolutePath().length() > 1 && partitionComboBox.getValue() != null && partitionComboBox.getValue().trim().length() > 0 && checkFastboot()) {
             comm = new Command(outputTextArea);
             if (autobootCheckBox.isSelected() && partitionComboBox.getValue().trim() == "recovery") {
             	comm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim(), "fastboot boot");
@@ -525,7 +525,7 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void bootButtonPressed(ActionEvent event) {
-        if (image.getAbsolutePath().length() > 1 && checkFastboot()) {
+        if (image != null && image.getAbsolutePath().length() > 1 && checkFastboot()) {
             comm = new Command(outputTextArea);
             comm.exec(image, "fastboot boot");
         }
