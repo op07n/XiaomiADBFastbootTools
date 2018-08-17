@@ -325,7 +325,6 @@ public class MainWindowController implements Initializable {
         apps.add(new App("Facebook App Manager", "com.facebook.appmanager"));
         apps.add(new App("Facebook Services", "com.facebook.services"));
         apps.add(new App("Feedback", "com.miui.bugreport"));
-        apps.add(new App("File Manager", "com.mi.android.globalFileexplorer"));
         apps.add(new App("File Manager", "com.android.fileexplorer"));
         apps.add(new App("Files", "com.android.documentsui"));
         apps.add(new App("FM Radio", "com.miui.fm"));
@@ -359,6 +358,7 @@ public class MainWindowController implements Initializable {
         apps.add(new App("Mi Cloud Backup", "com.miui.cloudbackup"));
         apps.add(new App("Mi Credit", "com.xiaomi.payment"));
         apps.add(new App("Mi Drop", "com.xiaomi.midrop"));
+        apps.add(new App("Mi File Manager", "com.mi.android.globalFileexplorer"));
         apps.add(new App("Mi Roaming", "com.miui.virtualsim"));
         apps.add(new App("Mi Video", "com.miui.video"));
         apps.add(new App("Mi Video", "com.miui.videoplayer"));
