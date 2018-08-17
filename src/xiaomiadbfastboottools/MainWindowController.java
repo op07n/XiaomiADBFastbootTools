@@ -313,13 +313,10 @@ public class MainWindowController implements Initializable {
         apps.add(new App("App Vault", "com.mi.android.globalpersonalassistant"));
         apps.add(new App("Apps (Mi App Store)", "com.xiaomi.mipicks"));
         apps.add(new App("Browser", "com.android.browser"));
-        apps.add(new App("Calculator", "com.google.android.calculator"));
         apps.add(new App("Calculator", "com.miui.calculator"));
         apps.add(new App("Calendar", "com.android.calendar"));
-        apps.add(new App("Calendar", "com.google.android.calendar"));
         apps.add(new App("Cleaner", "com.miui.cleanmaster"));
         apps.add(new App("Clock", "com.android.deskclock"));
-        apps.add(new App("Clock", "com.google.android.deskclock"));
         apps.add(new App("Compass", "com.miui.compass"));
         apps.add(new App("Direct Service / Quick Apps", "com.miui.hybrid"));
         apps.add(new App("Downloads", "com.android.providers.downloads.ui"));
@@ -336,7 +333,10 @@ public class MainWindowController implements Initializable {
         apps.add(new App("Gmail", "com.google.android.gm"));
         apps.add(new App("Google App", "com.google.android.googlequicksearchbox"));
         apps.add(new App("Google Assistant", "com.google.android.apps.googleassistant"));
+        apps.add(new App("Google Calculator", "com.google.android.calculator"));
+        apps.add(new App("Google Calendar", "com.google.android.calendar"));
         apps.add(new App("Google Chrome", "com.android.chrome"));
+        apps.add(new App("Google Clock", "com.google.android.deskclock"));
         apps.add(new App("Google Drive", "com.google.android.apps.docs"));
         apps.add(new App("Google Duo", "com.google.android.apps.tachyon"));
         apps.add(new App("Google Hangouts", "com.google.android.talk"));
