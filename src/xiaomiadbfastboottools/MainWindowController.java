@@ -332,6 +332,7 @@ public class MainWindowController implements Initializable {
         apps.add(new App("File Manager", "com.android.fileexplorer"));
         apps.add(new App("Files", "com.android.documentsui"));
         apps.add(new App("FM Radio", "com.miui.fm"));
+        apps.add(new App("Games", "com.xiaomi.glgm"));
         apps.add(new App("Gmail", "com.google.android.gm"));
         apps.add(new App("Google App", "com.google.android.googlequicksearchbox"));
         apps.add(new App("Google Assistant", "com.google.android.apps.googleassistant"));
@@ -638,7 +639,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.3" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.4" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	
