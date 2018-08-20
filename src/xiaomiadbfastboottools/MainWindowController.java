@@ -27,7 +27,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -68,8 +67,6 @@ public class MainWindowController implements Initializable {
     private Label codenameLabel;
     @FXML
     private Label bootloaderLabel;
-    @FXML
-    private ProgressBar progressBar;
     @FXML
     private TextArea outputTextArea;
     @FXML
@@ -129,14 +126,93 @@ public class MainWindowController implements Initializable {
     
     File image;
     Command comm;
+    ObservableList<App> apps;
     
-    public void setupWidgets(){
+    @SuppressWarnings("unchecked")
+	public void setupWidgets(){
         serialLabel.setText("-");
         codenameLabel.setText("-");
         bootloaderLabel.setText("-");
         partitionComboBox.getItems().addAll(
         "boot","cust","modem","persist","recovery","system");
         image = null;
+        
+        checkTableColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
+        checkTableColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+        appTableColumn.setCellValueFactory(new PropertyValueFactory<>("appname"));
+        packageTableColumn.setCellValueFactory(new PropertyValueFactory<>("packagename"));
+        debloaterTableView.getColumns().setAll(checkTableColumn, appTableColumn, packageTableColumn);
+        
+        apps = FXCollections.observableArrayList();
+        apps.add(new App("Analytics", "com.miui.analytics"));
+        apps.add(new App("App Vault", "com.miui.personalassistant"));
+        apps.add(new App("App Vault", "com.mi.android.globalpersonalassistant"));
+        apps.add(new App("Browser", "com.android.browser"));
+        apps.add(new App("Calculator", "com.miui.calculator"));
+        apps.add(new App("Calendar", "com.android.calendar"));
+        apps.add(new App("Cleaner", "com.miui.cleanmaster"));
+        apps.add(new App("Clock", "com.android.deskclock"));
+        apps.add(new App("Compass", "com.miui.compass"));
+        apps.add(new App("Downloads", "com.android.providers.downloads.ui"));
+        apps.add(new App("Facebook", "com.facebook.katana"));
+        apps.add(new App("Facebook App Installer", "com.facebook.system"));
+        apps.add(new App("Facebook App Manager", "com.facebook.appmanager"));
+        apps.add(new App("Facebook Services", "com.facebook.services"));
+        apps.add(new App("Feedback", "com.miui.bugreport"));
+        apps.add(new App("FM Radio", "com.miui.fm"));
+        apps.add(new App("Games", "com.xiaomi.glgm"));
+        apps.add(new App("Gmail", "com.google.android.gm"));
+        apps.add(new App("Google App", "com.google.android.googlequicksearchbox"));
+        apps.add(new App("Google Assistant", "com.google.android.apps.googleassistant"));
+        apps.add(new App("Google Calculator", "com.google.android.calculator"));
+        apps.add(new App("Google Calendar", "com.google.android.calendar"));
+        apps.add(new App("Google Chrome", "com.android.chrome"));
+        apps.add(new App("Google Clock", "com.google.android.deskclock"));
+        apps.add(new App("Google Drive", "com.google.android.apps.docs"));
+        apps.add(new App("Google Duo", "com.google.android.apps.tachyon"));
+        apps.add(new App("Google Hangouts", "com.google.android.talk"));
+        apps.add(new App("Google Indic Keyboard", "com.google.android.apps.inputmethod.hindi"));
+        apps.add(new App("Google Keep", "com.google.android.keep"));
+        apps.add(new App("Google Korean Input", "com.google.android.inputmethod.korean"));
+        apps.add(new App("Google Maps", "com.google.android.apps.maps"));
+        apps.add(new App("Google Photos", "com.google.android.apps.photos"));
+        apps.add(new App("Google Pinyin Input", "com.google.android.inputmethod.pinyin"));
+        apps.add(new App("Google Play Books", "com.google.android.apps.books"));
+        apps.add(new App("Google Play Games", "com.google.android.play.games"));
+        apps.add(new App("Google Play Movies", "com.google.android.videos"));
+        apps.add(new App("Google Play Music", "com.google.android.music"));
+        apps.add(new App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"));
+        apps.add(new App("KLO Bugreport", "com.miui.klo.bugreport"));
+        apps.add(new App("Mab", "com.xiaomi.ab"));
+        apps.add(new App("Mail", "com.android.email"));
+        apps.add(new App("Mi AI", "com.miui.voiceassist"));
+        apps.add(new App("Mi App Store", "com.xiaomi.mipicks"));
+        apps.add(new App("Mi Cloud", "com.miui.cloudservice"));
+        apps.add(new App("Mi Cloud Backup", "com.miui.cloudbackup"));
+        apps.add(new App("Mi Credit", "com.xiaomi.payment"));
+        apps.add(new App("Mi Drop", "com.xiaomi.midrop"));
+        apps.add(new App("Mi File Manager", "com.mi.android.globalFileexplorer"));
+        apps.add(new App("Mi Roaming", "com.miui.virtualsim"));
+        apps.add(new App("Mi Video", "com.miui.video"));
+        apps.add(new App("Mi Video", "com.miui.videoplayer"));
+        apps.add(new App("Mi Wallet", "com.mipay.wallet"));
+        apps.add(new App("MiuiDaemon", "com.miui.daemon"));
+        apps.add(new App("Mobile Device Information Provider", "com.amazon.appmanager"));
+        apps.add(new App("Msa", "com.miui.msa.global"));
+        apps.add(new App("Msa", "com.miui.systemAdSolution"));
+        apps.add(new App("Music", "com.miui.player"));
+        apps.add(new App("Notes", "com.miui.notes"));
+        apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi.tissot"));
+        apps.add(new App("Quick Apps", "com.miui.hybrid"));
+        apps.add(new App("Recorder", "com.android.soundrecorder"));
+        apps.add(new App("Scanner", "com.xiaomi.scanner"));
+        apps.add(new App("Screen Recorder", "com.miui.screenrecorder"));
+        apps.add(new App("Search", "com.android.quicksearchbox"));
+        apps.add(new App("Weather", "com.miui.weather2"));
+        apps.add(new App("Xiaomi Account", "com.xiaomi.vipaccount"));
+        apps.add(new App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"));
+        apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
+        apps.add(new App("YouTube", "com.google.android.youtube"));
     }
     
     public void setLabels(String serial, String codename, String bl){
@@ -291,99 +367,20 @@ public class MainWindowController implements Initializable {
         return comm.exec("adb shell getprop persist.camera.eis.enable").contains("1");
     }
     
-    @SuppressWarnings("unchecked")
 	public void createTable(){
         debloaterTableView.setItems(getApps());
-
-        checkTableColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
-        checkTableColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
-        appTableColumn.setCellValueFactory(new PropertyValueFactory<>("appname"));
-        packageTableColumn.setCellValueFactory(new PropertyValueFactory<>("packagename"));
-
-        debloaterTableView.getColumns().setAll(checkTableColumn, appTableColumn, packageTableColumn);
         debloaterTableView.refresh();
     }
     
     public ObservableList<App> getApps(){
         comm = new Command();
         String installed = comm.exec("adb shell pm list packages");
-        ObservableList<App> apps = FXCollections.observableArrayList();
-        apps.add(new App("Analytics", "com.miui.analytics"));
-        apps.add(new App("App Vault", "com.miui.personalassistant"));
-        apps.add(new App("App Vault", "com.mi.android.globalpersonalassistant"));
-        apps.add(new App("Apps (Mi App Store)", "com.xiaomi.mipicks"));
-        apps.add(new App("Browser", "com.android.browser"));
-        apps.add(new App("Calculator", "com.miui.calculator"));
-        apps.add(new App("Calendar", "com.android.calendar"));
-        apps.add(new App("Cleaner", "com.miui.cleanmaster"));
-        apps.add(new App("Clock", "com.android.deskclock"));
-        apps.add(new App("Compass", "com.miui.compass"));
-        apps.add(new App("Direct Service / Quick Apps", "com.miui.hybrid"));
-        apps.add(new App("Downloads", "com.android.providers.downloads.ui"));
-        apps.add(new App("Facebook", "com.facebook.katana"));
-        apps.add(new App("Facebook App Installer", "com.facebook.system"));
-        apps.add(new App("Facebook App Manager", "com.facebook.appmanager"));
-        apps.add(new App("Facebook Services", "com.facebook.services"));
-        apps.add(new App("Feedback", "com.miui.bugreport"));
-        apps.add(new App("File Manager", "com.android.fileexplorer"));
-        apps.add(new App("Files", "com.android.documentsui"));
-        apps.add(new App("FM Radio", "com.miui.fm"));
-        apps.add(new App("Games", "com.xiaomi.glgm"));
-        apps.add(new App("Gmail", "com.google.android.gm"));
-        apps.add(new App("Google App", "com.google.android.googlequicksearchbox"));
-        apps.add(new App("Google Assistant", "com.google.android.apps.googleassistant"));
-        apps.add(new App("Google Calculator", "com.google.android.calculator"));
-        apps.add(new App("Google Calendar", "com.google.android.calendar"));
-        apps.add(new App("Google Chrome", "com.android.chrome"));
-        apps.add(new App("Google Clock", "com.google.android.deskclock"));
-        apps.add(new App("Google Drive", "com.google.android.apps.docs"));
-        apps.add(new App("Google Duo", "com.google.android.apps.tachyon"));
-        apps.add(new App("Google Hangouts", "com.google.android.talk"));
-        apps.add(new App("Google Indic Keyboard", "com.google.android.apps.inputmethod.hindi"));
-        apps.add(new App("Google Keep", "com.google.android.keep"));
-        apps.add(new App("Google Korean Input", "com.google.android.inputmethod.korean"));
-        apps.add(new App("Google Maps", "com.google.android.apps.maps"));
-        apps.add(new App("Google Photos", "com.google.android.apps.photos"));
-        apps.add(new App("Google Pinyin Input", "com.google.android.inputmethod.pinyin"));
-        apps.add(new App("Google Play Books", "com.google.android.apps.books"));
-        apps.add(new App("Google Play Games", "com.google.android.play.games"));
-        apps.add(new App("Google Play Movies", "com.google.android.videos"));
-        apps.add(new App("Google Play Music", "com.google.android.music"));
-        apps.add(new App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"));
-        apps.add(new App("KLO Bugreport", "com.miui.klo.bugreport"));
-        apps.add(new App("Mab", "com.xiaomi.ab"));
-        apps.add(new App("Mail", "com.android.email"));
-        apps.add(new App("Mi AI", "com.miui.voiceassist"));
-        apps.add(new App("Mi Cloud", "com.miui.cloudservice"));
-        apps.add(new App("Mi Cloud Backup", "com.miui.cloudbackup"));
-        apps.add(new App("Mi Credit", "com.xiaomi.payment"));
-        apps.add(new App("Mi Drop", "com.xiaomi.midrop"));
-        apps.add(new App("Mi File Manager", "com.mi.android.globalFileexplorer"));
-        apps.add(new App("Mi Roaming", "com.miui.virtualsim"));
-        apps.add(new App("Mi Video", "com.miui.video"));
-        apps.add(new App("Mi Video", "com.miui.videoplayer"));
-        apps.add(new App("Mi Wallet", "com.mipay.wallet"));
-        apps.add(new App("MiuiDaemon", "com.miui.daemon"));
-        apps.add(new App("Mobile Device Information Provider", "com.amazon.appmanager"));
-        apps.add(new App("Msa", "com.miui.msa.global"));
-        apps.add(new App("Msa", "com.miui.systemAdSolution"));
-        apps.add(new App("Music", "com.miui.player"));
-        apps.add(new App("Notes", "com.miui.notes"));
-        apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi.tissot"));
-        apps.add(new App("Recorder", "com.android.soundrecorder"));
-        apps.add(new App("Scanner", "com.xiaomi.scanner"));
-        apps.add(new App("Screen Recorder", "com.miui.screenrecorder"));
-        apps.add(new App("Search", "com.android.quicksearchbox"));
-        apps.add(new App("Weather", "com.miui.weather2"));
-        apps.add(new App("Xiaomi Account", "com.xiaomi.vipaccount"));
-        apps.add(new App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"));
-        apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
-        apps.add(new App("YouTube", "com.google.android.youtube"));
-        for (Iterator<App> iterator = apps.iterator(); iterator.hasNext();) {
+        ObservableList<App> currapps = FXCollections.observableArrayList(apps);
+        for (Iterator<App> iterator = currapps.iterator(); iterator.hasNext();) {
             if (!installed.contains(iterator.next().packagenameProperty().get() + System.lineSeparator()))
                 iterator.remove();
         }
-        return apps;
+        return currapps;
     }
     
     @FXML
@@ -608,7 +605,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void uninstallButtonPressed(ActionEvent event) {
         if (checkADB()){
-            progressBar.setProgress(-1);
             Thread t = new Thread(() -> {
                 Uninstaller comm = new Uninstaller(outputTextArea);
                 for (App app : debloaterTableView.getItems()) {
@@ -618,7 +614,6 @@ public class MainWindowController implements Initializable {
                 }
                 Platform.runLater(() -> {
                     createTable();
-                    progressBar.setProgress(0);
                 });
             });
             t.start();
@@ -628,7 +623,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void addButtonPressed(ActionEvent event) {
         if (customappTextField.getText() != null && customappTextField.getText().trim().length() > 1)
-            debloaterTableView.getItems().add(new App(customappTextField.getText().trim(), customappTextField.getText().trim()));
+            debloaterTableView.getItems().add(new App("Custom app", customappTextField.getText().trim()));
         customappTextField.setText(null);
         debloaterTableView.refresh();
     }
@@ -639,7 +634,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.0.4" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.1.0" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	

@@ -30,10 +30,5 @@ public class Uninstaller extends Command {
         tic.appendText("Package: " + app.packagenameProperty().get() + System.lineSeparator());
         tic.appendText("Result: " + output + System.lineSeparator());
         scan.close();
-        try {
-            proc.waitFor();
-        } catch (InterruptedException ex) {
-        	ex.getMessage();
-        }
     }
 }

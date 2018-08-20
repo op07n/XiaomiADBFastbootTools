@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -105,9 +104,6 @@
                   <TitledPane animated="false" collapsible="false" prefHeight="475.0" prefWidth="350.0" text="Status">
                      <content>
                         <BorderPane>
-                           <top>
-                              <ProgressBar fx:id="progressBar" prefWidth="330.0" progress="0.0" BorderPane.alignment="TOP_CENTER" />
-                           </top>
                            <center>
                               <TextArea fx:id="outputTextArea" editable="false" />
                            </center>
