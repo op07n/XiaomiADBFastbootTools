@@ -1,4 +1,4 @@
-package xiaomiadbfastboottools;
+package tools;
 
 import javafx.beans.property.*;
 
