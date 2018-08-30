@@ -85,7 +85,7 @@ public class XiaomiADBFastbootTools extends Application {
         Command comm = new Command();
         comm.exec("adb kill-server");
         try {
-            Thread.sleep(500);
+            Thread.sleep(250);
         } catch (InterruptedException ex) {
         	ex.getMessage();
         }
