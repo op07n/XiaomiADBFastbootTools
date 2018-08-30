@@ -41,8 +41,6 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.StageStyle;
 
-import org.apache.commons.io.IOUtils;
-
 public class MainWindowController implements Initializable {
     
     @FXML
@@ -128,9 +126,45 @@ public class MainWindowController implements Initializable {
     Command comm;
     ObservableList<App> apps;
     
+    public void setLabels(String serial, String codename, String bl){
+        serialLabel.setText(serial);
+        codenameLabel.setText(codename);
+        bootloaderLabel.setText(bl);
+    }
+    
+    public void setADB(boolean adb){
+        adbTab.setDisable(!adb);
+        recoveryMenuItem.setDisable(!adb);
+        if (adb){
+            outputTextArea.setText("Device found!");
+            rebootMenu.setDisable(false);
+            fastbootTab.setDisable(true);
+        } else {
+            rebootMenu.setDisable(true);
+            outputTextArea.setText("No device found!");
+            setLabels("-", "-", "-");
+        }
+    }
+    
+    public void setFastboot(boolean fastboot){
+        recoveryMenuItem.setDisable(fastboot);
+        fastbootTab.setDisable(!fastboot);
+        if (fastboot){
+            outputTextArea.setText("Device found!");
+            rebootMenu.setDisable(false);
+            adbTab.setDisable(true);
+        } else {
+            rebootMenu.setDisable(true);
+            outputTextArea.setText("No device found!");
+            setLabels("-", "-", "-");
+        }
+    }
+    
+
     @SuppressWarnings("unchecked")
-	public void setupWidgets(){
-        serialLabel.setText("-");
+	@Override
+    public void initialize(URL url, ResourceBundle rb) {
+    	serialLabel.setText("-");
         codenameLabel.setText("-");
         bootloaderLabel.setText("-");
         partitionComboBox.getItems().addAll(
@@ -213,93 +247,6 @@ public class MainWindowController implements Initializable {
         apps.add(new App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"));
         apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
         apps.add(new App("YouTube", "com.google.android.youtube"));
-    }
-    
-    public void setLabels(String serial, String codename, String bl){
-        serialLabel.setText(serial);
-        codenameLabel.setText(codename);
-        bootloaderLabel.setText(bl);
-    }
-    
-    public void setADB(boolean adb){
-        adbTab.setDisable(!adb);
-        recoveryMenuItem.setDisable(!adb);
-        if (adb){
-            outputTextArea.setText("Device found!");
-            rebootMenu.setDisable(false);
-            fastbootTab.setDisable(true);
-        } else {
-            rebootMenu.setDisable(true);
-            outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-");
-        }
-    }
-    
-    public void setFastboot(boolean fastboot){
-        recoveryMenuItem.setDisable(fastboot);
-        fastbootTab.setDisable(!fastboot);
-        if (fastboot){
-            outputTextArea.setText("Device found!");
-            rebootMenu.setDisable(false);
-            adbTab.setDisable(true);
-        } else {
-            rebootMenu.setDisable(true);
-            outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-");
-        }
-    }
-    
-    public void createFile(String file, boolean exec){
-        File temp = new File(System.getProperty("user.dir") + "/temp");
-        temp.mkdir();
-        byte[] bytes = null;
-        try {
-            bytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream(file));
-        } catch (IOException ex) {
-        	ex.getMessage();
-        }
-        if (file.lastIndexOf("/") != -1)
-            file = file.substring(file.lastIndexOf("/")+1);
-        File newfile = new File(System.getProperty("user.dir") + "/temp/" + file);
-        if (!newfile.exists()) {
-            try {
-            	newfile.createNewFile();
-                FileOutputStream fos = new FileOutputStream(newfile);
-                fos.write(bytes);
-                fos.flush();
-                fos.close();
-            } catch (IOException ex) {
-            	ex.getMessage();
-            }
-	  }
-        newfile.setExecutable(exec, false);
-    }
-    
-    public void setupFiles(){
-        String os = System.getProperty("os.name").toLowerCase();
-        createFile("dummy.img", false);
-        if (os.contains("win")){
-            createFile("windows/adb.exe", true);
-            createFile("windows/fastboot.exe", true);
-            createFile("windows/AdbWinApi.dll", false);
-            createFile("windows/AdbWinUsbApi.dll", false);
-        }
-        if (os.contains("mac")){
-            createFile("macos/adb", true);
-            createFile("macos/fastboot", true);
-        }
-        if (os.contains("linux")){
-            createFile("linux/adb", true);
-            createFile("linux/fastboot", true);
-        }
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        setupWidgets();
-        setupFiles();
-        comm = new Command();
-        comm.exec("adb start-server");
     }
     
     public boolean checkFastboot(){
@@ -634,7 +581,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.1.0" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.1.1" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	
