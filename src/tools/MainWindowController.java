@@ -1,35 +1,17 @@
 package tools;
 
-import java.io.File;
-import java.io.IOException;
-import java.awt.Desktop;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -38,8 +20,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.StageStyle;
+import org.apache.commons.io.FileUtils;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
     
@@ -67,6 +60,8 @@ public class MainWindowController implements Initializable {
     private Label bootloaderLabel;
     @FXML
     private TextArea outputTextArea;
+    @FXML
+    private ProgressBar progressBar;
     @FXML
     private TableView<App> debloaterTableView;
     @FXML
@@ -100,13 +95,21 @@ public class MainWindowController implements Initializable {
     @FXML
     private Button browseimageButton;
     @FXML
+    private Button browseromButton;
+    @FXML
     private ComboBox<String> partitionComboBox;
     @FXML
-    private Button flashButton;
+    private ComboBox<String> scriptComboBox;
+    @FXML
+    private Button flashimageButton;
+    @FXML
+    private Button flashromButton;
     @FXML
     private CheckBox autobootCheckBox;
     @FXML
     private Label imageLabel;
+    @FXML
+    private Label romLabel;
     @FXML
     private Button bootButton;
     @FXML
@@ -123,8 +126,10 @@ public class MainWindowController implements Initializable {
     private Tab fastbootTab;
     
     File image;
+    File rom;
     Command comm;
-    ObservableList<App> apps;
+    Command displayedcomm;
+    Uninstaller uninstaller;
     
     public void setLabels(String serial, String codename, String bl){
         serialLabel.setText(serial);
@@ -168,8 +173,13 @@ public class MainWindowController implements Initializable {
         codenameLabel.setText("-");
         bootloaderLabel.setText("-");
         partitionComboBox.getItems().addAll(
-        "boot","cust","modem","persist","recovery","system");
+        		"boot","cust","modem","persist","recovery","system");
+        scriptComboBox.getItems().addAll(
+        		"Clean install", "Clean install and lock", "Update");
+        comm = new Command();
+        displayedcomm = new Command(outputTextArea);
         image = null;
+        rom = null;
         
         checkTableColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
         checkTableColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
@@ -177,80 +187,10 @@ public class MainWindowController implements Initializable {
         packageTableColumn.setCellValueFactory(new PropertyValueFactory<>("packagename"));
         debloaterTableView.getColumns().setAll(checkTableColumn, appTableColumn, packageTableColumn);
         
-        apps = FXCollections.observableArrayList();
-        apps.add(new App("Analytics", "com.miui.analytics"));
-        apps.add(new App("App Vault", "com.miui.personalassistant"));
-        apps.add(new App("App Vault", "com.mi.android.globalpersonalassistant"));
-        apps.add(new App("Browser", "com.android.browser"));
-        apps.add(new App("Calculator", "com.miui.calculator"));
-        apps.add(new App("Calendar", "com.android.calendar"));
-        apps.add(new App("Cleaner", "com.miui.cleanmaster"));
-        apps.add(new App("Clock", "com.android.deskclock"));
-        apps.add(new App("Compass", "com.miui.compass"));
-        apps.add(new App("Downloads", "com.android.providers.downloads.ui"));
-        apps.add(new App("Facebook", "com.facebook.katana"));
-        apps.add(new App("Facebook App Installer", "com.facebook.system"));
-        apps.add(new App("Facebook App Manager", "com.facebook.appmanager"));
-        apps.add(new App("Facebook Services", "com.facebook.services"));
-        apps.add(new App("Feedback", "com.miui.bugreport"));
-        apps.add(new App("FM Radio", "com.miui.fm"));
-        apps.add(new App("Games", "com.xiaomi.glgm"));
-        apps.add(new App("Gmail", "com.google.android.gm"));
-        apps.add(new App("Google App", "com.google.android.googlequicksearchbox"));
-        apps.add(new App("Google Assistant", "com.google.android.apps.googleassistant"));
-        apps.add(new App("Google Calculator", "com.google.android.calculator"));
-        apps.add(new App("Google Calendar", "com.google.android.calendar"));
-        apps.add(new App("Google Chrome", "com.android.chrome"));
-        apps.add(new App("Google Clock", "com.google.android.deskclock"));
-        apps.add(new App("Google Drive", "com.google.android.apps.docs"));
-        apps.add(new App("Google Duo", "com.google.android.apps.tachyon"));
-        apps.add(new App("Google Hangouts", "com.google.android.talk"));
-        apps.add(new App("Google Indic Keyboard", "com.google.android.apps.inputmethod.hindi"));
-        apps.add(new App("Google Keep", "com.google.android.keep"));
-        apps.add(new App("Google Korean Input", "com.google.android.inputmethod.korean"));
-        apps.add(new App("Google Maps", "com.google.android.apps.maps"));
-        apps.add(new App("Google Photos", "com.google.android.apps.photos"));
-        apps.add(new App("Google Pinyin Input", "com.google.android.inputmethod.pinyin"));
-        apps.add(new App("Google Play Books", "com.google.android.apps.books"));
-        apps.add(new App("Google Play Games", "com.google.android.play.games"));
-        apps.add(new App("Google Play Movies", "com.google.android.videos"));
-        apps.add(new App("Google Play Music", "com.google.android.music"));
-        apps.add(new App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"));
-        apps.add(new App("KLO Bugreport", "com.miui.klo.bugreport"));
-        apps.add(new App("Mab", "com.xiaomi.ab"));
-        apps.add(new App("Mail", "com.android.email"));
-        apps.add(new App("Mi AI", "com.miui.voiceassist"));
-        apps.add(new App("Mi App Store", "com.xiaomi.mipicks"));
-        apps.add(new App("Mi Cloud", "com.miui.cloudservice"));
-        apps.add(new App("Mi Cloud Backup", "com.miui.cloudbackup"));
-        apps.add(new App("Mi Credit", "com.xiaomi.payment"));
-        apps.add(new App("Mi Drop", "com.xiaomi.midrop"));
-        apps.add(new App("Mi File Manager", "com.mi.android.globalFileexplorer"));
-        apps.add(new App("Mi Roaming", "com.miui.virtualsim"));
-        apps.add(new App("Mi Video", "com.miui.video"));
-        apps.add(new App("Mi Video", "com.miui.videoplayer"));
-        apps.add(new App("Mi Wallet", "com.mipay.wallet"));
-        apps.add(new App("MiuiDaemon", "com.miui.daemon"));
-        apps.add(new App("Mobile Device Information Provider", "com.amazon.appmanager"));
-        apps.add(new App("Msa", "com.miui.msa.global"));
-        apps.add(new App("Msa", "com.miui.systemAdSolution"));
-        apps.add(new App("Music", "com.miui.player"));
-        apps.add(new App("Notes", "com.miui.notes"));
-        apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi.tissot"));
-        apps.add(new App("Quick Apps", "com.miui.hybrid"));
-        apps.add(new App("Recorder", "com.android.soundrecorder"));
-        apps.add(new App("Scanner", "com.xiaomi.scanner"));
-        apps.add(new App("Screen Recorder", "com.miui.screenrecorder"));
-        apps.add(new App("Search", "com.android.quicksearchbox"));
-        apps.add(new App("Weather", "com.miui.weather2"));
-        apps.add(new App("Xiaomi Account", "com.xiaomi.vipaccount"));
-        apps.add(new App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"));
-        apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
-        apps.add(new App("YouTube", "com.google.android.youtube"));
+        uninstaller = new Uninstaller(debloaterTableView, progressBar, outputTextArea);
     }
     
     public boolean checkFastboot(){
-        comm = new Command();
         String op = comm.exec("fastboot devices", false);
         if (op.length() < 1) {
             setFastboot(false);
@@ -270,7 +210,6 @@ public class MainWindowController implements Initializable {
     }
     
     public boolean checkADB(){
-        comm = new Command();
         String op = comm.exec("adb get-serialno", true);
         if (op.contains("no devices")) {
             setADB(false);
@@ -282,7 +221,7 @@ public class MainWindowController implements Initializable {
             return false;
         }
         setADB(true);
-        setLabels(comm.exec("adb get-serialno", false).trim(), comm.exec("adb shell getprop ro.product.name", false).trim(), "-");
+        setLabels(comm.exec("adb get-serialno", false).trim(), comm.exec("adb shell getprop ro.build.product", false).trim(), "-");
         op = comm.exec("adb shell getprop ro.boot.flash.locked", false);
         if (op.contains("0")) {
             bootloaderLabel.setText("unlocked");
@@ -296,7 +235,7 @@ public class MainWindowController implements Initializable {
     public boolean checkDevice(){
         if (!checkFastboot()){
             if(checkADB()){
-                createTable();
+                uninstaller.createTable();
                 return true;
             }
             return false;
@@ -305,29 +244,11 @@ public class MainWindowController implements Initializable {
     }
     
     public boolean checkcamera2(){
-        comm = new Command();
         return comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1");
     }
     
     public boolean checkEIS(){
-        comm = new Command();
         return comm.exec("adb shell getprop persist.camera.eis.enable").contains("1");
-    }
-    
-	public void createTable(){
-        debloaterTableView.setItems(getApps());
-        debloaterTableView.refresh();
-    }
-    
-    public ObservableList<App> getApps(){
-        comm = new Command();
-        String installed = comm.exec("adb shell pm list packages");
-        ObservableList<App> currapps = FXCollections.observableArrayList(apps);
-        for (Iterator<App> iterator = currapps.iterator(); iterator.hasNext();) {
-            if (!installed.contains(iterator.next().packagenameProperty().get() + System.lineSeparator()))
-                iterator.remove();
-        }
-        return currapps;
     }
     
     @FXML
@@ -338,12 +259,10 @@ public class MainWindowController implements Initializable {
     @FXML
     private void reboottwrpButtonPressed(ActionEvent event) {
         if (checkADB()){
-            comm = new Command();
             if (comm.exec("adb devices").contains("recovery")){
                 outputTextArea.setText("Device already in recovery mode!");
             } else {
-                comm = new Command(outputTextArea);
-                comm.exec("adb reboot recovery");
+                displayedcomm.exec("adb reboot recovery");
             }
         }
     }
@@ -351,7 +270,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void disableButtonPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command();
             if (!comm.exec("adb devices").contains("recovery")){
                 outputTextArea.setText("ERROR: No device found in recovery mode!");
                 return;
@@ -366,7 +284,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void enableButtonPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command();
             if (!comm.exec("adb devices").contains("recovery")){
                 outputTextArea.setText("ERROR: No device found in recovery mode!");
                 return;
@@ -381,7 +298,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void disableEISButtonPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command();
             if (!comm.exec("adb devices").contains("recovery")){
                 outputTextArea.setText("ERROR: No device found in recovery mode!");
                 return;
@@ -396,7 +312,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void enableEISButtonPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command();
             if (!comm.exec("adb devices").contains("recovery")){
                 outputTextArea.setText("ERROR: No device found in recovery mode!");
                 return;
@@ -411,8 +326,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void readpropertiesButtonPressed(ActionEvent event) {
         if (checkADB()){
-            comm = new Command(outputTextArea);
-            comm.exec("adb shell getprop");
+            displayedcomm.exec("adb shell getprop");
         }
     }
 
@@ -425,14 +339,13 @@ public class MainWindowController implements Initializable {
         File f = fc.showSaveDialog(((Node)event.getSource()).getScene().getWindow());
         if (f != null){
             FileWriter fw = null;
-            comm = new Command();
             try {
                 fw = new FileWriter(f);
                 fw.write(comm.exec("adb shell getprop"));
                 fw.flush();
                 fw.close();
             } catch (IOException ex) {
-            	ex.getMessage();
+            	ex.printStackTrace();
             }
         }
     }
@@ -440,8 +353,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void antirbButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot flash antirbpass dummy.img");
+            displayedcomm.exec("fastboot flash antirbpass dummy.img");
         }
     }
 
@@ -453,126 +365,144 @@ public class MainWindowController implements Initializable {
         fc.setTitle("Select an image");
         image = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
         if (image != null) {
-            imageLabel.setText(image.getAbsolutePath().substring(image.getAbsolutePath().lastIndexOf(File.separator)+1));
+        	imageLabel.setText(image.getName());
         }
     }
 
     @FXML
-    private void flashButtonPressed(ActionEvent event) {
+    private void flashimageButtonPressed(ActionEvent event) {
         if (image != null && image.getAbsolutePath().length() > 1 && partitionComboBox.getValue() != null && partitionComboBox.getValue().trim().length() > 0 && checkFastboot()) {
-            comm = new Command(outputTextArea);
             if (autobootCheckBox.isSelected() && partitionComboBox.getValue().trim() == "recovery") {
-            	comm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim(), "fastboot boot");
+            	displayedcomm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim(), "fastboot boot");
             }
-            	else comm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim());
+            	else displayedcomm.exec(image, "fastboot flash " + partitionComboBox.getValue().trim());
+        }
+    }
+    
+    @FXML
+    private void browseromButtonPressed(ActionEvent event) {
+    	DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Select the root directory of a Fastboot ROM");
+        rom = dc.showDialog(((Node) event.getSource()).getScene().getWindow());
+        outputTextArea.setText("");
+        if (rom != null) {
+        	if (new File(rom, "images").exists()) {
+        		romLabel.setText(rom.getName());
+        		outputTextArea.setText("Fastboot ROM found!");
+        		try {
+					if (System.getProperty("os.name").toLowerCase().contains("win")) {
+						FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/fastboot.exe"), rom);
+						FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/AdbWinApi.dll"), rom);
+						FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/AdbWinUsbApi.dll"), rom);
+					}
+	                else FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/fastboot"), rom);
+					new File(rom, "flash_all.sh").setExecutable(true, false);
+					new File(rom, "flash_all_lock.sh").setExecutable(true, false);
+					new File(rom, "flash_all_except_storage.sh").setExecutable(true, false);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+        	} else {
+              	outputTextArea.setText("ERROR: Fastboot ROM not found!");
+            	rom = null;
+            };
+        }
+    }
+
+    @FXML
+    private void flashromButtonPressed(ActionEvent event) {
+    	if (rom != null && scriptComboBox.getValue() != null && checkFastboot()) {
+    		FastbootFlasher fs = new FastbootFlasher(progressBar, outputTextArea, rom);
+    		progressBar.setProgress(-1);
+    		if (scriptComboBox.getValue().equals("Clean install")) fs.exec("flash_all");
+    		if (scriptComboBox.getValue().equals("Clean install and lock")) fs.exec("flash_all_lock");
+    		if (scriptComboBox.getValue().equals("Update")) fs.exec("flash_all_except_storage");
         }
     }
 
     @FXML
     private void bootButtonPressed(ActionEvent event) {
         if (image != null && image.getAbsolutePath().length() > 1 && checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec(image, "fastboot boot");
+            displayedcomm.exec(image, "fastboot boot");
         }
     }
 
     @FXML
     private void cacheButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot erase cache");
+            displayedcomm.exec("fastboot erase cache");
         }
     }
 
     @FXML
     private void cachedataButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot erase cache", "fastboot erase userdata");
+            displayedcomm.exec("fastboot erase cache", "fastboot erase userdata");
         }
     }
 
     @FXML
     private void lockButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot oem lock");
+            displayedcomm.exec("fastboot oem lock");
         }
     }
 
     @FXML
     private void unlockButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot oem unlock");
+            displayedcomm.exec("fastboot oem unlock");
         }
     }
     
     @FXML
     private void systemMenuItemPressed(ActionEvent event) {
         if (checkADB()){
-            comm = new Command(outputTextArea);
-            comm.exec("adb reboot");
+            displayedcomm.exec("adb reboot");
         } else if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot reboot");
+            displayedcomm.exec("fastboot reboot");
         }
     }
 
     @FXML
     private void recoveryMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command(outputTextArea);
-            comm.exec("adb reboot recovery");
+            displayedcomm.exec("adb reboot recovery");
         }
     }
 
     @FXML
     private void fastbootMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command(outputTextArea);
-            comm.exec("adb reboot bootloader");
+            displayedcomm.exec("adb reboot bootloader");
         } else if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot reboot bootloader");
+            displayedcomm.exec("fastboot reboot bootloader");
         }
     }
 
     @FXML
     private void edlMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            comm = new Command(outputTextArea);
-            comm.exec("adb reboot edl");
+            displayedcomm.exec("adb reboot edl");
         } else if (checkFastboot()) {
-            comm = new Command(outputTextArea);
-            comm.exec("fastboot oem edl");
+            displayedcomm.exec("fastboot oem edl");
         }
     }
     
     @FXML
     private void uninstallButtonPressed(ActionEvent event) {
         if (checkADB()){
-            Thread t = new Thread(() -> {
-                Uninstaller comm = new Uninstaller(outputTextArea);
-                for (App app : debloaterTableView.getItems()) {
-                    if (app.selectedProperty().get()) {
-                        comm.uninstall(app);
-                    }
-                }
-                Platform.runLater(() -> {
-                    createTable();
-                });
-            });
-            t.start();
+        	progressBar.setProgress(0);
+        	uninstaller.uninstall();
         }
     }
 
     @FXML
     private void addButtonPressed(ActionEvent event) {
         if (customappTextField.getText() != null && customappTextField.getText().trim().length() > 1)
-            debloaterTableView.getItems().add(new App("Custom app", customappTextField.getText().trim()));
+        	uninstaller.tv.getItems().add(new App("Custom app", customappTextField.getText().trim()));
         customappTextField.setText(null);
-        debloaterTableView.refresh();
+        uninstaller.tv.refresh();
     }
     
     @FXML
@@ -581,7 +511,7 @@ public class MainWindowController implements Initializable {
     	alert.initStyle(StageStyle.UTILITY);
     	alert.setTitle("About");
     	alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 3.1.1" + System.lineSeparator() + "Created by Saki_EU");
+    	alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.0.0" + System.lineSeparator() + "Created by Saki_EU");
     	VBox vb = new VBox();
     	vb.setAlignment(Pos.CENTER);
     	
@@ -592,7 +522,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://www.reddit.com/r/Xiaomi"));
 				} catch (IOException | URISyntaxException e1) {
-					e1.getMessage();
+					e1.printStackTrace();
 				}
     	    }
     	});
@@ -604,7 +534,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://discord.gg/xiaomi"));
 				} catch (IOException | URISyntaxException e1) {
-					e1.getMessage();
+					e1.printStackTrace();
 				}
     	    }
     	});
@@ -616,7 +546,7 @@ public class MainWindowController implements Initializable {
     	    	try {
 					Desktop.getDesktop().browse(new URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"));
 				} catch (IOException | URISyntaxException e1) {
-					e1.getMessage();
+					e1.printStackTrace();
 				}
     	    }
     	});

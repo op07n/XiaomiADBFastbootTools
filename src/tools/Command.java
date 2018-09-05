@@ -20,21 +20,21 @@ public class Command {
     
     public Command(){
         pb = new ProcessBuilder();
-        pb.directory(new File(System.getProperty("user.dir") + "/temp"));
+        pb.directory(new File(System.getProperty("user.home") + "/temp"));
         comm = null;
         tic = null;
         if (System.getProperty("os.name").toLowerCase().contains("win"))
-        	prefix = "temp/";
+        	prefix = System.getProperty("user.home") + "/temp/";
         else prefix = "./";
     }
     
     public Command(TextInputControl control){
         pb = new ProcessBuilder();
-        pb.directory(new File(System.getProperty("user.dir") + "/temp"));
+        pb.directory(new File(System.getProperty("user.home") + "/temp"));
         comm = null;
         tic = control;
         if (System.getProperty("os.name").toLowerCase().contains("win"))
-        	prefix = "temp/";
+        	prefix = System.getProperty("user.home") + "/temp/";
         else prefix = "./";
     }
     
@@ -47,7 +47,7 @@ public class Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-        	ex.getMessage();
+        	ex.printStackTrace();
         }
         scan = new Scanner(proc.getInputStream());
         String line;
@@ -73,7 +73,7 @@ public class Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-        	ex.getMessage();
+        	ex.printStackTrace();
         }
         scan = new Scanner(proc.getInputStream());
         String line;
@@ -96,7 +96,7 @@ public class Command {
         try {
             proc = pb.start();
         } catch (IOException ex) {
-        	ex.getMessage();
+        	ex.printStackTrace();
         }
         if (err)
             scan = new Scanner(proc.getErrorStream());
@@ -124,7 +124,7 @@ public class Command {
             try {
                 proc = pb.start();
             } catch (IOException ex) {
-            	ex.getMessage();
+            	ex.printStackTrace();
             }
             scan = new Scanner(proc.getInputStream());
             String line;
@@ -138,7 +138,7 @@ public class Command {
             try {
                 proc.waitFor();
             } catch (InterruptedException ex) {
-            	ex.getMessage();
+            	ex.printStackTrace();
             }
         }
         return output;
@@ -157,7 +157,7 @@ public class Command {
             try {
                 proc = pb.start();
             } catch (IOException ex) {
-            	ex.getMessage();
+            	ex.printStackTrace();
             }
             scan = new Scanner(proc.getInputStream());
             String line;
@@ -171,7 +171,7 @@ public class Command {
             try {
                 proc.waitFor();
             } catch (InterruptedException ex) {
-            	ex.getMessage();
+            	ex.printStackTrace();
             }
         }
         return output;
@@ -181,7 +181,7 @@ public class Command {
         try {
             proc.waitFor();
         } catch (InterruptedException ex) {
-            ex.getMessage();
+            ex.printStackTrace();
         }
     }
     
