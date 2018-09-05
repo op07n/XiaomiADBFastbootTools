@@ -5,7 +5,7 @@
 * **Debloater** \- Remove pre-installed apps and services on demand
 * **Camera2 & EIS Enabler** \- Enable camera2 and EIS (TWRP required)
 * **Read device properties** \- Retrieve tons of statistics and information about your phone
-* **Flasher** \- Flash any partition with an image or boot to any image (unlocked bootloader required)
+* **Flasher** \- Flash any partition with an image, boot to any image or flash a complete ROM package (unlocked bootloader required)
 * **Wiper** \- Wipe the cache or perform a factory reset
 * **OEM Unlocker & Locker** \- Lock or unlock the bootloader \(Unlocking is supported by the Android One phones only\)
 * **Rebooter** \- Advanced rebooting options using ADB/Fastboot
@@ -40,4 +40,4 @@ Download the executable JAR and the instructions from [here](https://github.com/
 
 **Q:** Does this replace MiFlash or MiUnlock?
 
-* **A:** No. Implementing their functionality in such a simple tool would only make it unnecessarily complex.
+* **A:** No. Fastboot ROM flashing is available, but implementing other features in such a simple tool would only make it unnecessarily complex.
