@@ -1,9 +1,6 @@
 package tools;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Scanner;
 
 import javafx.application.Platform;
@@ -11,47 +8,62 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextInputControl;
 
 public class FastbootFlasher {
-	
-	ProcessBuilder pb;
+
+    ProcessBuilder pb;
     Process proc;
     TextInputControl tic;
-    String prefix;
     Scanner scan;
+    File directory;
     Thread t;
     ProgressBar progress;
-    
-    public FastbootFlasher(ProgressBar prog, TextInputControl control, File dir){
+
+    public FastbootFlasher(ProgressBar prog, TextInputControl control, File dir) {
         pb = new ProcessBuilder();
+        directory = dir;
         pb.directory(dir);
         tic = control;
         progress = prog;
         pb.redirectErrorStream(true);
     }
-    
-    public void exec(String arg){
-    	tic.setText("");
+
+    private int getCmdCount(File file) {
+        try {
+            scan = new Scanner(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        int cnt = 0;
+        while (scan.hasNext())
+            if (scan.nextLine().contains("fastboot"))
+                cnt++;
+        scan.close();
+        return cnt;
+    }
+
+    public void exec(String arg) {
+        tic.setText("");
         if (System.getProperty("os.name").toLowerCase().contains("win"))
-        	pb.command("cmd.exe", "/c", arg + ".bat");
+            pb.command("cmd.exe", "/c", arg + ".bat");
         else pb.command("sh", "-c", "./" + arg + ".sh");
+        int n = getCmdCount(new File(directory, pb.command().get(pb.command().size() - 1)));
         try {
             proc = pb.start();
         } catch (IOException ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
         }
-        BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        scan = new Scanner(proc.getInputStream());
         t = new Thread(() -> {
-            while(true){
-                try {
-                    final int c = br.read();
-                    if (c == -1)
-                        break;
-                    Platform.runLater(() -> {
-                        tic.appendText("" + (char)c);
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            while (scan.hasNext()) {
+                String line = scan.nextLine() + System.lineSeparator();
+                if (line.contains("pause"))
+                    break;
+                Platform.runLater(() -> {
+                    tic.appendText(line);
+                    if (line.contains("fastboot"))
+                        progress.setProgress(progress.getProgress() + (1.0 / n));
+                });
             }
+            scan.close();
             Platform.runLater(() -> {
                 tic.appendText(System.lineSeparator() + "Done!");
                 progress.setProgress(0);
@@ -60,8 +72,8 @@ public class FastbootFlasher {
         t.setDaemon(true);
         t.start();
     }
-    
-    public void waitFor(){
+
+    public void waitFor() {
         try {
             proc.waitFor();
         } catch (InterruptedException ex) {

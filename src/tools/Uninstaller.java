@@ -15,20 +15,20 @@ import javafx.scene.control.TextInputControl;
 
 
 public class Uninstaller extends Command {
-	
-	Thread t;
-	TableView<App> tv;
-	ProgressBar progress;
-	ObservableList<App> apps;
-	int n;
-    
-    public Uninstaller(TableView<App> table, ProgressBar progress, TextInputControl control){
+
+    Thread t;
+    TableView<App> tv;
+    ProgressBar progress;
+    ObservableList<App> apps;
+    int n;
+
+    public Uninstaller(TableView<App> table, ProgressBar progress, TextInputControl control) {
         super(control);
         this.progress = progress;
         tv = table;
         pb.redirectErrorStream(false);
-    	
-    	apps = FXCollections.observableArrayList();
+
+        apps = FXCollections.observableArrayList();
         apps.add(new App("Analytics", "com.miui.analytics"));
         apps.add(new App("App Vault", "com.miui.personalassistant"));
         apps.add(new App("App Vault", "com.mi.android.globalpersonalassistant"));
@@ -100,11 +100,11 @@ public class Uninstaller extends Command {
         apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
         apps.add(new App("YouTube", "com.google.android.youtube"));
     }
-    
-    public void createTable(){
+
+    public void createTable() {
         String installed = new Command().exec("adb shell pm list packages");
         ObservableList<App> currapps = FXCollections.observableArrayList(apps);
-        for (Iterator<App> iterator = currapps.iterator(); iterator.hasNext();) {
+        for (Iterator<App> iterator = currapps.iterator(); iterator.hasNext(); ) {
             if (!installed.contains(iterator.next().packagenameProperty().get() + System.lineSeparator()))
                 iterator.remove();
         }
@@ -113,15 +113,15 @@ public class Uninstaller extends Command {
     }
 
     public void uninstall() {
-    	tic.setText("");
-    	ObservableList<App> undesirable = FXCollections.observableArrayList();
-    	for (App app : tv.getItems()){
+        tic.setText("");
+        ObservableList<App> undesirable = FXCollections.observableArrayList();
+        for (App app : tv.getItems()) {
             if (app.selectedProperty().get())
                 undesirable.add(app);
         }
         n = undesirable.size();
-    	t = new Thread(() -> {
-            for (App app : undesirable){
+        t = new Thread(() -> {
+            for (App app : undesirable) {
                 pb.command(Arrays.asList((prefix + "adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ")));
                 try {
                     proc = pb.start();
@@ -138,7 +138,7 @@ public class Uninstaller extends Command {
                     tic.appendText("App: " + app.appnameProperty().get() + System.lineSeparator());
                     tic.appendText("Package: " + app.packagenameProperty().get() + System.lineSeparator());
                     tic.appendText("Result: " + finalline + System.lineSeparator());
-                    progress.setProgress(progress.getProgress() + (1.0/n));
+                    progress.setProgress(progress.getProgress() + (1.0 / n));
                 });
             }
             Platform.runLater(() -> {
@@ -147,7 +147,7 @@ public class Uninstaller extends Command {
                 createTable();
             });
         });
-    	t.setDaemon(true);
-    	t.start();
+        t.setDaemon(true);
+        t.start();
     }
 }

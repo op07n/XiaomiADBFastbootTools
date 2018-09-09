@@ -13,14 +13,16 @@ public class App {
         packagename.set(b);
         selected.set(false);
     }
-    
-    public StringProperty appnameProperty(){
+
+    public StringProperty appnameProperty() {
         return appname;
     }
-    public StringProperty packagenameProperty(){
+
+    public StringProperty packagenameProperty() {
         return packagename;
     }
-    public BooleanProperty selectedProperty(){
+
+    public BooleanProperty selectedProperty() {
         return selected;
     }
 }
