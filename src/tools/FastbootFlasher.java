@@ -20,7 +20,7 @@ public class FastbootFlasher {
     public FastbootFlasher(ProgressBar prog, TextInputControl control, File dir) {
         pb = new ProcessBuilder();
         directory = dir;
-        pb.directory(dir);
+        pb.directory(new File(System.getProperty("user.home") + "/temp"));
         tic = control;
         progress = prog;
         pb.redirectErrorStream(true);
@@ -42,10 +42,15 @@ public class FastbootFlasher {
 
     public void exec(String arg) {
         tic.setText("");
-        if (System.getProperty("os.name").toLowerCase().contains("win"))
-            pb.command("cmd.exe", "/c", arg + ".bat");
-        else pb.command("sh", "-c", "./" + arg + ".sh");
-        int n = getCmdCount(new File(directory, pb.command().get(pb.command().size() - 1)));
+        File script;
+        if (System.getProperty("os.name").toLowerCase().contains("win")){
+            script = new File(directory, arg + ".bat");
+            pb.command("cmd.exe", "/c", script.getAbsolutePath());
+        } else {
+            script = new File(directory, arg + ".sh");
+            pb.command("sh", "-c", script.getAbsolutePath());
+        };
+        int n = getCmdCount(script);
         try {
             proc = pb.start();
         } catch (IOException ex) {

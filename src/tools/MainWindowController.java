@@ -387,26 +387,15 @@ public class MainWindowController implements Initializable {
             if (new File(rom, "images").exists()) {
                 romLabel.setText(rom.getName());
                 outputTextArea.setText("Fastboot ROM found!");
-                try {
-                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                        FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/fastboot.exe"), rom);
-                        FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/AdbWinApi.dll"), rom);
-                        FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/AdbWinUsbApi.dll"), rom);
-                    } else
-                        FileUtils.copyFileToDirectory(new File(System.getProperty("user.home") + "/temp/fastboot"), rom);
-                    new File(rom, "flash_all.sh").setExecutable(true, false);
-                    new File(rom, "flash_all_lock.sh").setExecutable(true, false);
-                    if (new File(rom, "flash_all_except_storage.sh").exists())
-                        new File(rom, "flash_all_except_storage.sh").setExecutable(true, false);
-                    else new File(rom, "flash_all_except_data.sh").setExecutable(true, false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                new File(rom, "flash_all.sh").setExecutable(true, false);
+                new File(rom, "flash_all_lock.sh").setExecutable(true, false);
+                if (new File(rom, "flash_all_except_storage.sh").exists())
+                    new File(rom, "flash_all_except_storage.sh").setExecutable(true, false);
+                else new File(rom, "flash_all_except_data.sh").setExecutable(true, false);
             } else {
                 outputTextArea.setText("ERROR: Fastboot ROM not found!");
                 rom = null;
             }
-            ;
         }
     }
 
@@ -516,7 +505,7 @@ public class MainWindowController implements Initializable {
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle("About");
         alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.0.2" + System.lineSeparator() + "Created by Saki_EU");
+        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.0.3" + System.lineSeparator() + "Created by Saki_EU");
         VBox vb = new VBox();
         vb.setAlignment(Pos.CENTER);
 
