@@ -10,7 +10,7 @@
 * **OEM Unlocker & Locker** \- Lock or unlock the bootloader \(Unlocking is supported by the Android One phones only\)
 * **Rebooter** \- Advanced rebooting options using ADB/Fastboot
 
-![](screenshot.png)
+![](screenshot.PNG)
 
 **Warning: Use the tool at your own risk. Removing factory apps which aren't in the tool may break your phone.**
 
