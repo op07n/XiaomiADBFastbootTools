@@ -52,12 +52,13 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0">
                            <children>
-                              <GridPane layoutX="10.0" layoutY="10.0" prefHeight="90.0" prefWidth="357.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <GridPane layoutX="10.8" layoutY="23.8" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-7.0">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="10.0" prefWidth="130.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="263.99999237060547" minWidth="10.0" prefWidth="192.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="263.99999237060547" minWidth="10.0" prefWidth="202.0" />
                                  </columnConstraints>
                                  <rowConstraints>
+                                    <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
@@ -65,32 +66,42 @@
                                  <children>
                                     <Label text="Codename:" GridPane.rowIndex="1">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                     <Label text="Bootloader:" GridPane.rowIndex="2">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                     <Label text="Serial No.:">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                     <Label fx:id="serialLabel" text="serial" GridPane.columnIndex="1">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                     <Label fx:id="codenameLabel" text="codename" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                     <Label fx:id="bootloaderLabel" text="bl" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font size="17.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Anti version:" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font size="17.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="antiLabel" text="anti" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font size="17.0" />
                                        </font>
                                     </Label>
                                  </children>

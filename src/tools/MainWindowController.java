@@ -64,6 +64,8 @@ public class MainWindowController implements Initializable {
     @FXML
     private Label bootloaderLabel;
     @FXML
+    private Label antiLabel;
+    @FXML
     private TextArea outputTextArea;
     @FXML
     private ProgressBar progressBar;
@@ -130,10 +132,11 @@ public class MainWindowController implements Initializable {
     @FXML
     private Tab fastbootTab;
 
-    public void setLabels(String serial, String codename, String bl) {
+    public void setLabels(String serial, String codename, String bl, String anti) {
         serialLabel.setText(serial);
         codenameLabel.setText(codename);
         bootloaderLabel.setText(bl);
+        antiLabel.setText(anti);
     }
 
     public void setADB(boolean adb) {
@@ -146,7 +149,7 @@ public class MainWindowController implements Initializable {
         } else {
             rebootMenu.setDisable(true);
             outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-");
+            setLabels("-", "-", "-", "-");
         }
     }
 
@@ -160,7 +163,7 @@ public class MainWindowController implements Initializable {
         } else {
             rebootMenu.setDisable(true);
             outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-");
+            setLabels("-", "-", "-", "-");
         }
     }
 
@@ -168,9 +171,7 @@ public class MainWindowController implements Initializable {
     @SuppressWarnings("unchecked")
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        serialLabel.setText("-");
-        codenameLabel.setText("-");
-        bootloaderLabel.setText("-");
+        setLabels("-", "-", "-", "-");
         partitionComboBox.getItems().addAll(
                 "boot", "cust", "modem", "persist", "recovery", "system");
         scriptComboBox.getItems().addAll(
@@ -197,7 +198,7 @@ public class MainWindowController implements Initializable {
         }
         String codename = comm.exec("fastboot getvar product", true);
         setFastboot(true);
-        setLabels(op.substring(0, op.indexOf("fa")).trim(), codename.substring(9, codename.indexOf(System.lineSeparator())).trim(), "-");
+        setLabels(op.substring(0, op.indexOf("fa")).trim(), codename.substring(9, codename.indexOf(System.lineSeparator())).trim(), "-", "-");
         op = comm.exec("fastboot oem device-info", true);
         if (op.contains("unlocked: true")) {
             bootloaderLabel.setText("unlocked");
@@ -205,6 +206,11 @@ public class MainWindowController implements Initializable {
         if (op.contains("unlocked: false")) {
             bootloaderLabel.setText("locked");
         }
+        op = comm.exec("fastboot getvar anti", true);
+        op = op.substring(0, op.indexOf(System.lineSeparator()));
+        if (op.length() == 6)
+            antiLabel.setText("-");
+        else antiLabel.setText(op.substring(6));
         return true;
     }
 
@@ -220,7 +226,7 @@ public class MainWindowController implements Initializable {
             return false;
         }
         setADB(true);
-        setLabels(comm.exec("adb get-serialno", false).trim(), comm.exec("adb shell getprop ro.build.product", false).trim(), "-");
+        setLabels(comm.exec("adb get-serialno", false).trim(), comm.exec("adb shell getprop ro.build.product", false).trim(), "-", "unknown");
         op = comm.exec("adb shell getprop ro.boot.flash.locked", false);
         if (op.contains("0")) {
             bootloaderLabel.setText("unlocked");
@@ -505,7 +511,7 @@ public class MainWindowController implements Initializable {
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle("About");
         alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.0.3" + System.lineSeparator() + "Created by Saki_EU");
+        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.1.0" + System.lineSeparator() + "Created by Saki_EU");
         VBox vb = new VBox();
         vb.setAlignment(Pos.CENTER);
 
