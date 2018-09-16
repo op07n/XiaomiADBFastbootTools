@@ -1,6 +1,6 @@
 # Xiaomi ADB/Fastboot Tools
 
-**Features:**
+### Features
 
 * **Debloater** \- Remove pre-installed apps and services on demand
 * **Camera2 & EIS Enabler** \- Enable camera2 and EIS (TWRP required)
@@ -10,13 +10,15 @@
 * **OEM Unlocker & Locker** \- Lock or unlock the bootloader \(Unlocking is supported by the Android One phones only\)
 * **Rebooter** \- Advanced rebooting options using ADB/Fastboot
 
-[Screenshot](https://i.imgur.com/F0Pd5l0.png)
+![](screenshot.png)
 
 **Warning: Use the tool at your own risk. Removing factory apps which aren't in the tool may break your phone.**
 
-Download the executable JAR and the instructions from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
+Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
-**Frequently Asked Questions:**
+See the instructions [here](Instructions.md)
+
+### Frequently Asked Questions
 
 **Q:** The tool doesn't launch on my computer, is there anything I should have installed?
 
