@@ -12,9 +12,7 @@
 
 ![](screenshot.PNG)
 
-## Download
-
-### Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
+## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
 **Warning: Use the tools at your own risk. Removing apps which aren't listed in the tool may break your phone.**
 
