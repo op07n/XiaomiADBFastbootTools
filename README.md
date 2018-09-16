@@ -2,19 +2,19 @@
 
 ## Features
 
-* **Debloater** \- Remove pre-installed apps and services on demand
-* **Camera2 & EIS Enabler** \- Enable camera2 and EIS (TWRP required)
-* **Read device properties** \- Retrieve tons of statistics and information about your phone
-* **Flasher** \- Flash any partition with an image, boot to any image or flash a complete ROM package (unlocked bootloader required)
-* **Wiper** \- Wipe the cache or perform a factory reset
-* **OEM Unlocker & Locker** \- Lock or unlock the bootloader \(Unlocking is supported by the Android One phones only\)
-* **Rebooter** \- Advanced rebooting options using ADB/Fastboot
+* **Debloater** - Remove pre-installed apps and services on demand
+* **Camera2 & EIS Enabler** - Enable Camera2 and EIS (TWRP required)
+* **Read device properties** - Retrieve tons of statistics and information about your phone
+* **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
+* **Wiper** - Wipe the cache or perform a factory reset
+* **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is supported by the Android One phones only)
+* **Rebooter** - Advanced rebooting options using ADB/Fastboot
 
 ![](screenshot.PNG)
 
 ## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
-**Warning: Use the tools at your own risk. Removing apps which aren't listed in the tool may break your phone.**
+**Warning: Use the tools at your own risk. Removing apps which aren't listed in the Debloater may break your phone.**
 
 ## Instructions
 
