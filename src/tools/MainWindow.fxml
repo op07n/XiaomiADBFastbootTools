@@ -147,7 +147,7 @@
                                     <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <TitledPane animated="false" collapsible="false" prefHeight="580.0" prefWidth="420.0" text="Debloater" GridPane.rowSpan="3">
+                                    <TitledPane animated="false" collapsible="false" prefHeight="580.0" prefWidth="420.0" text="Uninstaller" GridPane.rowSpan="3">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
