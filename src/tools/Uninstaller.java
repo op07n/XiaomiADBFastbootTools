@@ -68,7 +68,7 @@ public class Uninstaller extends Command {
         apps.add(new App("Google Play Music", "com.google.android.music"));
         apps.add(new App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"));
         apps.add(new App("KLO Bugreport", "com.miui.klo.bugreport"));
-        apps.add(new App("Mab", "com.xiaomi.ab"));
+        apps.add(new App("MAB", "com.xiaomi.ab"));
         apps.add(new App("Mail", "com.android.email"));
         apps.add(new App("Mi AI", "com.miui.voiceassist"));
         apps.add(new App("Mi App Store", "com.xiaomi.mipicks"));
@@ -83,8 +83,8 @@ public class Uninstaller extends Command {
         apps.add(new App("Mi Wallet", "com.mipay.wallet"));
         apps.add(new App("MiuiDaemon", "com.miui.daemon"));
         apps.add(new App("Mobile Device Information Provider", "com.amazon.appmanager"));
-        apps.add(new App("Msa", "com.miui.msa.global"));
-        apps.add(new App("Msa", "com.miui.systemAdSolution"));
+        apps.add(new App("MSA", "com.miui.msa.global"));
+        apps.add(new App("MSA", "com.miui.systemAdSolution"));
         apps.add(new App("Music", "com.miui.player"));
         apps.add(new App("Notes", "com.miui.notes"));
         apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi.tissot"));
