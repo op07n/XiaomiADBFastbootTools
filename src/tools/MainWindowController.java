@@ -511,7 +511,7 @@ public class MainWindowController implements Initializable {
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle("About");
         alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.1.1" + System.lineSeparator() + "Created by Saki_EU");
+        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.1.2" + System.lineSeparator() + "Created by Saki_EU");
         VBox vb = new VBox();
         vb.setAlignment(Pos.CENTER);
 
