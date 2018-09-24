@@ -2,7 +2,7 @@
 
 ## Features
 
-* **Debloater** - Remove pre-installed apps and services on demand
+* **Uninstaller** - Remove pre-installed apps and services on demand
 * **Camera2 & EIS Enabler** - Enable Camera2 and EIS (TWRP required)
 * **Read device properties** - Retrieve tons of statistics and information about your phone
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
