@@ -48,7 +48,7 @@
 
 * **Q:** The tool doesn't launch on my computer, is there anything I should have installed?
 
-    * **A:** Yes, the tool was developed in Java and needs the Java Runtime Environment to run. You can download Java from [here](https://java.com/en/download/).
+    * **A:** Yes, the tool was developed in Java and needs the Java Runtime Environment to run. You can download Java from [here](https://java.com/en/download/). On Linux, OpenJFX is needed alongside OpenJRE to run the application.
 
 * **Q:** The tool on Windows doesn't detect my phone even though it's connected and USB debugging is enabled. What's the problem?
 
