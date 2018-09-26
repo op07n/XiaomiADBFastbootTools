@@ -123,6 +123,9 @@ public class Uninstaller extends Command {
         t = new Thread(() -> {
             for (App app : undesirable) {
                 pb.command(Arrays.asList((prefix + "adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ")));
+                arguments = ("adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ");
+                arguments[0] = prefix + arguments[0];
+                pb.command(arguments);
                 try {
                     proc = pb.start();
                 } catch (IOException ex) {

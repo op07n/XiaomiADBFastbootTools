@@ -17,12 +17,11 @@ public class Command {
     protected String output;
     protected TextInputControl tic;
     protected String prefix;
-    protected List<String> comm;
+    protected String[] arguments;
 
     public Command() {
         pb = new ProcessBuilder();
         pb.directory(new File(System.getProperty("user.home") + "/temp"));
-        comm = null;
         tic = null;
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             prefix = System.getProperty("user.home") + "/temp/";
@@ -32,7 +31,6 @@ public class Command {
     public Command(TextInputControl control) {
         pb = new ProcessBuilder();
         pb.directory(new File(System.getProperty("user.home") + "/temp"));
-        comm = null;
         tic = control;
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             prefix = System.getProperty("user.home") + "/temp/";
@@ -40,7 +38,9 @@ public class Command {
     }
 
     public String exec(String arg) {
-        pb.command(Arrays.asList((prefix + arg).split(" ")));
+        arguments = arg.split(" ");
+        arguments[0] = prefix + arguments[0];
+        pb.command(arguments);
         pb.redirectErrorStream(true);
         output = "";
         if (tic != null)
@@ -63,10 +63,11 @@ public class Command {
     }
 
     public String exec(File image, String arg) {
-        comm = new LinkedList<String>(Arrays.asList((prefix + arg).split(" ")));
+        arguments = arg.split(" ");
+        arguments[0] = prefix + arguments[0];
+        pb.command(arguments);
         if (image != null)
-            comm.add(image.getAbsolutePath());
-        pb.command(comm);
+            pb.command().add(image.getAbsolutePath());
         pb.redirectErrorStream(true);
         output = "";
         if (tic != null)
@@ -89,7 +90,9 @@ public class Command {
     }
 
     public String exec(String arg, boolean err) {
-        pb.command(Arrays.asList((prefix + arg).split(" ")));
+        arguments = arg.split(" ");
+        arguments[0] = prefix + arguments[0];
+        pb.command(arguments);
         pb.redirectErrorStream(false);
         output = "";
         if (tic != null)
@@ -121,7 +124,9 @@ public class Command {
         if (tic != null)
             tic.setText("");
         for (String s : args) {
-            pb.command(Arrays.asList((prefix + s).split(" ")));
+            arguments = s.split(" ");
+            arguments[0] = prefix + arguments[0];
+            pb.command(arguments);
             try {
                 proc = pb.start();
             } catch (IOException ex) {
@@ -151,10 +156,11 @@ public class Command {
         if (tic != null)
             tic.setText("");
         for (String s : args) {
-            comm = new LinkedList<String>(Arrays.asList((prefix + s).split(" ")));
+            arguments = s.split(" ");
+            arguments[0] = prefix + arguments[0];
+            pb.command(arguments);
             if (image != null)
-                comm.add(image.getAbsolutePath());
-            pb.command(comm);
+                pb.command().add(image.getAbsolutePath());
             try {
                 proc = pb.start();
             } catch (IOException ex) {
