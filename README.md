@@ -1,10 +1,10 @@
 # Xiaomi ADB/Fastboot Tools
 
-## Features
+## Modules
 
 * **Uninstaller** - Remove pre-installed apps and services on demand
-* **Camera2 & EIS Enabler** - Enable Camera2 and EIS (TWRP required)
-* **Read device properties** - Retrieve tons of statistics and information about your phone
+* **Camera2** - Enable Camera2 and EIS (TWRP required)
+* **Device properties** - Retrieve tons of statistics and information about your phone
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
 * **Wiper** - Wipe the cache or perform a factory reset
 * **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is supported by the Android One phones only)
@@ -14,7 +14,7 @@
 
 ## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
-**Warning: Use the tools at your own risk. Removing apps which aren't listed in the Debloater may break your phone.**
+**Warning: Use the program at your own risk. Removing apps which aren't listed in the Debloater by default may brick your device.**
 
 ## Instructions
 
@@ -48,19 +48,23 @@
 
 * **Q:** The tool doesn't launch on my computer, is there anything I should have installed?
 
-    * **A:** Yes, the tool was developed in Java and needs the Java Runtime Environment to run. You can download Java from [here](https://java.com/en/download/). On Linux, OpenJFX is needed alongside OpenJRE to run the application.
+    * **A:** Yes, the tool was developed in Java and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, OpenJFX is needed alongside OpenJRE to run the application.
 
-* **Q:** The tool on Windows doesn't detect my phone even though it's connected and USB debugging is enabled. What's the problem?
+* **Q:** The tool on Windows doesn't detect my phone even though it's connected and USB debugging is enabled. What could be the issue?
 
     * **A:** Windows most likely does not recognise your phone in ADB. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
 
 * **Q:** Do I need an unlocked bootloader or root access to use the tool?
 
-    * **A:** The Image Flasher, the Wiper and the Camera2 enabler require an unlocked bootloader but everything else works without rooting or unlocking.
+    * **A:** The Image Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
 
 * **Q:** Do uninstalled system apps affect OTA updates?
 
     * **A:** No, you are free to install updates without the fear of bricking your device or losing data.
+
+* **Q:** How do I regain uninstalled system apps?
+
+    * **A:** Since apps get uninstalled rather than disabled, you need to factory reset your device to get them back.
 
 * **Q:** The tool is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?
 
