@@ -34,7 +34,7 @@
                   <Menu fx:id="rebootMenu" disable="true" mnemonicParsing="false" text="Reboot device to">
                     <items>
                       <MenuItem fx:id="systemMenuItem" mnemonicParsing="false" onAction="#systemMenuItemPressed" text="System" />
-                        <MenuItem fx:id="recoveryMenuItem" mnemonicParsing="false" onAction="#recoveryMenuItemPressed" text="Recovery" />
+                        <MenuItem fx:id="recoveryMenuItem" disable="true" mnemonicParsing="false" onAction="#recoveryMenuItemPressed" text="Recovery" />
                         <MenuItem fx:id="fastbootMenuItem" mnemonicParsing="false" onAction="#fastbootMenuItemPressed" text="Fastboot" />
                         <MenuItem fx:id="edlMenuItem" mnemonicParsing="false" onAction="#edlMenuItemPressed" text="EDL" />
                     </items>
@@ -164,7 +164,7 @@
                                                       <RowConstraints maxHeight="46.0" minHeight="0.0" prefHeight="44.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <TableView fx:id="debloaterTableView" editable="true" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                                      <TableView fx:id="uninstallerTableView" editable="true" GridPane.columnSpan="2" GridPane.rowIndex="1">
                                                         <columns>
                                                           <TableColumn fx:id="checkTableColumn" prefWidth="35.0" />
                                                           <TableColumn fx:id="appTableColumn" editable="false" prefWidth="160.0" text="App name" />

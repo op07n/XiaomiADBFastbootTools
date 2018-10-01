@@ -1,17 +1,15 @@
 package tools;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Scanner;
-
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Scanner;
 
 
 public class Uninstaller extends Command {
@@ -27,7 +25,9 @@ public class Uninstaller extends Command {
         this.progress = progress;
         tv = table;
         pb.redirectErrorStream(false);
+    }
 
+    public void loadApps(Device device) {
         apps = FXCollections.observableArrayList();
         apps.add(new App("Analytics", "com.miui.analytics"));
         apps.add(new App("App Vault", "com.miui.personalassistant"));
@@ -87,7 +87,7 @@ public class Uninstaller extends Command {
         apps.add(new App("MSA", "com.miui.systemAdSolution"));
         apps.add(new App("Music", "com.miui.player"));
         apps.add(new App("Notes", "com.miui.notes"));
-        apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi.tissot"));
+        apps.add(new App("PAI", "android.autoinstalls.config.Xiaomi." + device.codename));
         apps.add(new App("Quick Apps", "com.miui.hybrid"));
         apps.add(new App("Recorder", "com.android.soundrecorder"));
         apps.add(new App("Scanner", "com.xiaomi.scanner"));
@@ -99,27 +99,32 @@ public class Uninstaller extends Command {
         apps.add(new App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"));
         apps.add(new App("Yellow Pages", "com.miui.yellowpage"));
         apps.add(new App("YouTube", "com.google.android.youtube"));
+
+        createTable();
     }
 
     public void createTable() {
         String installed = new Command().exec("adb shell pm list packages");
-        ObservableList<App> currapps = FXCollections.observableArrayList(apps);
-        for (Iterator<App> iterator = currapps.iterator(); iterator.hasNext(); ) {
+        for (Iterator<App> iterator = apps.iterator(); iterator.hasNext(); ) {
             if (!installed.contains(iterator.next().packagenameProperty().get() + System.lineSeparator()))
                 iterator.remove();
         }
-        tv.setItems(currapps);
+        tv.setItems(apps);
         tv.refresh();
     }
 
     public void uninstall() {
-        tic.setText("");
         ObservableList<App> undesirable = FXCollections.observableArrayList();
-        for (App app : tv.getItems()) {
-            if (app.selectedProperty().get())
-                undesirable.add(app);
-        }
+        if (tv.getItems().size() != 0) {
+            for (App app : tv.getItems()) {
+                if (app.selectedProperty().get())
+                    undesirable.add(app);
+            }
+            if (undesirable.size() == 0)
+                return;
+        } else return;
         n = undesirable.size();
+        tic.setText("");
         t = new Thread(() -> {
             for (App app : undesirable) {
                 arguments = ("adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ");

@@ -23,7 +23,6 @@ import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.StageStyle;
-import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -36,6 +35,7 @@ import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
 
+    Device device;
     File image;
     File rom;
     Command comm;
@@ -70,7 +70,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private ProgressBar progressBar;
     @FXML
-    private TableView<App> debloaterTableView;
+    private TableView<App> uninstallerTableView;
     @FXML
     private TableColumn<App, Boolean> checkTableColumn;
     @FXML
@@ -132,46 +132,66 @@ public class MainWindowController implements Initializable {
     @FXML
     private Tab fastbootTab;
 
-    public void setLabels(String serial, String codename, String bl, String anti) {
-        serialLabel.setText(serial);
-        codenameLabel.setText(codename);
-        bootloaderLabel.setText(bl);
-        antiLabel.setText(anti);
+    public void setLabels() {
+        serialLabel.setText(device.serial);
+        codenameLabel.setText(device.codename);
+        if (device.bootloader)
+            bootloaderLabel.setText("unlocked");
+        else bootloaderLabel.setText("locked");
+        if (device.anti != -1)
+            antiLabel.setText(Integer.toString(device.anti));
+        else antiLabel.setText("-");
     }
 
-    public void setADB(boolean adb) {
-        adbTab.setDisable(!adb);
-        recoveryMenuItem.setDisable(!adb);
-        if (adb) {
-            outputTextArea.setText("Device found!");
-            rebootMenu.setDisable(false);
-            fastbootTab.setDisable(true);
-        } else {
-            rebootMenu.setDisable(true);
-            outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-", "-");
-        }
+    public void clearLabels() {
+        serialLabel.setText("-");
+        bootloaderLabel.setText("-");
+        codenameLabel.setText("-");
+        antiLabel.setText("-");
     }
 
-    public void setFastboot(boolean fastboot) {
-        recoveryMenuItem.setDisable(fastboot);
-        fastbootTab.setDisable(!fastboot);
-        if (fastboot) {
-            outputTextArea.setText("Device found!");
-            rebootMenu.setDisable(false);
+    public boolean checkFastboot() {
+        boolean fb = device.readFastboot();
+        if (fb) {
+            setLabels();
             adbTab.setDisable(true);
+            fastbootTab.setDisable(false);
+            recoveryMenuItem.setDisable(true);
+            rebootMenu.setDisable(false);
         } else {
-            rebootMenu.setDisable(true);
-            outputTextArea.setText("No device found!");
-            setLabels("-", "-", "-", "-");
+            outputTextArea.setText("No device found in Fastboot mode!");
+            fastbootTab.setDisable(true);
         }
+        return fb;
+    }
+
+    public boolean checkADB() {
+        boolean adb = device.readADB();
+        if (adb) {
+            setLabels();
+            adbTab.setDisable(false);
+            fastbootTab.setDisable(true);
+            recoveryMenuItem.setDisable(false);
+            rebootMenu.setDisable(false);
+            antiLabel.setText("unknown");
+        } else {
+            if (device.auth)
+                outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
+            else outputTextArea.setText("No device found in ADB mode!");
+            adbTab.setDisable(true);
+            recoveryMenuItem.setDisable(true);
+        }
+        return adb;
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setLabels("-", "-", "-", "-");
+        serialLabel.setText("-");
+        bootloaderLabel.setText("-");
+        codenameLabel.setText("-");
+        antiLabel.setText("-");
         partitionComboBox.getItems().addAll(
                 "boot", "cust", "modem", "persist", "recovery", "system");
         scriptComboBox.getItems().addAll(
@@ -180,85 +200,47 @@ public class MainWindowController implements Initializable {
         displayedcomm = new Command(outputTextArea);
         image = null;
         rom = null;
+        device = new Device();
+        uninstaller = new Uninstaller(uninstallerTableView, progressBar, outputTextArea);
 
         checkTableColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
         checkTableColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
         appTableColumn.setCellValueFactory(new PropertyValueFactory<>("appname"));
         packageTableColumn.setCellValueFactory(new PropertyValueFactory<>("packagename"));
-        debloaterTableView.getColumns().setAll(checkTableColumn, appTableColumn, packageTableColumn);
-
-        uninstaller = new Uninstaller(debloaterTableView, progressBar, outputTextArea);
-    }
-
-    public boolean checkFastboot() {
-        String op = comm.exec("fastboot devices", false);
-        if (op.length() < 1) {
-            setFastboot(false);
-            return false;
-        }
-        String codename = comm.exec("fastboot getvar product", true);
-        setFastboot(true);
-        setLabels(op.substring(0, op.indexOf("fa")).trim(), codename.substring(9, codename.indexOf(System.lineSeparator())).trim(), "-", "-");
-        op = comm.exec("fastboot oem device-info", true);
-        if (op.contains("unlocked: true")) {
-            bootloaderLabel.setText("unlocked");
-        }
-        if (op.contains("unlocked: false")) {
-            bootloaderLabel.setText("locked");
-        }
-        op = comm.exec("fastboot getvar anti", true);
-        op = op.substring(0, op.indexOf(System.lineSeparator()));
-        if (op.length() != 7)
-            antiLabel.setText("-");
-        else antiLabel.setText(op.substring(6));
-        return true;
-    }
-
-    public boolean checkADB() {
-        String op = comm.exec("adb get-serialno", true);
-        if (op.contains("no devices")) {
-            setADB(false);
-            return false;
-        }
-        if (op.contains("unauthorized")) {
-            setFastboot(false);
-            outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
-            return false;
-        }
-        setADB(true);
-        setLabels(comm.exec("adb get-serialno", false).trim(), comm.exec("adb shell getprop ro.build.product", false).trim(), "-", "unknown");
-        op = comm.exec("adb shell getprop ro.boot.flash.locked", false);
-        if (op.contains("0")) {
-            bootloaderLabel.setText("unlocked");
-        }
-        if (op.contains("1")) {
-            bootloaderLabel.setText("locked");
-        }
-        return true;
-    }
-
-    public boolean checkDevice() {
-        if (!checkFastboot()) {
-            if (checkADB()) {
-                uninstaller.createTable();
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public boolean checkcamera2() {
-        return comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1");
-    }
-
-    public boolean checkEIS() {
-        return comm.exec("adb shell getprop persist.camera.eis.enable").contains("1");
+        uninstallerTableView.getColumns().setAll(checkTableColumn, appTableColumn, packageTableColumn);
     }
 
     @FXML
     private void checkMenuItemPressed(ActionEvent event) {
-        checkDevice();
+        boolean fb = device.readFastboot();
+        boolean adb = device.readADB();
+        if (adb || fb) {
+            setLabels();
+            rebootMenu.setDisable(false);
+            if (fb) {
+                outputTextArea.setText("Device found in Fastboot mode!");
+                adbTab.setDisable(true);
+                fastbootTab.setDisable(false);
+                recoveryMenuItem.setDisable(true);
+            }
+            if (adb) {
+                uninstaller.loadApps(device);
+                antiLabel.setText("unknown");
+                outputTextArea.setText("Device found in ADB mode!");
+                adbTab.setDisable(false);
+                fastbootTab.setDisable(true);
+                recoveryMenuItem.setDisable(false);
+            }
+        } else {
+            if (device.auth)
+                outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
+            else outputTextArea.setText("No device found!");
+            fastbootTab.setDisable(true);
+            adbTab.setDisable(true);
+            rebootMenu.setDisable(true);
+            recoveryMenuItem.setDisable(true);
+            clearLabels();
+        }
     }
 
     @FXML
@@ -267,9 +249,17 @@ public class MainWindowController implements Initializable {
             if (comm.exec("adb devices").contains("recovery")) {
                 outputTextArea.setText("Device already in recovery mode!");
             } else {
-                displayedcomm.exec("adb reboot recovery");
+                comm.exec("adb reboot recovery");
             }
         }
+    }
+
+    public boolean checkcamera2() {
+        return comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1");
+    }
+
+    public boolean checkEIS() {
+        return comm.exec("adb shell getprop persist.camera.eis.enable").contains("1");
     }
 
     @FXML
@@ -337,20 +327,22 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void savepropertiesButtonPressed(ActionEvent event) {
-        FileChooser fc = new FileChooser();
-        FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Text File (.txt)", "*.txt");
-        fc.getExtensionFilters().add(fileExtensions);
-        fc.setTitle("Save properties");
-        File f = fc.showSaveDialog(((Node) event.getSource()).getScene().getWindow());
-        if (f != null) {
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(f);
-                fw.write(comm.exec("adb shell getprop"));
-                fw.flush();
-                fw.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        if (checkADB()) {
+            FileChooser fc = new FileChooser();
+            FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Text File (.txt)", "*.txt");
+            fc.getExtensionFilters().add(fileExtensions);
+            fc.setTitle("Save properties");
+            File f = fc.showSaveDialog(((Node) event.getSource()).getScene().getWindow());
+            if (f != null) {
+                FileWriter fw = null;
+                try {
+                    fw = new FileWriter(f);
+                    fw.write(comm.exec("adb shell getprop"));
+                    fw.flush();
+                    fw.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
@@ -458,7 +450,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void systemMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            displayedcomm.exec("adb reboot");
+            comm.exec("adb reboot");
         } else if (checkFastboot()) {
             displayedcomm.exec("fastboot reboot");
         }
@@ -467,14 +459,14 @@ public class MainWindowController implements Initializable {
     @FXML
     private void recoveryMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            displayedcomm.exec("adb reboot recovery");
+            comm.exec("adb reboot recovery");
         }
     }
 
     @FXML
     private void fastbootMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            displayedcomm.exec("adb reboot bootloader");
+            comm.exec("adb reboot bootloader");
         } else if (checkFastboot()) {
             displayedcomm.exec("fastboot reboot bootloader");
         }
@@ -483,7 +475,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void edlMenuItemPressed(ActionEvent event) {
         if (checkADB()) {
-            displayedcomm.exec("adb reboot edl");
+            comm.exec("adb reboot edl");
         } else if (checkFastboot()) {
             displayedcomm.exec("fastboot oem edl");
         }
@@ -500,7 +492,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void addButtonPressed(ActionEvent event) {
         if (customappTextField.getText() != null && customappTextField.getText().trim().length() > 1)
-            uninstaller.tv.getItems().add(new App("Custom app", customappTextField.getText().trim()));
+            uninstaller.apps.add(new App("Custom app", customappTextField.getText().trim()));
         customappTextField.setText(null);
         uninstaller.tv.refresh();
     }
@@ -511,7 +503,7 @@ public class MainWindowController implements Initializable {
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle("About");
         alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.1.4" + System.lineSeparator() + "Created by Saki_EU");
+        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.2" + System.lineSeparator() + "Created by Saki_EU");
         VBox vb = new VBox();
         vb.setAlignment(Pos.CENTER);
 

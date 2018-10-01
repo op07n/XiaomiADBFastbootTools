@@ -1,11 +1,14 @@
 package tools;
 
-import java.io.*;
-import java.util.Scanner;
-
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextInputControl;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class FastbootFlasher {
 
@@ -43,13 +46,14 @@ public class FastbootFlasher {
     public void exec(String arg) {
         tic.setText("");
         File script;
-        if (System.getProperty("os.name").toLowerCase().contains("win")){
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
             script = new File(directory, arg + ".bat");
             pb.command("cmd.exe", "/c", script.getAbsolutePath());
         } else {
             script = new File(directory, arg + ".sh");
             pb.command("sh", "-c", script.getAbsolutePath());
-        };
+        }
+        ;
         int n = getCmdCount(script);
         try {
             proc = pb.start();

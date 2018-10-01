@@ -1,21 +1,19 @@
 package tools;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class XiaomiADBFastbootTools extends Application {
@@ -88,7 +86,7 @@ public class XiaomiADBFastbootTools extends Application {
         stage.setResizable(false);
         t.start();
 
-        if (!new File(System.getProperty("user.home") + "/temp/adb").exists() && !new File(System.getProperty("user.home") + "/temp/adb.exe").exists()){
+        if (!new File(System.getProperty("user.home") + "/temp/adb").exists() && !new File(System.getProperty("user.home") + "/temp/adb.exe").exists()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Fatal Error");
             alert.setHeaderText("ERROR: Couldn't initialise ADB!");

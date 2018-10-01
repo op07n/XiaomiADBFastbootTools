@@ -1,13 +1,10 @@
 package tools;
 
+import javafx.scene.control.TextInputControl;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
-
-import javafx.scene.control.TextInputControl;
 
 public class Command {
 
