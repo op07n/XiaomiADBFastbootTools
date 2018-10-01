@@ -143,11 +143,16 @@ public class MainWindowController implements Initializable {
         else antiLabel.setText("-");
     }
 
-    public void clearLabels() {
+    public void clear() {
         serialLabel.setText("-");
         bootloaderLabel.setText("-");
         codenameLabel.setText("-");
         antiLabel.setText("-");
+
+        fastbootTab.setDisable(true);
+        adbTab.setDisable(true);
+        rebootMenu.setDisable(true);
+        recoveryMenuItem.setDisable(true);
     }
 
     public boolean checkFastboot() {
@@ -160,7 +165,7 @@ public class MainWindowController implements Initializable {
             rebootMenu.setDisable(false);
         } else {
             outputTextArea.setText("No device found in Fastboot mode!");
-            fastbootTab.setDisable(true);
+            clear();
         }
         return fb;
     }
@@ -178,8 +183,7 @@ public class MainWindowController implements Initializable {
             if (device.auth)
                 outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
             else outputTextArea.setText("No device found in ADB mode!");
-            adbTab.setDisable(true);
-            recoveryMenuItem.setDisable(true);
+            clear();
         }
         return adb;
     }
@@ -188,10 +192,7 @@ public class MainWindowController implements Initializable {
     @SuppressWarnings("unchecked")
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        serialLabel.setText("-");
-        bootloaderLabel.setText("-");
-        codenameLabel.setText("-");
-        antiLabel.setText("-");
+        clear();
         partitionComboBox.getItems().addAll(
                 "boot", "cust", "modem", "persist", "recovery", "system");
         scriptComboBox.getItems().addAll(
@@ -235,11 +236,7 @@ public class MainWindowController implements Initializable {
             if (device.auth)
                 outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
             else outputTextArea.setText("No device found!");
-            fastbootTab.setDisable(true);
-            adbTab.setDisable(true);
-            rebootMenu.setDisable(true);
-            recoveryMenuItem.setDisable(true);
-            clearLabels();
+            clear();
         }
     }
 
