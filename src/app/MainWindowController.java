@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -98,6 +98,10 @@ public class MainWindowController implements Initializable {
     @FXML
     private Button savepropertiesButton;
     @FXML
+    private TextField dpiTextField;
+    @FXML
+    private Button dpiButton;
+    @FXML
     private Button antirbButton;
     @FXML
     private Button browseimageButton;
@@ -148,6 +152,7 @@ public class MainWindowController implements Initializable {
         bootloaderLabel.setText("-");
         codenameLabel.setText("-");
         antiLabel.setText("-");
+        dpiTextField.setText("");
 
         fastbootTab.setDisable(true);
         adbTab.setDisable(true);
@@ -181,7 +186,7 @@ public class MainWindowController implements Initializable {
             antiLabel.setText("unknown");
         } else {
             if (device.auth)
-                outputTextArea.setText("Device unauthorised!\nPlease allow USB debugging!");
+                outputTextArea.setText("ERROR: Device unauthorised!\nPlease allow USB debugging!");
             else outputTextArea.setText("No device found in ADB mode!");
             clear();
         }
@@ -227,6 +232,7 @@ public class MainWindowController implements Initializable {
             if (adb) {
                 uninstaller.loadApps(device);
                 antiLabel.setText("unknown");
+                dpiTextField.setText(Integer.toString(device.dpi));
                 outputTextArea.setText("Device found in ADB mode!");
                 adbTab.setDisable(false);
                 fastbootTab.setDisable(true);
@@ -345,6 +351,21 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
+    private void dpiButtonPressed(ActionEvent event) {
+        if (checkADB()) {
+            String attempt = displayedcomm.exec("adb shell wm density " + dpiTextField.getText().trim());
+            if (attempt.contains("permission"))
+                outputTextArea.setText("ERROR: Please allow USB debugging (Security settings)!");
+            if (attempt.contains("bad number"))
+                outputTextArea.setText("ERROR: Invalid value!");
+            if (attempt.length() < 1) {
+                outputTextArea.setText("Done! Rebooting...");
+                comm.exec("adb reboot");
+            }
+        }
+    }
+
+    @FXML
     private void antirbButtonPressed(ActionEvent event) {
         if (checkFastboot()) {
             displayedcomm.exec("fastboot flash antirbpass dummy.img");
@@ -449,7 +470,7 @@ public class MainWindowController implements Initializable {
         if (checkADB()) {
             comm.exec("adb reboot");
         } else if (checkFastboot()) {
-            displayedcomm.exec("fastboot reboot");
+            comm.exec("fastboot reboot");
         }
     }
 
@@ -465,7 +486,7 @@ public class MainWindowController implements Initializable {
         if (checkADB()) {
             comm.exec("adb reboot bootloader");
         } else if (checkFastboot()) {
-            displayedcomm.exec("fastboot reboot bootloader");
+            comm.exec("fastboot reboot bootloader");
         }
     }
 
@@ -499,8 +520,8 @@ public class MainWindowController implements Initializable {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle("About");
-        alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("smallicon.png").toString())));
-        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.2" + System.lineSeparator() + "Created by Saki_EU");
+        alert.setGraphic(new ImageView(new Image(this.getClass().getClassLoader().getResource("res/smallicon.png").toString())));
+        alert.setHeaderText("Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.3" + System.lineSeparator() + "Created by Saki_EU");
         VBox vb = new VBox();
         vb.setAlignment(Pos.CENTER);
 

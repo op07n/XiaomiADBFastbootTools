@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;

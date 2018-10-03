@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -17,8 +17,6 @@ import java.io.IOException;
 
 
 public class XiaomiADBFastbootTools extends Application {
-
-    Thread t;
 
     public static void main(String[] args) {
         launch(args);
@@ -52,25 +50,26 @@ public class XiaomiADBFastbootTools extends Application {
 
     public void setupFiles() {
         String os = System.getProperty("os.name").toLowerCase();
-        createFile("dummy.img", false);
+        createFile("res/dummy.img", false);
         if (os.contains("win")) {
-            createFile("windows/adb.exe", true);
-            createFile("windows/fastboot.exe", true);
-            createFile("windows/AdbWinApi.dll", false);
-            createFile("windows/AdbWinUsbApi.dll", false);
+            createFile("res/windows/adb.exe", true);
+            createFile("res/windows/fastboot.exe", true);
+            createFile("res/windows/AdbWinApi.dll", false);
+            createFile("res/windows/AdbWinUsbApi.dll", false);
         }
         if (os.contains("mac")) {
-            createFile("macos/adb", true);
-            createFile("macos/fastboot", true);
+            createFile("res/macos/adb", true);
+            createFile("res/macos/fastboot", true);
         }
         if (os.contains("linux")) {
-            createFile("linux/adb", true);
-            createFile("linux/fastboot", true);
+            createFile("res/linux/adb", true);
+            createFile("res/linux/fastboot", true);
         }
-        t = new Thread(() -> {
+        Thread t = new Thread(() -> {
             new Command().exec("adb start-server");
         });
         t.setDaemon(true);
+        t.start();
     }
 
     @Override
@@ -81,10 +80,9 @@ public class XiaomiADBFastbootTools extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Xiaomi ADB/Fastboot Tools");
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResource("icon.png").toString()));
+        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResource("res/icon.png").toString()));
         stage.show();
         stage.setResizable(false);
-        t.start();
 
         if (!new File(System.getProperty("user.home") + "/temp/adb").exists() && !new File(System.getProperty("user.home") + "/temp/adb.exe").exists()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

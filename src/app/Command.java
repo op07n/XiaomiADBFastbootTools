@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import javafx.scene.control.TextInputControl;
 

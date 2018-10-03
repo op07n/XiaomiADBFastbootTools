@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 public class Device {
 
@@ -7,6 +7,7 @@ public class Device {
     boolean bootloader;
     int anti;
     boolean auth;
+    int dpi;
     Command comm = new Command();
 
     public boolean readFastboot() {
@@ -20,15 +21,13 @@ public class Device {
         op = comm.exec("fastboot oem device-info", true);
         if (op.contains("unlocked: true")) {
             bootloader = true;
-        }
-        if (op.contains("unlocked: false")) {
-            bootloader = false;
-        }
+        } else bootloader = false;
         op = comm.exec("fastboot getvar anti", true);
         op = op.substring(0, op.indexOf(System.lineSeparator()));
         if (op.length() != 7)
             anti = -1;
         else anti = Integer.parseInt(op.substring(6));
+        dpi = -1;
         return true;
     }
 
@@ -44,14 +43,13 @@ public class Device {
         }
         serial = comm.exec("adb get-serialno", false).trim();
         codename = comm.exec("adb shell getprop ro.build.product", false).trim();
-        anti = -1;
         op = comm.exec("adb shell getprop ro.boot.flash.locked", false);
         if (op.contains("0")) {
             bootloader = true;
-        }
-        if (op.contains("1")) {
-            bootloader = false;
-        }
+        } else bootloader = false;
+        anti = -1;
+        op = comm.exec("adb shell wm density");
+        dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim());
         return true;
     }
 }

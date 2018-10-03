@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -77,6 +77,7 @@ public class Uninstaller extends Command {
         apps.add(new App("Mi Credit", "com.xiaomi.payment"));
         apps.add(new App("Mi Drop", "com.xiaomi.midrop"));
         apps.add(new App("Mi File Manager", "com.mi.android.globalFileexplorer"));
+        apps.add(new App("Mi Recycle", "com.xiaomi.mirecycle"));
         apps.add(new App("Mi Roaming", "com.miui.virtualsim"));
         apps.add(new App("Mi Video", "com.miui.video"));
         apps.add(new App("Mi Video", "com.miui.videoplayer"));
