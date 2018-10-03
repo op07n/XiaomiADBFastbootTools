@@ -4,10 +4,11 @@
 
 * **Uninstaller** - Remove pre-installed apps and services on demand
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
-* **Device properties** - Retrieve tons of statistics and information about your phone
+* **Device properties** - Retrieve tons of statistics and information about your device
+* **Screen density** - Tweak screen density by overriding the DPI value
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
 * **Wiper** - Wipe the cache or perform a factory reset
-* **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is supported by the Android One phones only)
+* **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is supported by the Android One devices only)
 * **Rebooter** - Advanced rebooting options using ADB/Fastboot
 
 ![](screenshot.PNG)
@@ -50,9 +51,9 @@
 
     * **A:** Yes, the tool was developed in Java and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, OpenJFX is needed alongside OpenJRE to run the application.
 
-* **Q:** The tool on Windows doesn't detect my phone even though it's connected and USB debugging is enabled. What could be the issue?
+* **Q:** The tool on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?
 
-    * **A:** Windows most likely does not recognise your phone in ADB. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
+    * **A:** Windows most likely does not recognise your device in ADB. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
 
 * **Q:** Do I need an unlocked bootloader or root access to use the tool?
 
