@@ -27,7 +27,7 @@
 
 2. Enable USB debugging in Android.
 
-    * MIUI: Go to Settings > Additional settings > Developer options and enable USB debugging.
+    * MIUI: Go to Settings > Additional settings > Developer options and enable USB debugging as well as USB debugging (Security settings).
     * Android One: Go to Settings > System > Developer options and enable USB debugging.
 
 3. Connect your device to your computer and launch the application. The device will ask for authorisation right away, which you have to allow.
