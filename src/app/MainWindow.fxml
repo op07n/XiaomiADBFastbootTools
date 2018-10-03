@@ -44,9 +44,9 @@
         </Menu>
       </menus>
     </MenuBar>
-      <HBox>
+      <HBox prefHeight="650.0" prefWidth="1000.0">
          <children>
-            <VBox prefWidth="350.0">
+            <VBox prefHeight="650.0" prefWidth="350.0">
                <children>
                   <TitledPane animated="false" collapsible="false" prefHeight="175.0" prefWidth="350.0" text="Device Info">
                     <content>
@@ -130,7 +130,7 @@
                   </TitledPane>
                </children>
             </VBox>
-            <TabPane prefWidth="650.0">
+            <TabPane prefHeight="650.0" prefWidth="650.0">
                <tabs>
                   <Tab fx:id="adbTab" closable="false" disable="true" text="ADB">
                      <content>
@@ -299,7 +299,7 @@
                   </Tab>
                   <Tab fx:id="fastbootTab" closable="false" disable="true" text="Fastboot">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane>
                            <children>
                               <GridPane AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <columnConstraints>
