@@ -15,7 +15,7 @@
 
 ## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
-**Warning: Use the program at your own risk. Removing apps which aren't listed in the Debloater by default may brick your device.**
+**Warning: Use the program at your own risk. Removing apps which aren't listed in the Uninstaller by default may brick your device.**
 
 ## Instructions
 
