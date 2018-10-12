@@ -70,6 +70,7 @@ public class Uninstaller extends Command {
         apps.add(new App("KLO Bugreport", "com.miui.klo.bugreport"));
         apps.add(new App("MAB", "com.xiaomi.ab"));
         apps.add(new App("Mail", "com.android.email"));
+        apps.add(new App("Mi Account", "com.xiaomi.account"));
         apps.add(new App("Mi AI", "com.miui.voiceassist"));
         apps.add(new App("Mi App Store", "com.xiaomi.mipicks"));
         apps.add(new App("Mi Cloud", "com.miui.cloudservice"));
