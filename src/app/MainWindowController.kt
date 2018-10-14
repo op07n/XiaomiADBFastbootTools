@@ -123,10 +123,10 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var fastbootTab: Tab
 
-    lateinit var device: Device
+    var device = Device()
     var image: File? = null
     var rom: File? = null
-    lateinit var comm: Command
+    var comm =  Command()
     lateinit var displayedcomm: Command
     lateinit var uninstaller: Uninstaller
 
@@ -195,18 +195,15 @@ class MainWindowController : Initializable {
                 "boot", "cust", "modem", "persist", "recovery", "system")
         scriptComboBox.items.addAll(
                 "Clean install", "Clean install and lock", "Update")
-        comm = Command()
-        displayedcomm = Command(outputTextArea)
-        image = null
-        rom = null
-        device = Device()
-        uninstaller = Uninstaller(uninstallerTableView, progressBar, outputTextArea)
 
         checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
         checkTableColumn.setCellFactory { tc -> CheckBoxTableCell() }
         appTableColumn.cellValueFactory = PropertyValueFactory("appname")
         packageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
         uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
+
+        displayedcomm = Command(outputTextArea)
+        uninstaller = Uninstaller(uninstallerTableView, progressBar, outputTextArea)
     }
 
     @FXML

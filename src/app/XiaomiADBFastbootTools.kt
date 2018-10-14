@@ -99,7 +99,7 @@ class XiaomiADBFastbootTools : Application() {
     override fun stop() {
         Command().exec("adb kill-server")
         try {
-            Thread.sleep(250)
+            Thread.sleep(500)
         } catch (ex: InterruptedException) {
             ex.printStackTrace()
         }
