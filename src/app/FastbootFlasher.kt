@@ -2,6 +2,7 @@ package app
 
 import javafx.application.Platform
 import javafx.scene.control.ProgressBar
+import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
 import java.io.File
 import java.io.FileNotFoundException
@@ -9,7 +10,7 @@ import java.io.FileReader
 import java.io.IOException
 import java.util.*
 
-class FastbootFlasher(var progress: ProgressBar, var tic: TextInputControl, var directory: File) {
+class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndicator, var tic: TextInputControl, var directory: File) {
 
     var pb: ProcessBuilder = ProcessBuilder()
     lateinit var proc: Process
@@ -52,6 +53,7 @@ class FastbootFlasher(var progress: ProgressBar, var tic: TextInputControl, var 
             ex.printStackTrace()
         }
         scan = Scanner(proc.inputStream)
+        progressind.isVisible = true
         t = Thread {
             while (scan.hasNext()) {
                 val line = scan.nextLine() + System.lineSeparator()
@@ -67,6 +69,7 @@ class FastbootFlasher(var progress: ProgressBar, var tic: TextInputControl, var 
             Platform.runLater {
                 tic.appendText(System.lineSeparator() + "Done!")
                 progress.progress = 0.0
+                progressind.isVisible = false
             }
         }
         t.isDaemon = true

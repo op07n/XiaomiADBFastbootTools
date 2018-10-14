@@ -40,8 +40,7 @@ class Device {
         }
         serial = comm.exec("adb get-serialno", false).trim()
         codename = comm.exec("adb shell getprop ro.build.product", false).trim()
-        op = comm.exec("adb shell getprop ro.boot.flash.locked", false)
-        bootloader = op.contains("0")
+        bootloader = comm.exec("adb shell getprop ro.boot.flash.locked", false).contains("0") or comm.exec("adb shell getprop ro.secureboot.lockstate", false).contains("unlocked")
         anti = -1
         op = comm.exec("adb shell wm density")
         dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim())

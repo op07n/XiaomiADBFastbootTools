@@ -4,17 +4,17 @@ import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
+import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
 import javafx.scene.control.TextInputControl
 import java.io.IOException
 import java.util.*
 
 
-class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, control: TextInputControl) : Command(control) {
+class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progressind: ProgressIndicator, control: TextInputControl) : Command(control) {
 
     lateinit var t: Thread
     lateinit var apps: ObservableList<App>
-    var n = 0
 
     init {
         pb.redirectErrorStream(false)
@@ -89,7 +89,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, control: Te
         apps.add(App("Screen Recorder", "com.miui.screenrecorder"))
         apps.add(App("Search", "com.android.quicksearchbox"))
         apps.add(App("Weather", "com.miui.weather2"))
-        apps.add(App("Xiaomi Account", "com.xiaomi.vipaccount"))
+        apps.add(App("Xiaomi VIP Account", "com.xiaomi.vipaccount"))
         apps.add(App("Xiaomi Service Framework", "com.xiaomi.xmsf"))
         apps.add(App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"))
         apps.add(App("Yellow Pages", "com.miui.yellowpage"))
@@ -118,8 +118,9 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, control: Te
             if (undesirable.size == 0)
                 return
         } else return
-        n = undesirable.size
+        val n = undesirable.size
         tic?.text = ""
+        progressind.isVisible = true
         t = Thread {
             for (app in undesirable) {
                 arguments = ("adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ").toTypedArray()
@@ -135,17 +136,17 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, control: Te
                 while (scan.hasNext())
                     line += scan.nextLine() + System.lineSeparator()
                 scan.close()
-                val finalline = line
                 Platform.runLater {
                     tic?.appendText("App: " + app.appnameProperty().get() + System.lineSeparator())
                     tic?.appendText("Package: " + app.packagenameProperty().get() + System.lineSeparator())
-                    tic?.appendText("Result: " + finalline + System.lineSeparator())
+                    tic?.appendText("Result: " + line + System.lineSeparator())
                     progress.progress = progress.progress + (1.0 / n)
                 }
             }
             Platform.runLater {
                 tic?.appendText("Done!")
                 progress.progress = 0.0
+                progressind.isVisible = false
                 createTable()
             }
         }

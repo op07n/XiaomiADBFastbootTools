@@ -57,6 +57,8 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var progressBar: ProgressBar
     @FXML
+    private lateinit var progressIndicator: ProgressIndicator
+    @FXML
     private lateinit var uninstallerTableView: TableView<App>
     @FXML
     private lateinit var checkTableColumn: TableColumn<App, Boolean>
@@ -197,13 +199,13 @@ class MainWindowController : Initializable {
                 "Clean install", "Clean install and lock", "Update")
 
         checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
-        checkTableColumn.setCellFactory { tc -> CheckBoxTableCell() }
+        checkTableColumn.setCellFactory { _ -> CheckBoxTableCell() }
         appTableColumn.cellValueFactory = PropertyValueFactory("appname")
         packageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
         uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
 
         displayedcomm = Command(outputTextArea)
-        uninstaller = Uninstaller(uninstallerTableView, progressBar, outputTextArea)
+        uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
     }
 
     @FXML
@@ -409,7 +411,7 @@ class MainWindowController : Initializable {
         when {
             rom != null && scriptComboBox.value != null ->
                 if (checkFastboot()) {
-                    val fs = FastbootFlasher(progressBar, outputTextArea, rom!!)
+                    val fs = FastbootFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
                     progressBar.progress = 0.0
                     if (scriptComboBox.value == "Clean install") fs.exec("flash_all")
                     if (scriptComboBox.value == "Clean install and lock") fs.exec("flash_all_lock")
@@ -510,7 +512,7 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("res/smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.3.1" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.4" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
