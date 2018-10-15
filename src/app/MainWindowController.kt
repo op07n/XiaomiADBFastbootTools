@@ -459,31 +459,31 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
-        if (checkADB())
+        if (!adbTab.isDisabled)
             comm.exec("adb reboot")
-        else if (checkFastboot())
+        else if (!fastbootTab.isDisabled)
             comm.exec("fastboot reboot")
     }
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
-        if (checkADB())
+        if (!adbTab.isDisabled)
             comm.exec("adb reboot recovery")
     }
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
-        if (checkADB())
+        if (!adbTab.isDisabled)
             comm.exec("adb reboot bootloader")
-        else if (checkFastboot())
+        else if (!fastbootTab.isDisabled)
             comm.exec("fastboot reboot bootloader")
     }
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
-        if (checkADB())
+        if (!adbTab.isDisabled)
             comm.exec("adb reboot edl")
-        else if (checkFastboot())
+        else if (!fastbootTab.isDisabled)
             displayedcomm.exec("fastboot oem edl")
     }
 
