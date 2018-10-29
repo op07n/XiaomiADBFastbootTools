@@ -155,7 +155,7 @@
                                     <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="196.0" valignment="TOP" />
                                  </rowConstraints>
                                  <children>
-                                    <TitledPane fx:id="uninstallerPane" animated="false" collapsible="false" disable="true" prefHeight="638.0" prefWidth="560.0" text="Uninstaller" GridPane.rowSpan="3">
+                                    <TitledPane fx:id="uninstallerPane" animated="false" collapsible="false" disable="true" prefHeight="638.0" prefWidth="565.0" text="Uninstaller" GridPane.rowSpan="3">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
@@ -262,7 +262,7 @@
                                           <Font size="16.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefHeight="143.0" prefWidth="239.0" text="Screen density (DPI)" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefHeight="135.0" prefWidth="239.0" text="Screen density (DPI)" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
