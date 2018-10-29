@@ -45,11 +45,10 @@ class Device {
         codename = comm.exec("adb shell getprop ro.build.product", false).trim()
         bootloader = comm.exec("adb shell getprop ro.boot.flash.locked", false).contains("0") or comm.exec("adb shell getprop ro.secureboot.lockstate", false).contains("unlocked")
         anti = -1
-        if (!recovery){
+        if (!recovery) {
             op = comm.exec("adb shell wm density")
             dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim())
-        }
-        else dpi = -1
+        } else dpi = -1
         return true
     }
 }

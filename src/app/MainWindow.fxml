@@ -366,7 +366,7 @@
                                                       </FlowPane>
                                                       <FlowPane hgap="10.0" GridPane.rowIndex="2">
                                                          <children>
-                                                            <Label text="Image: ">
+                                                            <Label text="Image:">
                                                                <font>
                                                                   <Font size="16.0" />
                                                                </font>

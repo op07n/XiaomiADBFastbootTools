@@ -20,7 +20,9 @@ import javafx.stage.StageStyle
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.io.*
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URISyntaxException
@@ -152,7 +154,7 @@ class MainWindowController : Initializable {
     var adb = false
     var image: File? = null
     var rom: File? = null
-    var comm =  Command()
+    var comm = Command()
     lateinit var displayedcomm: Command
     lateinit var uninstaller: Uninstaller
     var device = Device()
@@ -183,7 +185,7 @@ class MainWindowController : Initializable {
         recoveryMenuItem.isDisable = true
     }
 
-    fun setADBTab(value: Boolean){
+    fun setADBTab(value: Boolean) {
         uninstallerPane.isDisable = !value
         camera2Pane.isDisable = !value
         devicepropertiesPane.isDisable = !value
@@ -192,7 +194,7 @@ class MainWindowController : Initializable {
         fastboot = !value
     }
 
-    fun setFastbootTab(value: Boolean){
+    fun setFastbootTab(value: Boolean) {
         flasherPane.isDisable = !value
         wiperPane.isDisable = !value
         oemPane.isDisable = !value
@@ -511,7 +513,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun getlinkButtonPressed(event: ActionEvent) {
-        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null){
+        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
             val codename = codenameTextField.text.trim()
             var url = URL("http://google.com")
             if (branchComboBox.value == "Global Stable")
@@ -529,7 +531,7 @@ class MainWindowController : Initializable {
             huc.connect()
             huc.disconnect()
             val link = huc.getHeaderField("Location")
-            if (link != null && link.contains("bigota")){
+            if (link != null && link.contains("bigota")) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
                 outputTextArea.text = "${link}\n\nLink copied to clipboard!"
                 Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
@@ -542,7 +544,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun downloadromButtonPressed(event: ActionEvent) {
-        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null){
+        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
             val codename = codenameTextField.text.trim()
             var url = URL("http://google.com")
             if (branchComboBox.value == "Global Stable")
@@ -560,7 +562,7 @@ class MainWindowController : Initializable {
             huc.connect()
             huc.disconnect()
             val link = huc.getHeaderField("Location")
-            if (link != null && link.contains("bigota")){
+            if (link != null && link.contains("bigota")) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
                 outputTextArea.text = "Opening browser..."
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))
