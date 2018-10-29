@@ -9,6 +9,7 @@
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
 * **Wiper** - Wipe the cache or perform a factory reset
 * **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is supported by the Android One devices only)
+* **ROM Downloader** - Get links to the latest Fastboot ROMs or download them right away
 * **Rebooter** - Advanced rebooting options using ADB/Fastboot
 
 ![](screenshot.PNG)
