@@ -18,9 +18,10 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.StageStyle
 import java.awt.Desktop
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
+import java.io.*
+import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
@@ -115,22 +116,46 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var cacheButton: Button
     @FXML
+    private lateinit var dataButton: Button
+    @FXML
     private lateinit var cachedataButton: Button
     @FXML
     private lateinit var unlockButton: Button
     @FXML
     private lateinit var lockButton: Button
     @FXML
-    private lateinit var adbTab: Tab
+    private lateinit var codenameTextField: TextField
     @FXML
-    private lateinit var fastbootTab: Tab
+    private lateinit var branchComboBox: ComboBox<String>
+    @FXML
+    private lateinit var getlinkButton: Button
+    @FXML
+    private lateinit var downloadromButton: Button
+    @FXML
+    private lateinit var versionLabel: Label
+    @FXML
+    private lateinit var uninstallerPane: TitledPane
+    @FXML
+    private lateinit var camera2Pane: TitledPane
+    @FXML
+    private lateinit var devicepropertiesPane: TitledPane
+    @FXML
+    private lateinit var flasherPane: TitledPane
+    @FXML
+    private lateinit var wiperPane: TitledPane
+    @FXML
+    private lateinit var oemPane: TitledPane
+    @FXML
+    private lateinit var dpiPane: TitledPane
 
-    var device = Device()
+    var fastboot = false
+    var adb = false
     var image: File? = null
     var rom: File? = null
     var comm =  Command()
     lateinit var displayedcomm: Command
     lateinit var uninstaller: Uninstaller
+    var device = Device()
 
     fun setLabels() {
         serialLabel.text = device.serial
@@ -152,18 +177,35 @@ class MainWindowController : Initializable {
         antiLabel.text = "-"
         dpiTextField.text = ""
 
-        fastbootTab.isDisable = true
-        adbTab.isDisable = true
+        setADBTab(false)
+        setFastbootTab(false)
         rebootMenu.isDisable = true
         recoveryMenuItem.isDisable = true
+    }
+
+    fun setADBTab(value: Boolean){
+        uninstallerPane.isDisable = !value
+        camera2Pane.isDisable = !value
+        devicepropertiesPane.isDisable = !value
+        dpiPane.isDisable = !value
+        adb = value
+        fastboot = !value
+    }
+
+    fun setFastbootTab(value: Boolean){
+        flasherPane.isDisable = !value
+        wiperPane.isDisable = !value
+        oemPane.isDisable = !value
+        fastboot = value
+        adb = !value
     }
 
     fun checkFastboot(): Boolean {
         val fb = device.readFastboot()
         if (fb) {
             setLabels()
-            adbTab.isDisable = true
-            fastbootTab.isDisable = false
+            setADBTab(false)
+            setFastbootTab(true)
             recoveryMenuItem.isDisable = true
             rebootMenu.isDisable = false
         } else {
@@ -177,8 +219,8 @@ class MainWindowController : Initializable {
         val adb = device.readADB()
         if (adb) {
             setLabels()
-            adbTab.isDisable = false
-            fastbootTab.isDisable = true
+            setADBTab(true)
+            setFastbootTab(false)
             recoveryMenuItem.isDisable = false
             rebootMenu.isDisable = false
             antiLabel.text = "unknown"
@@ -197,6 +239,8 @@ class MainWindowController : Initializable {
                 "boot", "cust", "modem", "persist", "recovery", "system")
         scriptComboBox.items.addAll(
                 "Clean install", "Clean install and lock", "Update")
+        branchComboBox.items.addAll(
+                "Global Stable", "Global Developer", "China Stable", "China Developer")
 
         checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
         checkTableColumn.setCellFactory { _ -> CheckBoxTableCell() }
@@ -217,17 +261,19 @@ class MainWindowController : Initializable {
             rebootMenu.isDisable = false
             if (fb) {
                 outputTextArea.text = "Device found in Fastboot mode!"
-                adbTab.isDisable = true
-                fastbootTab.isDisable = false
+                setADBTab(false)
+                setFastbootTab(true)
                 recoveryMenuItem.isDisable = true
             }
             if (adb) {
                 uninstaller.loadApps(device)
                 antiLabel.text = "unknown"
-                dpiTextField.text = Integer.toString(device.dpi)
+                if (!device.recovery)
+                    dpiTextField.text = Integer.toString(device.dpi)
+                dpiPane.isDisable = device.recovery
                 outputTextArea.text = "Device found in ADB mode!"
-                adbTab.isDisable = false
-                fastbootTab.isDisable = true
+                setADBTab(true)
+                setFastbootTab(false)
                 recoveryMenuItem.isDisable = false
             }
         } else {
@@ -241,7 +287,7 @@ class MainWindowController : Initializable {
     @FXML
     private fun reboottwrpButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            if (comm.exec("adb devices").contains("recovery")) {
+            if (device.recovery) {
                 outputTextArea.text = "Device already in recovery mode!"
             } else {
                 comm.exec("adb reboot recovery")
@@ -260,7 +306,7 @@ class MainWindowController : Initializable {
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            if (!comm.exec("adb devices").contains("recovery")) {
+            if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
                 return
             }
@@ -274,7 +320,7 @@ class MainWindowController : Initializable {
     @FXML
     private fun enableButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            if (!comm.exec("adb devices").contains("recovery")) {
+            if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
                 return
             }
@@ -288,7 +334,7 @@ class MainWindowController : Initializable {
     @FXML
     private fun disableEISButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            if (!comm.exec("adb devices").contains("recovery")) {
+            if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
                 return
             }
@@ -302,7 +348,7 @@ class MainWindowController : Initializable {
     @FXML
     private fun enableEISButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            if (!comm.exec("adb devices").contains("recovery")) {
+            if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
                 return
             }
@@ -440,6 +486,12 @@ class MainWindowController : Initializable {
     }
 
     @FXML
+    private fun dataButtonPressed(event: ActionEvent) {
+        if (checkFastboot())
+            displayedcomm.exec("fastboot erase userdata")
+    }
+
+    @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             displayedcomm.exec("fastboot erase cache", "fastboot erase userdata")
@@ -458,32 +510,96 @@ class MainWindowController : Initializable {
     }
 
     @FXML
+    private fun getlinkButtonPressed(event: ActionEvent) {
+        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null){
+            val codename = codenameTextField.text.trim()
+            var url = URL("http://google.com")
+            if (branchComboBox.value == "Global Stable")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+            if (branchComboBox.value == "Global Developer")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+            if (branchComboBox.value == "China Stable")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+            if (branchComboBox.value == "China Developer")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            val huc = url.openConnection() as HttpURLConnection
+            huc.requestMethod = "GET"
+            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+            huc.instanceFollowRedirects = false
+            huc.connect()
+            huc.disconnect()
+            val link = huc.getHeaderField("Location")
+            if (link != null && link.contains("bigota")){
+                versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                outputTextArea.text = "${link}\n\nLink copied to clipboard!"
+                Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
+            } else {
+                versionLabel.text = "-"
+                outputTextArea.text = "Link not found!"
+            }
+        }
+    }
+
+    @FXML
+    private fun downloadromButtonPressed(event: ActionEvent) {
+        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null){
+            val codename = codenameTextField.text.trim()
+            var url = URL("http://google.com")
+            if (branchComboBox.value == "Global Stable")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+            if (branchComboBox.value == "Global Developer")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+            if (branchComboBox.value == "China Stable")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+            if (branchComboBox.value == "China Developer")
+                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            val huc = url.openConnection() as HttpURLConnection
+            huc.requestMethod = "GET"
+            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+            huc.instanceFollowRedirects = false
+            huc.connect()
+            huc.disconnect()
+            val link = huc.getHeaderField("Location")
+            if (link != null && link.contains("bigota")){
+                versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                outputTextArea.text = "Opening browser..."
+                if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                    Runtime.getRuntime().exec("xdg-open ${link}")
+                else Desktop.getDesktop().browse(URI(link))
+            } else {
+                versionLabel.text = "-"
+                outputTextArea.text = "Link not found!"
+            }
+        }
+    }
+
+    @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
-        if (!adbTab.isDisabled)
+        if (adb)
             comm.exec("adb reboot")
-        else if (!fastbootTab.isDisabled)
+        else if (fastboot)
             comm.exec("fastboot reboot")
     }
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
-        if (!adbTab.isDisabled)
+        if (adb)
             comm.exec("adb reboot recovery")
     }
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
-        if (!adbTab.isDisabled)
+        if (adb)
             comm.exec("adb reboot bootloader")
-        else if (!fastbootTab.isDisabled)
+        else if (fastboot)
             comm.exec("fastboot reboot bootloader")
     }
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
-        if (!adbTab.isDisabled)
+        if (adb)
             comm.exec("adb reboot edl")
-        else if (!fastbootTab.isDisabled)
+        else if (fastboot)
             displayedcomm.exec("fastboot oem edl")
     }
 
@@ -512,15 +628,17 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("res/smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 4.4" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
         val reddit = Hyperlink("r/Xiaomi on Reddit")
         reddit.onAction = EventHandler {
             try {
-                Desktop.getDesktop().browse(URI("https://www.reddit.com/r/Xiaomi"))
-            } catch (e1: IOException) {
+                if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                    Runtime.getRuntime().exec("xdg-open https://www.reddit.com/r/Xiaomi")
+                else Desktop.getDesktop().browse(URI("https://www.reddit.com/r/Xiaomi"))
+            } catch (e1: Exception) {
                 e1.printStackTrace()
             } catch (e1: URISyntaxException) {
                 e1.printStackTrace()
@@ -530,8 +648,10 @@ class MainWindowController : Initializable {
         val discord = Hyperlink("r/Xiaomi on Discord")
         discord.onAction = EventHandler {
             try {
-                Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
-            } catch (e1: IOException) {
+                if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                    Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
+                else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
+            } catch (e1: Exception) {
                 e1.printStackTrace()
             } catch (e1: URISyntaxException) {
                 e1.printStackTrace()
@@ -541,8 +661,10 @@ class MainWindowController : Initializable {
         val github = Hyperlink("This project on GitHub")
         github.onAction = EventHandler {
             try {
-                Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
-            } catch (e1: IOException) {
+                if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
+                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
+            } catch (e1: Exception) {
                 e1.printStackTrace()
             } catch (e1: URISyntaxException) {
                 e1.printStackTrace()

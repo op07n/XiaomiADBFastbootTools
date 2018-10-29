@@ -9,12 +9,14 @@ class Device {
     var auth = false
     var dpi = 0
     var comm = Command()
+    var recovery = false
 
     fun readFastboot(): Boolean {
         var op = comm.exec("fastboot devices", false)
         if (op.isEmpty())
             return false
         val cn = comm.exec("fastboot getvar product", true)
+        recovery = false
         serial = op.substring(0, op.indexOf("fa")).trim()
         codename = cn.substring(9, cn.indexOf(System.lineSeparator())).trim()
         op = comm.exec("fastboot oem device-info", true)
@@ -38,12 +40,16 @@ class Device {
             auth = true
             return false
         }
+        recovery = comm.exec("adb devices").contains("recovery")
         serial = comm.exec("adb get-serialno", false).trim()
         codename = comm.exec("adb shell getprop ro.build.product", false).trim()
         bootloader = comm.exec("adb shell getprop ro.boot.flash.locked", false).contains("0") or comm.exec("adb shell getprop ro.secureboot.lockstate", false).contains("unlocked")
         anti = -1
-        op = comm.exec("adb shell wm density")
-        dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim())
+        if (!recovery){
+            op = comm.exec("adb shell wm density")
+            dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim())
+        }
+        else dpi = -1
         return true
     }
 }
