@@ -12,7 +12,7 @@
 * **ROM Downloader** - Get links to the latest Fastboot ROMs or download them right away
 * **Rebooter** - Advanced rebooting options using ADB/Fastboot
 
-![](screenshot.PNG)
+![](screenshot.png)
 
 ## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
