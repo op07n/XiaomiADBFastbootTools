@@ -564,7 +564,7 @@ class MainWindowController : Initializable {
             val link = huc.getHeaderField("Location")
             if (link != null && link.contains("bigota")) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text = "Opening browser..."
+                outputTextArea.text = "Starting download in browser..."
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))
                     Runtime.getRuntime().exec("xdg-open ${link}")
                 else Desktop.getDesktop().browse(URI(link))
