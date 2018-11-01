@@ -55,20 +55,20 @@ class XiaomiADBFastbootTools : Application() {
 
     fun setupFiles() {
         val os = System.getProperty("os.name").toLowerCase()
-        createFile("res/dummy.img", false)
+        createFile("dummy.img", false)
         if (os.contains("win")) {
-            createFile("res/windows/adb.exe", true)
-            createFile("res/windows/fastboot.exe", true)
-            createFile("res/windows/AdbWinApi.dll", false)
-            createFile("res/windows/AdbWinUsbApi.dll", false)
+            createFile("windows/adb.exe", true)
+            createFile("windows/fastboot.exe", true)
+            createFile("windows/AdbWinApi.dll", false)
+            createFile("windows/AdbWinUsbApi.dll", false)
         }
         if (os.contains("mac")) {
-            createFile("res/macos/adb", true)
-            createFile("res/macos/fastboot", true)
+            createFile("macos/adb", true)
+            createFile("macos/fastboot", true)
         }
         if (os.contains("linux")) {
-            createFile("res/linux/adb", true)
-            createFile("res/linux/fastboot", true)
+            createFile("linux/adb", true)
+            createFile("linux/fastboot", true)
         }
         val t = Thread { Command().exec("adb start-server") }
         t.isDaemon = true
@@ -83,7 +83,7 @@ class XiaomiADBFastbootTools : Application() {
         val scene = Scene(root)
         stage.scene = scene
         stage.title = "Xiaomi ADB/Fastboot Tools"
-        stage.icons.add(Image(this.javaClass.classLoader.getResource("res/icon.png").toString()))
+        stage.icons.add(Image(this.javaClass.classLoader.getResource("icon.png").toString()))
         stage.show()
         stage.isResizable = false
 

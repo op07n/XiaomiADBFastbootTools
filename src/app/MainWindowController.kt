@@ -629,8 +629,8 @@ class MainWindowController : Initializable {
         val alert = Alert(AlertType.INFORMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
-        alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("res/smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0" + System.lineSeparator() + "Created by Saki_EU"
+        alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0.1" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 

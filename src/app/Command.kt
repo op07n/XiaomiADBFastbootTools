@@ -39,6 +39,8 @@ open class Command() {
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()
+            if (line.contains("fastboot format"))
+                continue
             output += line
             tic?.appendText(line)
         }

@@ -427,12 +427,12 @@
                                                             <Font size="18.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" text="Wipe cache and data" textFill="RED">
+                                                      <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" text="Wipe data" textFill="RED">
                                                          <font>
                                                             <Font size="18.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" text="Wipe data" textFill="RED">
+                                                      <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" text="Wipe cache and data" textFill="RED">
                                                          <font>
                                                             <Font size="18.0" />
                                                          </font>
