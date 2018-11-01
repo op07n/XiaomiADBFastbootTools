@@ -4,10 +4,7 @@ import javafx.application.Platform
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileReader
-import java.io.IOException
+import java.io.*
 import java.util.*
 
 class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndicator, var tic: TextInputControl, var directory: File) {
@@ -36,6 +33,29 @@ class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndica
         return cnt
     }
 
+    private fun createScript(arg: String) {
+        try {
+            scan = Scanner(FileReader(File(directory, "$arg.sh")))
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        var content = ""
+        while (scan.hasNext()) {
+            content += scan.nextLine().replace("fastboot", "./fastboot") + System.lineSeparator()
+        }
+        scan.close()
+        val script = File(directory, "script.sh")
+        try {
+            val fw = FileWriter(script)
+            fw.write(content)
+            fw.flush()
+            fw.close()
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        }
+        script.setExecutable(true, false)
+    }
+
     fun exec(arg: String) {
         tic.text = ""
         val script: File
@@ -43,7 +63,8 @@ class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndica
             script = File(directory, "$arg.bat")
             pb.command("cmd.exe", "/c", script.absolutePath)
         } else {
-            script = File(directory, "$arg.sh")
+            createScript(arg)
+            script = File(directory, "script.sh")
             pb.command("sh", "-c", script.absolutePath)
         }
         val n = getCmdCount(script)
@@ -61,8 +82,8 @@ class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndica
                     break
                 Platform.runLater {
                     tic.appendText(line)
-                    if (line.contains("fastboot"))
-                        progress.progress = progress.progress + (1.0 / n)
+                    if (line.contains("Finished.") || line.contains("finished."))
+                        progress.progress += 1.0 / n
                 }
             }
             scan.close()

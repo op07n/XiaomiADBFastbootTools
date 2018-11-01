@@ -191,7 +191,8 @@ class MainWindowController : Initializable {
         devicepropertiesPane.isDisable = !value
         dpiPane.isDisable = !value
         adb = value
-        fastboot = !value
+        if (value)
+            fastboot = !value
     }
 
     fun setFastbootTab(value: Boolean) {
@@ -199,7 +200,8 @@ class MainWindowController : Initializable {
         wiperPane.isDisable = !value
         oemPane.isDisable = !value
         fastboot = value
-        adb = !value
+        if (value)
+            adb = !value
     }
 
     fun checkFastboot(): Boolean {
@@ -437,6 +439,7 @@ class MainWindowController : Initializable {
         dc.title = "Select the root directory of a Fastboot ROM"
         rom = dc.showDialog((event.source as Node).scene.window)
         outputTextArea.text = ""
+        romLabel.text = "-"
         when {
             rom != null ->
                 if (File(rom, "images").exists()) {
@@ -449,6 +452,7 @@ class MainWindowController : Initializable {
                     else File(rom, "flash_all_except_data.sh").setExecutable(true, false)
                 } else {
                     outputTextArea.text = "ERROR: Fastboot ROM not found!"
+                    romLabel.text = "-"
                     rom = null
                 }
         }
@@ -461,6 +465,7 @@ class MainWindowController : Initializable {
                 if (checkFastboot()) {
                     val fs = FastbootFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
                     progressBar.progress = 0.0
+                    setFastbootTab(false)
                     if (scriptComboBox.value == "Clean install") fs.exec("flash_all")
                     if (scriptComboBox.value == "Clean install and lock") fs.exec("flash_all_lock")
                     if (scriptComboBox.value == "Update") {
@@ -577,31 +582,36 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
-        if (adb)
+        if (adb){
+            checkADB()
             comm.exec("adb reboot")
-        else if (fastboot)
+        } else if (checkFastboot())
             comm.exec("fastboot reboot")
     }
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
-        if (adb)
+        if (adb){
+            checkADB()
             comm.exec("adb reboot recovery")
+        }
     }
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
-        if (adb)
+        if (adb){
+            checkADB()
             comm.exec("adb reboot bootloader")
-        else if (fastboot)
+        } else if (checkFastboot())
             comm.exec("fastboot reboot bootloader")
     }
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
-        if (adb)
+        if (adb){
+            checkADB()
             comm.exec("adb reboot edl")
-        else if (fastboot)
+        } else if (checkFastboot())
             displayedcomm.exec("fastboot oem edl")
     }
 
@@ -630,7 +640,7 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0.1" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0.2" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 

@@ -140,7 +140,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
                     tic?.appendText("App: " + app.appnameProperty().get() + System.lineSeparator())
                     tic?.appendText("Package: " + app.packagenameProperty().get() + System.lineSeparator())
                     tic?.appendText("Result: " + line + System.lineSeparator())
-                    progress.progress = progress.progress + (1.0 / n)
+                    progress.progress += 1.0 / n
                 }
             }
             Platform.runLater {
