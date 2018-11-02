@@ -351,7 +351,7 @@
                                                                   <Font size="16.0" />
                                                                </font>
                                                             </Button>
-                                                            <ComboBox fx:id="partitionComboBox" editable="true" promptText="Select partition" />
+                                                            <ComboBox fx:id="partitionComboBox" editable="true" promptText="Partition" />
                                                             <Button fx:id="flashimageButton" mnemonicParsing="false" onAction="#flashimageButtonPressed" prefWidth="150.0" text="Flash image" textFill="RED">
                                                                <font>
                                                                   <Font size="16.0" />
@@ -399,7 +399,7 @@
                                                                   <Font size="16.0" />
                                                                </font>
                                                             </Button>
-                                                            <ComboBox fx:id="scriptComboBox" promptText="Select method" />
+                                                            <ComboBox fx:id="scriptComboBox" prefWidth="200.0" promptText="Method" />
                                                             <Button fx:id="flashromButton" mnemonicParsing="false" onAction="#flashromButtonPressed" prefWidth="150.0" text="Flash ROM" textFill="RED">
                                                                <font>
                                                                   <Font size="16.0" />
