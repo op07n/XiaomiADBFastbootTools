@@ -268,6 +268,7 @@ class MainWindowController : Initializable {
                 setADBTab(false)
                 setFastbootTab(true)
                 recoveryMenuItem.isDisable = true
+                codenameTextField.text = codenameLabel.text
             }
             if (adb) {
                 uninstaller.loadApps(device)
