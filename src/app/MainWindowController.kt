@@ -150,14 +150,14 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var dpiPane: TitledPane
 
-    var fastboot = false
-    var adb = false
     var image: File? = null
     var rom: File? = null
-    var comm = Command()
+    var fastboot = false
+    var adb = false
+    val comm = Command()
+    val device = Device()
     lateinit var displayedcomm: Command
     lateinit var uninstaller: Uninstaller
-    var device = Device()
 
     fun setLabels() {
         serialLabel.text = device.serial
