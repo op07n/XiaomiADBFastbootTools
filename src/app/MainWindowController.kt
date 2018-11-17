@@ -408,8 +408,12 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun antirbButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
-            displayedcomm.exec("fastboot flash antirbpass dummy.img")
+        if (checkFastboot()){
+            val result = comm.exec("fastboot flash antirbpass dummy.img")
+            if (result.contains("doesn't exist"))
+                displayedcomm.exec("fastboot oem ignore_anti")
+            else outputTextArea.text = result
+        }
     }
 
     @FXML
@@ -583,7 +587,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
-        if (adb){
+        if (adb) {
             checkADB()
             comm.exec("adb reboot")
         } else if (checkFastboot())
@@ -592,7 +596,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
-        if (adb){
+        if (adb) {
             checkADB()
             comm.exec("adb reboot recovery")
         }
@@ -600,7 +604,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
-        if (adb){
+        if (adb) {
             checkADB()
             comm.exec("adb reboot bootloader")
         } else if (checkFastboot())
@@ -609,7 +613,7 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
-        if (adb){
+        if (adb) {
             checkADB()
             comm.exec("adb reboot edl")
         } else if (checkFastboot())
@@ -641,16 +645,16 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.0.2" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.1" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
-        val reddit = Hyperlink("r/Xiaomi on Reddit")
+        val reddit = Hyperlink("Xiaomi Wiki")
         reddit.onAction = EventHandler {
             try {
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))
-                    Runtime.getRuntime().exec("xdg-open https://www.reddit.com/r/Xiaomi")
-                else Desktop.getDesktop().browse(URI("https://www.reddit.com/r/Xiaomi"))
+                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiWiki")
+                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiWiki"))
             } catch (e1: Exception) {
                 e1.printStackTrace()
             } catch (e1: URISyntaxException) {
@@ -658,7 +662,7 @@ class MainWindowController : Initializable {
             }
         }
         reddit.font = Font(14.0)
-        val discord = Hyperlink("r/Xiaomi on Discord")
+        val discord = Hyperlink("Xiaomi Discord")
         discord.onAction = EventHandler {
             try {
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))
@@ -671,7 +675,7 @@ class MainWindowController : Initializable {
             }
         }
         discord.font = Font(14.0)
-        val github = Hyperlink("This project on GitHub")
+        val github = Hyperlink("Project page")
         github.onAction = EventHandler {
             try {
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))

@@ -79,11 +79,11 @@ class XiaomiADBFastbootTools : Application() {
     override fun start(stage: Stage) {
         setupFiles()
 
-        val root = FXMLLoader.load<Parent>(javaClass.getResource("MainWindow.fxml"))
+        val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("MainWindow.fxml"))
         val scene = Scene(root)
         stage.scene = scene
         stage.title = "Xiaomi ADB/Fastboot Tools"
-        stage.icons.add(Image(this.javaClass.classLoader.getResource("icon.png").toString()))
+        stage.icons.add(Image(javaClass.classLoader.getResource("icon.png").toString()))
         stage.show()
         stage.isResizable = false
 
