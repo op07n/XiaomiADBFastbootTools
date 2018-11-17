@@ -410,7 +410,7 @@ class MainWindowController : Initializable {
     private fun antirbButtonPressed(event: ActionEvent) {
         if (checkFastboot()){
             val result = comm.exec("fastboot flash antirbpass dummy.img")
-            if (result.contains("doesn't exist"))
+            if (result.contains("FAILED"))
                 displayedcomm.exec("fastboot oem ignore_anti")
             else outputTextArea.text = result
         }
