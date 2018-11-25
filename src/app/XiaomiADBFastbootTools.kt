@@ -77,6 +77,14 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
+        if (File(System.getProperty("user.home") + "/temp").exists()){
+            try {
+                FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+        }
+
         setupFiles()
 
         val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("MainWindow.fxml"))

@@ -452,9 +452,9 @@ class MainWindowController : Initializable {
                     outputTextArea.text = "Fastboot ROM found!"
                     File(rom, "flash_all.sh").setExecutable(true, false)
                     File(rom, "flash_all_lock.sh").setExecutable(true, false)
-                    if (File(rom, "flash_all_except_storage.sh").exists())
-                        File(rom, "flash_all_except_storage.sh").setExecutable(true, false)
-                    else File(rom, "flash_all_except_data.sh").setExecutable(true, false)
+                    File(rom, "flash_all_except_storage.sh").setExecutable(true, false)
+                    File(rom, "flash_all_except_data.sh").setExecutable(true, false)
+                    File(rom, "flash_all_except_data_storage.sh").setExecutable(true, false)
                 } else {
                     outputTextArea.text = "ERROR: Fastboot ROM not found!"
                     romLabel.text = "-"
@@ -474,9 +474,11 @@ class MainWindowController : Initializable {
                     if (scriptComboBox.value == "Clean install") fs.exec("flash_all")
                     if (scriptComboBox.value == "Clean install and lock") fs.exec("flash_all_lock")
                     if (scriptComboBox.value == "Update") {
-                        if (File(rom, "flash_all_except_storage.sh").exists())
-                            fs.exec("flash_all_except_storage")
-                        else fs.exec("flash_all_except_data")
+                        when {
+                            File(rom, "flash_all_except_storage.sh").exists() -> fs.exec("flash_all_except_storage")
+                            File(rom, "flash_all_except_data.sh").exists() -> fs.exec("flash_all_except_data")
+                            File(rom, "flash_all_except_data_storage.sh").exists() -> fs.exec("flash_all_except_data_storage")
+                        }
                     }
                 }
         }
@@ -645,7 +647,7 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.1" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.1.1" + System.lineSeparator() + "Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
