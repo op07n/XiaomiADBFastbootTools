@@ -77,7 +77,7 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        if (File(System.getProperty("user.home") + "/temp").exists()){
+        if (File(System.getProperty("user.home") + "/temp").exists()) {
             try {
                 FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
             } catch (ex: IOException) {
