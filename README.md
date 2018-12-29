@@ -50,7 +50,7 @@
 
 * **Q:** The tool doesn't launch on my computer, is there anything I should have installed?
 
-    * **A:** Yes, the tool was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, OpenJFX is needed alongside OpenJDK to run the application. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 to use the application.
+    * **A:** Yes, the tool was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 to be able to run the application.
 
 * **Q:** The tool on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?
 
