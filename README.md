@@ -48,15 +48,15 @@
 
 ## Frequently Asked Questions
 
-* **Q:** The tool doesn't launch on my computer, is there anything I should have installed?
+* **Q:** The application doesn't launch on my computer, is there anything I should have installed?
 
-    * **A:** Yes, the tool was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 in order to run the application.
+    * **A:** Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 in order to run the application.
 
-* **Q:** The tool on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?
+* **Q:** The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?
 
-    * **A:** Windows most likely does not recognise your device in ADB. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
+    * **A:** Windows most likely does not recognise your device in ADB mode. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
 
-* **Q:** Do I need an unlocked bootloader or root access to use the tool?
+* **Q:** Do I need an unlocked bootloader or root access to use the app?
 
     * **A:** The Image Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
 
@@ -72,10 +72,10 @@
 
     * **A:** When you uninstall apps, you erase them from `/data` so you need to factory reset (wipe data) to make your device reinstall them (from `/system`).
 
-* **Q:** The tool is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?
+* **Q:** The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?
 
     * **A:** ADB and Fastboot are universal interfaces for Android devices but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
 
 * **Q:** Does this replace MiFlash or MiUnlock?
 
-    * **A:** No. Fastboot ROM flashing is available, but implementing other features in such a simple tool would only make it unnecessarily complex.
+    * **A:** No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or unlocking in such a simple tool would only make it unnecessarily complex.
