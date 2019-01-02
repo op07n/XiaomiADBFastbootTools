@@ -167,9 +167,9 @@ class MainWindowController : Initializable {
         else
             bootloaderLabel.text = "locked"
         if (device.anti != -1)
-            antiLabel.text = Integer.toString(device.anti)
+            antiLabel.text = device.anti.toString()
         else
-            antiLabel.text = "-"
+            antiLabel.text = "unknown"
     }
 
     fun clear() {
@@ -260,32 +260,39 @@ class MainWindowController : Initializable {
     private fun checkMenuItemPressed(event: ActionEvent) {
         val fb = device.readFastboot()
         val adb = device.readADB()
-        if (adb || fb) {
-            setLabels()
-            rebootMenu.isDisable = false
-            if (fb) {
+        when {
+            fb -> {
+                setLabels()
+                rebootMenu.isDisable = false
                 outputTextArea.text = "Device found in Fastboot mode!"
                 setADBTab(false)
                 setFastbootTab(true)
                 recoveryMenuItem.isDisable = true
                 codenameTextField.text = codenameLabel.text
             }
-            if (adb) {
+            adb -> {
+                setLabels()
+                rebootMenu.isDisable = false
                 uninstaller.loadApps(device)
                 antiLabel.text = "unknown"
-                if (!device.recovery)
-                    dpiTextField.text = Integer.toString(device.dpi)
+                if (!device.recovery) {
+                    if (device.dpi != -1)
+                        dpiTextField.text = device.dpi.toString()
+                    else dpiTextField.text = "ERROR"
+                }
                 dpiPane.isDisable = device.recovery
                 outputTextArea.text = "Device found in ADB mode!"
                 setADBTab(true)
                 setFastbootTab(false)
                 recoveryMenuItem.isDisable = false
+                codenameTextField.text = codenameLabel.text
             }
-        } else {
-            if (device.auth)
-                outputTextArea.text = "Device unauthorised!\nPlease allow USB debugging!"
-            else outputTextArea.text = "No device found!"
-            clear()
+            else -> {
+                if (device.auth)
+                    outputTextArea.text = "Device unauthorised!\nPlease allow USB debugging!"
+                else outputTextArea.text = "No device found!"
+                clear()
+            }
         }
     }
 
@@ -394,14 +401,20 @@ class MainWindowController : Initializable {
     @FXML
     private fun dpiButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            val attempt = displayedcomm.exec("adb shell wm density " + dpiTextField.text.trim())
-            if (attempt.contains("permission"))
-                outputTextArea.text = "ERROR: Please allow USB debugging (Security settings)!"
-            if (attempt.contains("bad number"))
-                outputTextArea.text = "ERROR: Invalid value!"
-            if (attempt.isEmpty()) {
-                outputTextArea.text = "Done! Rebooting..."
-                comm.exec("adb reboot")
+            val attempt = displayedcomm.exec("adb shell wm density ${dpiTextField.text.trim()}")
+            when {
+                attempt.contains("permission") -> {
+                    outputTextArea.text = "ERROR: Please allow USB debugging (Security settings)!"
+                }
+                attempt.contains("bad number") -> {
+                    outputTextArea.text = "ERROR: Invalid value!"
+                }
+                attempt.isEmpty() -> {
+                    outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
+                }
+                else -> {
+                    outputTextArea.text = "ERROR: Unexpected output!\n\n$attempt"
+                }
             }
         }
     }
@@ -432,8 +445,8 @@ class MainWindowController : Initializable {
             image != null && partitionComboBox.value != null ->
                 if (image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
                     if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
-                        displayedcomm.exec(image, "fastboot flash " + partitionComboBox.value.trim(), "fastboot boot")
-                    else displayedcomm.exec(image, "fastboot flash " + partitionComboBox.value.trim())
+                        displayedcomm.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
+                    else displayedcomm.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
                 }
         }
     }
@@ -471,10 +484,10 @@ class MainWindowController : Initializable {
                     val fs = FastbootFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
                     progressBar.progress = 0.0
                     setFastbootTab(false)
-                    if (scriptComboBox.value == "Clean install") fs.exec("flash_all")
-                    if (scriptComboBox.value == "Clean install and lock") fs.exec("flash_all_lock")
-                    if (scriptComboBox.value == "Update") {
-                        when {
+                    when (scriptComboBox.value) {
+                        "Clean install" -> fs.exec("flash_all")
+                        "Clean install and lock" -> fs.exec("flash_all_lock")
+                        "Update" -> when {
                             File(rom, "flash_all_except_storage.sh").exists() -> fs.exec("flash_all_except_storage")
                             File(rom, "flash_all_except_data.sh").exists() -> fs.exec("flash_all_except_data")
                             File(rom, "flash_all_except_data_storage.sh").exists() -> fs.exec("flash_all_except_data_storage")
@@ -528,14 +541,12 @@ class MainWindowController : Initializable {
         if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
             val codename = codenameTextField.text.trim()
             var url = URL("http://google.com")
-            if (branchComboBox.value == "Global Stable")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-            if (branchComboBox.value == "Global Developer")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-            if (branchComboBox.value == "China Stable")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-            if (branchComboBox.value == "China Developer")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            when (branchComboBox.value) {
+                "Global Stable" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                "Global Developer" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                "China Stable" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                "China Developer" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            }
             val huc = url.openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
             huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
@@ -559,14 +570,12 @@ class MainWindowController : Initializable {
         if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
             val codename = codenameTextField.text.trim()
             var url = URL("http://google.com")
-            if (branchComboBox.value == "Global Stable")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-            if (branchComboBox.value == "Global Developer")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-            if (branchComboBox.value == "China Stable")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-            if (branchComboBox.value == "China Developer")
-                url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            when (branchComboBox.value) {
+                "Global Stable" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                "Global Developer" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                "China Stable" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                "China Developer" -> url = URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+            }
             val huc = url.openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
             huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
@@ -647,7 +656,7 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools" + System.lineSeparator() + "Version 5.1.1" + System.lineSeparator() + "Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.1.2${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
@@ -690,10 +699,8 @@ class MainWindowController : Initializable {
             }
         }
         github.font = Font(14.0)
-
         vb.children.addAll(reddit, discord, github)
         alert.dialogPane.content = vb
         alert.showAndWait()
     }
-
 }

@@ -26,7 +26,7 @@ class Device {
         if (op.length != 7)
             anti = -1
         else
-            anti = Integer.parseInt(op.substring(6))
+            anti = op.substring(6).toInt()
         dpi = -1
         return true
     }
@@ -47,8 +47,12 @@ class Device {
         anti = -1
         if (!recovery) {
             op = comm.exec("adb shell wm density")
-            dpi = Integer.parseInt(op.substring(op.lastIndexOf(":") + 2).trim())
-        } else dpi = -1
+            try {
+                dpi = op.substring(op.lastIndexOf(":") + 2).trim().toInt()
+            } catch (e: Exception) {
+                dpi = -1
+            }
+        }
         return true
     }
 }

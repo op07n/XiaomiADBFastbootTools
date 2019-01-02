@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 
 
-class App(a: String, b: String) {
+class App(a: String, b: String, c: Boolean = false) {
     private val appname = SimpleStringProperty()
     private val packagename = SimpleStringProperty()
     private val selected = SimpleBooleanProperty()
@@ -14,7 +14,7 @@ class App(a: String, b: String) {
     init {
         appname.set(a)
         packagename.set(b)
-        selected.set(false)
+        selected.set(c)
     }
 
     fun appnameProperty(): StringProperty = appname

@@ -22,7 +22,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
 
     fun loadApps(device: Device) {
         apps = FXCollections.observableArrayList()
-        apps.add(App("Analytics", "com.miui.analytics"))
+        apps.add(App("Analytics", "com.miui.analytics", true))
         apps.add(App("App Vault", "com.miui.personalassistant"))
         apps.add(App("App Vault", "com.mi.android.globalpersonalassistant"))
         apps.add(App("Browser", "com.android.browser"))
@@ -60,8 +60,8 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
         apps.add(App("Google Play Movies", "com.google.android.videos"))
         apps.add(App("Google Play Music", "com.google.android.music"))
         apps.add(App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"))
-        apps.add(App("KLO Bugreport", "com.miui.klo.bugreport"))
-        apps.add(App("MAB", "com.xiaomi.ab"))
+        apps.add(App("KLO Bugreport", "com.miui.klo.bugreport", true))
+        apps.add(App("MAB", "com.xiaomi.ab", true))
         apps.add(App("Mail", "com.android.email"))
         apps.add(App("Mi Account", "com.xiaomi.account"))
         apps.add(App("Mi AI", "com.miui.voiceassist"))
@@ -76,14 +76,14 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
         apps.add(App("Mi Video", "com.miui.video"))
         apps.add(App("Mi Video", "com.miui.videoplayer"))
         apps.add(App("Mi Wallet", "com.mipay.wallet"))
-        apps.add(App("MiuiDaemon", "com.miui.daemon"))
+        apps.add(App("MiuiDaemon", "com.miui.daemon", true))
         apps.add(App("Mobile Device Information Provider", "com.amazon.appmanager"))
-        apps.add(App("MSA", "com.miui.msa.global"))
-        apps.add(App("MSA", "com.miui.systemAdSolution"))
+        apps.add(App("MSA", "com.miui.msa.global", true))
+        apps.add(App("MSA", "com.miui.systemAdSolution", true))
         apps.add(App("Music", "com.miui.player"))
         apps.add(App("Notes", "com.miui.notes"))
-        apps.add(App("PAI", "android.autoinstalls.config.Xiaomi." + device.codename))
-        apps.add(App("Quick Apps", "com.miui.hybrid"))
+        apps.add(App("PAI", "android.autoinstalls.config.Xiaomi.${device.codename}", true))
+        apps.add(App("Quick Apps", "com.miui.hybrid", true))
         apps.add(App("Recorder", "com.android.soundrecorder"))
         apps.add(App("Scanner", "com.xiaomi.scanner"))
         apps.add(App("Screen Recorder", "com.miui.screenrecorder"))
@@ -94,7 +94,6 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
         apps.add(App("Xiaomi SIM Activate Service", "com.xiaomi.simactivate.service"))
         apps.add(App("Yellow Pages", "com.miui.yellowpage"))
         apps.add(App("YouTube", "com.google.android.youtube"))
-
         createTable()
     }
 
@@ -123,7 +122,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
         progressind.isVisible = true
         t = Thread {
             for (app in undesirable) {
-                arguments = ("adb shell pm uninstall --user 0 " + app.packagenameProperty().get()).split(" ").toTypedArray()
+                arguments = ("adb shell pm uninstall --user 0 ${app.packagenameProperty().get()}").split(" ").toTypedArray()
                 arguments[0] = prefix + arguments[0]
                 pb.command(*arguments)
                 try {
@@ -137,9 +136,9 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
                     line += scan.nextLine() + System.lineSeparator()
                 scan.close()
                 Platform.runLater {
-                    tic?.appendText("App: " + app.appnameProperty().get() + System.lineSeparator())
-                    tic?.appendText("Package: " + app.packagenameProperty().get() + System.lineSeparator())
-                    tic?.appendText("Result: " + line + System.lineSeparator())
+                    tic?.appendText("App: ${app.appnameProperty().get()}${System.lineSeparator()}")
+                    tic?.appendText("Package: ${app.packagenameProperty().get()}${System.lineSeparator()}")
+                    tic?.appendText("Result: $line${System.lineSeparator()}")
                     progress.progress += 1.0 / n
                 }
             }

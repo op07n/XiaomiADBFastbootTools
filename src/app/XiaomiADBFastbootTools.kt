@@ -36,8 +36,8 @@ class XiaomiADBFastbootTools : Application() {
         }
         var newfile: File
         if (file.lastIndexOf("/") != -1)
-            newfile = File(System.getProperty("user.home") + "/temp/" + file.substring(file.lastIndexOf("/") + 1))
-        else newfile = File(System.getProperty("user.home") + "/temp/" + file)
+            newfile = File(System.getProperty("user.home") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
+        else newfile = File(System.getProperty("user.home") + "/temp/$file")
         if (!newfile.exists()) {
             try {
                 newfile.createNewFile()
