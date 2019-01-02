@@ -413,7 +413,7 @@ class MainWindowController : Initializable {
                     outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
                 }
                 else -> {
-                    outputTextArea.text = "ERROR: Unexpected output!\n\n$attempt"
+                    outputTextArea.text = "ERROR: Unexpected error!\n\n$attempt"
                 }
             }
         }
