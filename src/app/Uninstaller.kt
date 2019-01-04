@@ -108,7 +108,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
         tv.refresh()
     }
 
-    fun uninstall() {
+    fun uninstall(func: () -> Unit) {
         val undesirable = FXCollections.observableArrayList<App>()
         if (tv.items.size != 0) {
             for (app in tv.items)
@@ -146,6 +146,7 @@ class Uninstaller(var tv: TableView<App>, var progress: ProgressBar, var progres
                 tic?.appendText("Done!")
                 progress.progress = 0.0
                 progressind.isVisible = false
+                func()
                 createTable()
             }
         }

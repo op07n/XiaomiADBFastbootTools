@@ -20,7 +20,7 @@
 
 ## Instructions
 
-### Loading a device in ADB mode
+### Connecting a device in ADB mode
 
 1. Enable developer options in Android.
 
@@ -32,23 +32,23 @@
     * MIUI: Go to Settings > Additional settings > Developer options and enable USB debugging as well as USB debugging (Security settings).
     * Android One: Go to Settings > System > Developer options and enable USB debugging.
 
-3. Connect your device to your computer and launch the application. The device will ask for authorisation right away, which you have to allow.
+3. Connect your device to the computer and launch the application. The device is going to ask for authorisation, which you'll have to allow.
 
-4. Load your device by clicking Menu > Check for device in the application. Your device info should appear.
+4. Wait for the application to detect your device. The device info should appear in the top left section.
 
-### Loading a device in Fastboot mode
+### Connecting a device in Fastboot mode
 
 1. Put your device into Fastboot mode by holding power and volume down simultaneously until the Fastboot splash screen comes up.
 
     * If your device is loaded in ADB mode, you can enter Fastboot mode by clicking Menu > Reboot device to Fastboot.
 
-2. Connect your device to your computer and launch the application.
+2. Connect your device to the computer and launch the application.
 
-3. Load your device by clicking Menu > Check for device in the application. Your device info should appear.
+3. Wait for the application to detect your device. The device info should appear in the top left section.
 
 ## Frequently Asked Questions
 
-* **Q:** The application doesn't launch on my computer, is there anything I should have installed?
+* **Q:** The application doesn't launch on the computer, is there anything I should have installed?
 
     * **A:** Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 in order to run the application.
 

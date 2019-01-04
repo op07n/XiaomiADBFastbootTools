@@ -1,5 +1,6 @@
 package app
 
+import javafx.application.Platform
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -25,7 +26,6 @@ import java.io.FileWriter
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 
@@ -33,8 +33,6 @@ class MainWindowController : Initializable {
 
     @FXML
     private lateinit var optionsMenu: Menu
-    @FXML
-    private lateinit var checkMenuItem: MenuItem
     @FXML
     private lateinit var rebootMenu: Menu
     @FXML
@@ -152,93 +150,94 @@ class MainWindowController : Initializable {
 
     var image: File? = null
     var rom: File? = null
-    var fastboot = false
-    var adb = false
     val comm = Command()
     val device = Device()
     lateinit var displayedcomm: Command
     lateinit var uninstaller: Uninstaller
 
-    fun setLabels() {
-        serialLabel.text = device.serial
-        codenameLabel.text = device.codename
-        if (device.bootloader)
-            bootloaderLabel.text = "unlocked"
-        else
-            bootloaderLabel.text = "locked"
-        if (device.anti != -1)
-            antiLabel.text = device.anti.toString()
-        else
-            antiLabel.text = "unknown"
-    }
+    fun setUI() {
+        when (device.mode) {
+            0 -> {
+                serialLabel.text = "-"
+                bootloaderLabel.text = "-"
+                codenameLabel.text = "-"
+                antiLabel.text = "-"
 
-    fun clear() {
-        serialLabel.text = "-"
-        bootloaderLabel.text = "-"
-        codenameLabel.text = "-"
-        antiLabel.text = "-"
-        dpiTextField.text = ""
+                uninstallerPane.isDisable = true
+                camera2Pane.isDisable = true
+                devicepropertiesPane.isDisable = true
+                dpiPane.isDisable = true
+                flasherPane.isDisable = true
+                wiperPane.isDisable = true
+                oemPane.isDisable = true
+                rebootMenu.isDisable = true
+                recoveryMenuItem.isDisable = true
+            }
+            1 -> {
+                serialLabel.text = device.serial
+                codenameLabel.text = device.codename
+                codenameTextField.text = device.codename
+                if (device.bootloader)
+                    bootloaderLabel.text = "unlocked"
+                else bootloaderLabel.text = "locked"
+                if (device.anti != -1)
+                    antiLabel.text = device.anti.toString()
+                else antiLabel.text = "unknown"
 
-        setADBTab(false)
-        setFastbootTab(false)
-        rebootMenu.isDisable = true
-        recoveryMenuItem.isDisable = true
-    }
+                uninstallerPane.isDisable = false
+                camera2Pane.isDisable = false
+                devicepropertiesPane.isDisable = false
+                dpiPane.isDisable = device.recovery
+                flasherPane.isDisable = true
+                wiperPane.isDisable = true
+                oemPane.isDisable = true
+                rebootMenu.isDisable = false
+                recoveryMenuItem.isDisable = false
+            }
+            2 -> {
+                serialLabel.text = device.serial
+                codenameLabel.text = device.codename
+                codenameTextField.text = device.codename
+                if (device.bootloader)
+                    bootloaderLabel.text = "unlocked"
+                else bootloaderLabel.text = "locked"
+                if (device.anti != -1)
+                    antiLabel.text = device.anti.toString()
+                else antiLabel.text = "unknown"
 
-    fun setADBTab(value: Boolean) {
-        uninstallerPane.isDisable = !value
-        camera2Pane.isDisable = !value
-        devicepropertiesPane.isDisable = !value
-        dpiPane.isDisable = !value
-        adb = value
-        if (value)
-            fastboot = !value
-    }
-
-    fun setFastbootTab(value: Boolean) {
-        flasherPane.isDisable = !value
-        wiperPane.isDisable = !value
-        oemPane.isDisable = !value
-        fastboot = value
-        if (value)
-            adb = !value
-    }
-
-    fun checkFastboot(): Boolean {
-        val fb = device.readFastboot()
-        if (fb) {
-            setLabels()
-            setADBTab(false)
-            setFastbootTab(true)
-            recoveryMenuItem.isDisable = true
-            rebootMenu.isDisable = false
-        } else {
-            outputTextArea.text = "No device found in Fastboot mode!"
-            clear()
+                uninstallerPane.isDisable = true
+                camera2Pane.isDisable = true
+                devicepropertiesPane.isDisable = true
+                dpiPane.isDisable = true
+                flasherPane.isDisable = false
+                wiperPane.isDisable = false
+                oemPane.isDisable = false
+                rebootMenu.isDisable = false
+                recoveryMenuItem.isDisable = true
+            }
         }
-        return fb
     }
 
     fun checkADB(): Boolean {
-        val adb = device.readADB()
-        if (adb) {
-            setLabels()
-            setADBTab(true)
-            setFastbootTab(false)
-            recoveryMenuItem.isDisable = false
-            rebootMenu.isDisable = false
-            antiLabel.text = "unknown"
-        } else {
-            if (device.auth)
-                outputTextArea.text = "ERROR: Device unauthorised!\nPlease allow USB debugging!"
-            else outputTextArea.text = "No device found in ADB mode!"
-            clear()
+        if (device.readADB()) {
+            setUI()
+            return true
         }
-        return adb
+        return false
+    }
+
+    fun checkFastboot(): Boolean {
+        if (device.readFastboot()) {
+            setUI()
+            return true
+        }
+        return false
     }
 
     override fun initialize(url: URL, rb: ResourceBundle?) {
-        clear()
+        setUI()
+        outputTextArea.text = "Looking for devices..."
+        progressIndicator.isVisible = true
         partitionComboBox.items.addAll(
                 "boot", "cust", "modem", "persist", "recovery", "system")
         scriptComboBox.items.addAll(
@@ -254,46 +253,44 @@ class MainWindowController : Initializable {
 
         displayedcomm = Command(outputTextArea)
         uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
-    }
 
-    @FXML
-    private fun checkMenuItemPressed(event: ActionEvent) {
-        val fb = device.readFastboot()
-        val adb = device.readADB()
-        when {
-            fb -> {
-                setLabels()
-                rebootMenu.isDisable = false
-                outputTextArea.text = "Device found in Fastboot mode!"
-                setADBTab(false)
-                setFastbootTab(true)
-                recoveryMenuItem.isDisable = true
-                codenameTextField.text = codenameLabel.text
-            }
-            adb -> {
-                setLabels()
-                rebootMenu.isDisable = false
-                uninstaller.loadApps(device)
-                antiLabel.text = "unknown"
-                if (!device.recovery) {
-                    if (device.dpi != -1)
-                        dpiTextField.text = device.dpi.toString()
-                    else dpiTextField.text = "ERROR"
+        val t = Thread {
+            comm.exec("adb start-server")
+            while (true) {
+                if (device.mode == 0) {
+                    outputTextArea.text = "Looking for devices..."
+                    progressIndicator.isVisible = true
+                    if (device.readADB()) {
+                        progressIndicator.isVisible = false
+                        outputTextArea.text = "Device found in ADB mode!"
+                        uninstaller.loadApps(device)
+                        Platform.runLater { setUI() }
+                        if (!device.recovery) {
+                            if (device.dpi != -1)
+                                dpiTextField.text = device.dpi.toString()
+                            else dpiTextField.text = "ERROR"
+                        }
+                        continue
+                    }
+                    if (device.readFastboot()) {
+                        progressIndicator.isVisible = false
+                        outputTextArea.text = "Device found in Fastboot mode!"
+                        Platform.runLater { setUI() }
+                        continue
+                    }
+                    Platform.runLater { setUI() }
+                    if (device.auth)
+                        outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
                 }
-                dpiPane.isDisable = device.recovery
-                outputTextArea.text = "Device found in ADB mode!"
-                setADBTab(true)
-                setFastbootTab(false)
-                recoveryMenuItem.isDisable = false
-                codenameTextField.text = codenameLabel.text
-            }
-            else -> {
-                if (device.auth)
-                    outputTextArea.text = "Device unauthorised!\nPlease allow USB debugging!"
-                else outputTextArea.text = "No device found!"
-                clear()
+                try {
+                    Thread.sleep(1000)
+                } catch (ex: InterruptedException) {
+                    //Closing the application
+                }
             }
         }
+        t.isDaemon = true
+        t.start()
     }
 
     @FXML
@@ -324,8 +321,8 @@ class MainWindowController : Initializable {
             }
             comm.exec("adb shell setprop persist.camera.HAL3.enabled 0")
             if (!checkcamera2())
-                outputTextArea.text = "Disabled!"
-            else outputTextArea.text = "ERROR: Couldn't disable!"
+                outputTextArea.text = "Camera2 disabled!"
+            else outputTextArea.text = "ERROR: Couldn't disable Camera2!"
         }
     }
 
@@ -338,8 +335,8 @@ class MainWindowController : Initializable {
             }
             comm.exec("adb shell setprop persist.camera.HAL3.enabled 1")
             if (checkcamera2())
-                outputTextArea.text = "Enabled!"
-            else outputTextArea.text = "ERROR: Couldn't enable!"
+                outputTextArea.text = "Camera2 enabled!"
+            else outputTextArea.text = "ERROR: Couldn't enable Camera2!"
         }
     }
 
@@ -352,8 +349,8 @@ class MainWindowController : Initializable {
             }
             comm.exec("adb shell setprop persist.camera.eis.enable 0")
             if (!checkEIS())
-                outputTextArea.text = "Disabled!"
-            else outputTextArea.text = "ERROR: Couldn't disable!"
+                outputTextArea.text = "EIS disabled!"
+            else outputTextArea.text = "ERROR: Couldn't disable EIS!"
         }
     }
 
@@ -366,8 +363,8 @@ class MainWindowController : Initializable {
             }
             comm.exec("adb shell setprop persist.camera.eis.enable 1")
             if (checkEIS())
-                outputTextArea.text = "Enabled!"
-            else outputTextArea.text = "ERROR: Couldn't enable!"
+                outputTextArea.text = "EIS enabled!"
+            else outputTextArea.text = "ERROR: Couldn't enable EIS!"
         }
     }
 
@@ -413,7 +410,7 @@ class MainWindowController : Initializable {
                     outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
                 }
                 else -> {
-                    outputTextArea.text = "ERROR: Unexpected error!\n\n$attempt"
+                    outputTextArea.text = "ERROR: Unexpected result!\n\n$attempt"
                 }
             }
         }
@@ -483,7 +480,15 @@ class MainWindowController : Initializable {
                 if (checkFastboot()) {
                     val fs = FastbootFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
                     progressBar.progress = 0.0
-                    setFastbootTab(false)
+                    uninstallerPane.isDisable = true
+                    camera2Pane.isDisable = true
+                    devicepropertiesPane.isDisable = true
+                    dpiPane.isDisable = true
+                    flasherPane.isDisable = true
+                    wiperPane.isDisable = true
+                    oemPane.isDisable = true
+                    rebootMenu.isDisable = true
+                    recoveryMenuItem.isDisable = true
                     when (scriptComboBox.value) {
                         "Clean install" -> fs.exec("flash_all")
                         "Clean install and lock" -> fs.exec("flash_all_lock")
@@ -598,44 +603,59 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
-        if (adb) {
-            checkADB()
-            comm.exec("adb reboot")
-        } else if (checkFastboot())
-            comm.exec("fastboot reboot")
+        when (device.mode) {
+            1 -> if (checkADB()) comm.exec("adb reboot")
+            2 -> if (checkFastboot()) comm.exec("fastboot reboot")
+        }
     }
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
-        if (adb) {
-            checkADB()
-            comm.exec("adb reboot recovery")
+        when (device.mode) {
+            1 -> if (checkADB()) comm.exec("adb reboot recovery")
         }
     }
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
-        if (adb) {
-            checkADB()
-            comm.exec("adb reboot bootloader")
-        } else if (checkFastboot())
-            comm.exec("fastboot reboot bootloader")
+        when (device.mode) {
+            1 -> if (checkADB()) comm.exec("adb reboot bootloader")
+            2 -> if (checkFastboot()) comm.exec("fastboot reboot bootloader")
+        }
     }
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
-        if (adb) {
-            checkADB()
-            comm.exec("adb reboot edl")
-        } else if (checkFastboot())
-            displayedcomm.exec("fastboot oem edl")
+        when (device.mode) {
+            1 -> if (checkADB()) comm.exec("adb reboot edl")
+            2 -> if (checkFastboot()) comm.exec("fastboot oem edl")
+        }
     }
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             progressBar.progress = 0.0
-            uninstaller.uninstall()
+            uninstallerPane.isDisable = true
+            camera2Pane.isDisable = true
+            devicepropertiesPane.isDisable = true
+            dpiPane.isDisable = true
+            flasherPane.isDisable = true
+            wiperPane.isDisable = true
+            oemPane.isDisable = true
+            rebootMenu.isDisable = true
+            recoveryMenuItem.isDisable = true
+            uninstaller.uninstall {
+                uninstallerPane.isDisable = false
+                camera2Pane.isDisable = false
+                devicepropertiesPane.isDisable = false
+                dpiPane.isDisable = device.recovery
+                flasherPane.isDisable = true
+                wiperPane.isDisable = true
+                oemPane.isDisable = true
+                rebootMenu.isDisable = false
+                recoveryMenuItem.isDisable = false
+            }
         }
     }
 
@@ -656,47 +676,29 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.1.2${System.lineSeparator()}Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
         val reddit = Hyperlink("Xiaomi Wiki")
         reddit.onAction = EventHandler {
-            try {
-                if (System.getProperty("os.name").toLowerCase().contains("linux"))
-                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiWiki")
-                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiWiki"))
-            } catch (e1: Exception) {
-                e1.printStackTrace()
-            } catch (e1: URISyntaxException) {
-                e1.printStackTrace()
-            }
+            if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiWiki")
+            else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiWiki"))
         }
         reddit.font = Font(14.0)
         val discord = Hyperlink("Xiaomi Discord")
         discord.onAction = EventHandler {
-            try {
-                if (System.getProperty("os.name").toLowerCase().contains("linux"))
-                    Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
-                else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
-            } catch (e1: Exception) {
-                e1.printStackTrace()
-            } catch (e1: URISyntaxException) {
-                e1.printStackTrace()
-            }
+            if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
+            else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
         discord.font = Font(14.0)
         val github = Hyperlink("Project page")
         github.onAction = EventHandler {
-            try {
-                if (System.getProperty("os.name").toLowerCase().contains("linux"))
-                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
-                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
-            } catch (e1: Exception) {
-                e1.printStackTrace()
-            } catch (e1: URISyntaxException) {
-                e1.printStackTrace()
-            }
+            if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
+            else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
         }
         github.font = Font(14.0)
         vb.children.addAll(reddit, discord, github)

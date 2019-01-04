@@ -70,9 +70,6 @@ class XiaomiADBFastbootTools : Application() {
             createFile("linux/adb", true)
             createFile("linux/fastboot", true)
         }
-        val t = Thread { Command().exec("adb start-server") }
-        t.isDaemon = true
-        t.start()
     }
 
     @Throws(Exception::class)
@@ -81,12 +78,10 @@ class XiaomiADBFastbootTools : Application() {
             try {
                 FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
             } catch (ex: IOException) {
-                ex.printStackTrace()
+                System.out.println("Couldn't delete ${System.getProperty("user.home") + "/temp"}")
             }
         }
-
         setupFiles()
-
         val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("MainWindow.fxml"))
         val scene = Scene(root)
         stage.scene = scene
@@ -94,11 +89,10 @@ class XiaomiADBFastbootTools : Application() {
         stage.icons.add(Image(javaClass.classLoader.getResource("icon.png").toString()))
         stage.show()
         stage.isResizable = false
-
         if (!File(System.getProperty("user.home") + "/temp/adb").exists() && !File(System.getProperty("user.home") + "/temp/adb.exe").exists()) {
             val alert = Alert(Alert.AlertType.ERROR)
             alert.title = "Fatal Error"
-            alert.headerText = "ERROR: Couldn't initialise ADB!"
+            alert.headerText = "ERROR: Couldn't initialize ADB!"
             alert.showAndWait()
             Platform.exit()
         }
@@ -114,7 +108,7 @@ class XiaomiADBFastbootTools : Application() {
         try {
             FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
         } catch (ex: IOException) {
-            ex.printStackTrace()
+            System.out.println("Couldn't delete ${System.getProperty("user.home") + "/temp"}")
         }
     }
 

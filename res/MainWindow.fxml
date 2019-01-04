@@ -31,7 +31,6 @@
       <menus>
         <Menu fx:id="optionsMenu" mnemonicParsing="false" text="Menu">
           <items>
-            <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" onAction="#checkMenuItemPressed" text="Check for device" />
                   <Menu fx:id="rebootMenu" disable="true" mnemonicParsing="false" text="Reboot device to">
                     <items>
                       <MenuItem fx:id="systemMenuItem" mnemonicParsing="false" onAction="#systemMenuItemPressed" text="System" />
@@ -165,9 +164,9 @@
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
                                                    </columnConstraints>
                                                    <rowConstraints>
-                                                      <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="463.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="39.0" minHeight="-Infinity" prefHeight="31.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="50.0" minHeight="-Infinity" prefHeight="45.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
@@ -182,7 +181,7 @@
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font></TextField>
-                                                      <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="532.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
+                                                      <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="537.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
                                                          <font>
                                                             <Font size="16.0" />
                                                          </font>
