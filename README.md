@@ -58,7 +58,7 @@
 
 * **Q:** Do I need an unlocked bootloader or root access to use the app?
 
-    * **A:** The Image Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
+    * **A:** The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
 
 * **Q:** Do uninstalled system apps affect OTA updates?
 
@@ -70,7 +70,7 @@
 
 * **Q:** How do I regain uninstalled system apps?
 
-    * **A:** When you uninstall apps, you erase them from `/data` so you need to factory reset (wipe data) to make your device reinstall them (from `/system`).
+    * **A:** When you uninstall apps, you erase them from `/data` so you need to factory reset to make your device reinstall them (from `/system`).
 
 * **Q:** The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?
 
