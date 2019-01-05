@@ -695,7 +695,7 @@ class MainWindowController : Initializable {
             else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
         }
         twitter.font = Font(14.0)
-        val github = Hyperlink("GitHub")
+        val github = Hyperlink("Project page on GitHub")
         github.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")

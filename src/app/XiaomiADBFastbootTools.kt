@@ -101,6 +101,7 @@ class XiaomiADBFastbootTools : Application() {
     override fun stop() {
         Thread.sleep(500)
         Command().exec("adb kill-server")
+        Thread.sleep(500)
         try {
             FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
         } catch (ex: IOException) {
