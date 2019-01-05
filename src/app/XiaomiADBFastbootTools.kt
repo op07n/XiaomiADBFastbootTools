@@ -78,7 +78,7 @@ class XiaomiADBFastbootTools : Application() {
             try {
                 FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
             } catch (ex: IOException) {
-                System.out.println("Couldn't delete ${System.getProperty("user.home") + "/temp"}")
+                ex.printStackTrace()
             }
         }
         setupFiles()
@@ -99,16 +99,12 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     override fun stop() {
+        Thread.sleep(500)
         Command().exec("adb kill-server")
-        try {
-            Thread.sleep(500)
-        } catch (ex: InterruptedException) {
-            ex.printStackTrace()
-        }
         try {
             FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
         } catch (ex: IOException) {
-            System.out.println("Couldn't delete ${System.getProperty("user.home") + "/temp"}")
+            stop()
         }
     }
 

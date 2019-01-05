@@ -114,11 +114,7 @@ open class Command() {
         tic?.text = ""
         for (s in args) {
             init(s)
-            try {
-                proc.waitFor()
-            } catch (ex: InterruptedException) {
-                ex.printStackTrace()
-            }
+            proc.waitFor()
         }
         return output
     }
@@ -129,26 +125,8 @@ open class Command() {
         tic?.text = ""
         for (s in args) {
             init(image, s)
-            try {
-                proc.waitFor()
-            } catch (ex: InterruptedException) {
-                ex.printStackTrace()
-            }
+            proc.waitFor()
         }
         return output
-    }
-
-    fun waitFor() {
-        try {
-            proc.waitFor()
-        } catch (ex: InterruptedException) {
-            ex.printStackTrace()
-        }
-    }
-
-    fun kill() {
-        proc.destroy()
-        if (proc.isAlive)
-            proc.destroyForcibly()
     }
 }

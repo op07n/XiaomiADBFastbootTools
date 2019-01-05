@@ -285,7 +285,7 @@ class MainWindowController : Initializable {
                 try {
                     Thread.sleep(1000)
                 } catch (ex: InterruptedException) {
-                    //Closing the application
+                    comm.exec("adb kill-server")
                 }
             }
         }
@@ -676,17 +676,11 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2${System.lineSeparator()}Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2.1${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
-        val reddit = Hyperlink("Xiaomi Wiki")
-        reddit.onAction = EventHandler {
-            if (System.getProperty("os.name").toLowerCase().contains("linux"))
-                Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiWiki")
-            else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiWiki"))
-        }
-        reddit.font = Font(14.0)
+
         val discord = Hyperlink("Xiaomi Discord")
         discord.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
@@ -694,14 +688,21 @@ class MainWindowController : Initializable {
             else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
         discord.font = Font(14.0)
-        val github = Hyperlink("Project page")
+        val twitter = Hyperlink("Twitter")
+        twitter.onAction = EventHandler {
+            if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
+            else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
+        }
+        twitter.font = Font(14.0)
+        val github = Hyperlink("GitHub")
         github.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
             else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
         }
         github.font = Font(14.0)
-        vb.children.addAll(reddit, discord, github)
+        vb.children.addAll(discord, twitter, github)
         alert.dialogPane.content = vb
         alert.showAndWait()
     }

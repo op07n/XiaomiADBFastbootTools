@@ -97,13 +97,4 @@ class FastbootFlasher(var progress: ProgressBar, var progressind: ProgressIndica
         t.start()
     }
 
-    fun waitFor() {
-        try {
-            proc.waitFor()
-        } catch (ex: InterruptedException) {
-            ex.printStackTrace()
-        }
-
-    }
-
 }
