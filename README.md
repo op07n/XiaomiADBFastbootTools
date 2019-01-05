@@ -2,7 +2,7 @@
 
 ## Modules
 
-* **Uninstaller** - Remove pre-installed apps and services on demand
+* **Uninstaller** - Remove factory apps and services on demand
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
 * **Device properties** - Retrieve tons of statistics and information about your device
 * **Screen density** - Tweak screen density by overriding the DPI value
