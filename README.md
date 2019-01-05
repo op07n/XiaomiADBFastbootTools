@@ -56,6 +56,10 @@ Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. Y
 
 Windows most likely doesn't recognise your device in ADB mode. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip), reboot your PC and try again.
 
+**Do I need an unlocked bootloader or root access to use the app?**
+
+The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
+
 **What apps are safe to uninstall?**
 
 All applications in the list are safe to uninstall. You'll lose some features but the phone will keep working just fine. Some apps, like Gallery, aren't listed because uninstalling them would soft brick your phone.
@@ -63,10 +67,6 @@ All applications in the list are safe to uninstall. You'll lose some features bu
 **Do uninstalled system apps affect OTA updates?**
 
 No, you are free to install updates without the fear of bricking your device or losing data.
-
-**Do I need an unlocked bootloader or root access to use the app?**
-
-The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
 
 **Why does the Uninstaller hang on some apps?**
 
