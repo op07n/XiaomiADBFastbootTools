@@ -48,34 +48,38 @@
 
 ## Frequently Asked Questions
 
-* **Q:** The application doesn't launch on the computer, is there anything I should have installed?
+**The application doesn't launch, is there anything I should have installed?**
 
-    * **A:** Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall OpenJDK 11 in order to run the application.
+Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall it in order to run the application.
 
-* **Q:** The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?
+**The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
-    * **A:** Windows most likely does not recognise your device in ADB mode. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip).
+Windows most likely doesn't recognise your device in ADB mode. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip), reboot your PC and try again.
 
-* **Q:** Do I need an unlocked bootloader or root access to use the app?
+**What apps are safe to uninstall?**
 
-    * **A:** The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
+All applications in the list are safe to uninstall. You'll lose some features but the phone will keep working just fine. Some apps, like Gallery, aren't listed because uninstalling them would soft brick your phone.
 
-* **Q:** Do uninstalled system apps affect OTA updates?
+**Do uninstalled system apps affect OTA updates?**
 
-    * **A:** No, you are free to install updates without the fear of bricking your device or losing data.
+No, you are free to install updates without the fear of bricking your device or losing data.
 
-* **Q:** Why does the Uninstaller hang on some apps?
+**Do I need an unlocked bootloader or root access to use the app?**
 
-    * **A:** There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall such an app, the tool will hang. Disconnect your device, uninstall the app then reconnect the device to proceed.
+The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
 
-* **Q:** How do I regain uninstalled system apps?
+**Why does the Uninstaller hang on some apps?**
 
-    * **A:** When you uninstall apps, you erase them from `/data` so you need to factory reset to make your device reinstall them (from `/system`).
+There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall such an app, the tool will hang. Disconnect your device, uninstall the app then reconnect the device to proceed.
 
-* **Q:** The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?
+**How do I regain uninstalled system apps?**
 
-    * **A:** ADB and Fastboot are universal interfaces for Android devices but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
+When you uninstall apps, you erase them from `/data` so you need to factory reset to make your device reinstall them (from `/system`).
 
-* **Q:** Does this replace MiFlash or MiUnlock?
+**The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?**
 
-    * **A:** No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or unlocking in such a simple tool would only make it unnecessarily complex.
+ADB and Fastboot are universal interfaces for Android devices but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
+
+**Does this replace MiFlash or MiUnlock?**
+
+No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or unlocking in such a simple tool would only make it unnecessarily complex.
