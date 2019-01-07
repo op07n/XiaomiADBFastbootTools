@@ -70,11 +70,11 @@ No, you are free to install updates without the fear of bricking your device or 
 
 **Why does the Uninstaller hang on some apps?**
 
-There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall such an app, the tool will hang. Disconnect your device, uninstall the app then reconnect the device to proceed.
+There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall an app like that, the tool will hang. If that happens, close the tools, disconnect your device, uninstall the app manually, then launch the tools and reconnect the device to proceed.
 
 **How do I regain uninstalled system apps?**
 
-When you uninstall apps, you erase them from `/data` so you need to factory reset to make your device reinstall them (from `/system`).
+When you uninstall apps, you erase them from `/data` so you need to factory reset (wipe `/data`) to make your device reinstall them.
 
 **The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?**
 
@@ -82,4 +82,4 @@ ADB and Fastboot are universal interfaces for Android devices but some of the al
 
 **Does this replace MiFlash or MiUnlock?**
 
-No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or unlocking in such a simple tool would only make it unnecessarily complex.
+No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or MIUI unlocking would only make the program unnecessarily complex.
