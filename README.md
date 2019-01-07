@@ -70,7 +70,7 @@ No, you are free to install updates without the fear of bricking your device or 
 
 **Why does the Uninstaller hang on some apps?**
 
-There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall an app like that, the tool will hang. If that happens, close the tools, disconnect your device, uninstall the app manually, then launch the tools and reconnect your device to proceed.
+There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall an app like that, the tool will hang. If that happens, close the tools, disconnect your device, uninstall the app manually, then launch the tools again and reconnect your device to proceed.
 
 **How do I regain uninstalled system apps?**
 
