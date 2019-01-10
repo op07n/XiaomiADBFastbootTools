@@ -258,7 +258,8 @@ class MainWindowController : Initializable {
             comm.exec("adb start-server")
             while (true) {
                 if (device.mode == 0) {
-                    outputTextArea.text = "Looking for devices..."
+                    if (!outputTextArea.text.contains("Looking"))
+                        outputTextArea.text = "Looking for devices..."
                     progressIndicator.isVisible = true
                     if (device.readADB()) {
                         progressIndicator.isVisible = false
@@ -279,11 +280,11 @@ class MainWindowController : Initializable {
                         continue
                     }
                     Platform.runLater { setUI() }
-                    if (device.auth)
+                    if (device.auth && !outputTextArea.text.contains("Unauthorised"))
                         outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
                 }
                 try {
-                    Thread.sleep(1000)
+                    Thread.sleep(2000)
                 } catch (ex: InterruptedException) {
                     comm.exec("adb kill-server")
                 }
@@ -561,11 +562,11 @@ class MainWindowController : Initializable {
             val link = huc.getHeaderField("Location")
             if (link != null && link.contains("bigota")) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text = "${link}\n\nLink copied to clipboard!"
+                outputTextArea.text += "\n\n${link}\n\nLink copied to clipboard!"
                 Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
             } else {
                 versionLabel.text = "-"
-                outputTextArea.text = "Link not found!"
+                outputTextArea.text += "\n\nLink not found!"
             }
         }
     }
@@ -590,13 +591,13 @@ class MainWindowController : Initializable {
             val link = huc.getHeaderField("Location")
             if (link != null && link.contains("bigota")) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text = "Starting download in browser..."
+                outputTextArea.text += "\n\nStarting download in browser..."
                 if (System.getProperty("os.name").toLowerCase().contains("linux"))
                     Runtime.getRuntime().exec("xdg-open ${link}")
                 else Desktop.getDesktop().browse(URI(link))
             } else {
                 versionLabel.text = "-"
-                outputTextArea.text = "Link not found!"
+                outputTextArea.text += "\n\nLink not found!"
             }
         }
     }
@@ -676,7 +677,7 @@ class MainWindowController : Initializable {
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
-        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2.1${System.lineSeparator()}Created by Saki_EU"
+        alert.headerText = "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2.2${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
