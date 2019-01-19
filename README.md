@@ -50,7 +50,7 @@
 
 **The application doesn't launch, is there anything I should have installed?**
 
-Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/). On Linux, you need to have OpenJDK 8 and OpenJFX installed. Please note, that Java 11 does not come with JavaFX so you may have to uninstall it in order to run the application.
+Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/).
 
 **The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
