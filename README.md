@@ -1,5 +1,9 @@
 # Xiaomi ADB/Fastboot Tools
 
+![](https://img.shields.io/github/downloads/Saki-EU/XiaomiADBFastbootTools/total.svg)
+![](https://img.shields.io/github/license/Saki-EU/XiaomiADBFastbootTools.svg)
+[![](https://img.shields.io/twitter/url/https/github.com/Saki-EU/XiaomiADBFastbootTools.svg?style=social)](https://twitter.com/Saki_EU)
+
 ## Modules
 
 * **Uninstaller** - Remove factory apps and services on demand
