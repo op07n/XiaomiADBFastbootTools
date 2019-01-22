@@ -5,7 +5,7 @@ import javafx.scene.control.TextInputControl
 import java.io.*
 import java.util.*
 
-class FastbootFlasher(
+class ROMFlasher(
     var progress: ProgressBar,
     var progressind: ProgressIndicator,
     var tic: TextInputControl,

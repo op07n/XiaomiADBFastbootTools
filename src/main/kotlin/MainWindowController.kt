@@ -151,6 +151,7 @@ class MainWindowController : Initializable {
     val comm = Command()
     val device = Device()
     lateinit var displayedcomm: Command
+    lateinit var flasher: Flasher
     lateinit var uninstaller: Uninstaller
 
     companion object {
@@ -257,6 +258,7 @@ class MainWindowController : Initializable {
         uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
 
         displayedcomm = Command(outputTextArea)
+        flasher = Flasher(outputTextArea, progressIndicator)
         uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
 
         thread = Thread {
@@ -388,8 +390,8 @@ class MainWindowController : Initializable {
             fc.extensionFilters.add(fileExtensions)
             fc.title = "Save properties"
             val f = fc.showSaveDialog((event.source as Node).scene.window)
-            when {
-                f != null -> try {
+            if (f != null) {
+                try {
                     val fw = FileWriter(f)
                     fw.write(comm.exec("adb shell getprop"))
                     fw.flush()
@@ -444,13 +446,10 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun flashimageButtonPressed(event: ActionEvent) {
-        when {
-            image != null && partitionComboBox.value != null ->
-                if (image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
-                    if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
-                        displayedcomm.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
-                    else displayedcomm.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
-                }
+        if (image != null && partitionComboBox.value != null && image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
+            if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
+                flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
+            else flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
         }
     }
 
@@ -461,63 +460,56 @@ class MainWindowController : Initializable {
         rom = dc.showDialog((event.source as Node).scene.window)
         outputTextArea.text = ""
         romLabel.text = "-"
-        when {
-            rom != null ->
-                if (File(rom, "images").exists()) {
-                    romLabel.text = rom?.name
-                    outputTextArea.text = "Fastboot ROM found!"
-                    File(rom, "flash_all.sh").setExecutable(true, false)
-                    File(rom, "flash_all_lock.sh").setExecutable(true, false)
-                    File(rom, "flash_all_except_storage.sh").setExecutable(true, false)
-                    File(rom, "flash_all_except_data.sh").setExecutable(true, false)
-                    File(rom, "flash_all_except_data_storage.sh").setExecutable(true, false)
-                } else {
-                    outputTextArea.text = "ERROR: Fastboot ROM not found!"
-                    romLabel.text = "-"
-                    rom = null
-                }
+        if (rom != null) {
+            if (File(rom, "images").exists()) {
+                romLabel.text = rom?.name
+                outputTextArea.text = "Fastboot ROM found!"
+                File(rom, "flash_all.sh").setExecutable(true, false)
+                File(rom, "flash_all_lock.sh").setExecutable(true, false)
+                File(rom, "flash_all_except_storage.sh").setExecutable(true, false)
+                File(rom, "flash_all_except_data.sh").setExecutable(true, false)
+                File(rom, "flash_all_except_data_storage.sh").setExecutable(true, false)
+            } else {
+                outputTextArea.text = "ERROR: Fastboot ROM not found!"
+                romLabel.text = "-"
+                rom = null
+            }
         }
     }
 
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
-        when {
-            rom != null && scriptComboBox.value != null ->
-                if (checkFastboot()) {
-                    val fs = FastbootFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
-                    progressBar.progress = 0.0
-                    uninstallerPane.isDisable = true
-                    camera2Pane.isDisable = true
-                    devicepropertiesPane.isDisable = true
-                    dpiPane.isDisable = true
-                    flasherPane.isDisable = true
-                    wiperPane.isDisable = true
-                    oemPane.isDisable = true
-                    rebootMenu.isDisable = true
-                    recoveryMenuItem.isDisable = true
-                    when (scriptComboBox.value) {
-                        "Clean install" -> fs.exec("flash_all")
-                        "Clean install and lock" -> fs.exec("flash_all_lock")
-                        "Update" -> when {
-                            File(rom, "flash_all_except_storage.sh").exists() -> fs.exec("flash_all_except_storage")
-                            File(rom, "flash_all_except_data.sh").exists() -> fs.exec("flash_all_except_data")
-                            File(
-                                rom,
-                                "flash_all_except_data_storage.sh"
-                            ).exists() -> fs.exec("flash_all_except_data_storage")
-                        }
-                    }
+        if (rom != null && scriptComboBox.value != null && checkFastboot()) {
+            val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
+            progressBar.progress = 0.0
+            uninstallerPane.isDisable = true
+            camera2Pane.isDisable = true
+            devicepropertiesPane.isDisable = true
+            dpiPane.isDisable = true
+            flasherPane.isDisable = true
+            wiperPane.isDisable = true
+            oemPane.isDisable = true
+            rebootMenu.isDisable = true
+            recoveryMenuItem.isDisable = true
+            when (scriptComboBox.value) {
+                "Clean install" -> rf.exec("flash_all")
+                "Clean install and lock" -> rf.exec("flash_all_lock")
+                "Update" -> when {
+                    File(rom, "flash_all_except_storage.sh").exists() -> rf.exec("flash_all_except_storage")
+                    File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
+                    File(
+                        rom,
+                        "flash_all_except_data_storage.sh"
+                    ).exists() -> rf.exec("flash_all_except_data_storage")
                 }
+            }
         }
     }
 
     @FXML
     private fun bootButtonPressed(event: ActionEvent) {
-        when {
-            image != null ->
-                if (image!!.absolutePath.isNotEmpty() && checkFastboot())
-                    displayedcomm.exec(image, "fastboot boot")
-        }
+        if (image != null && image!!.absolutePath.isNotEmpty() && checkFastboot())
+            flasher.exec(image, "fastboot boot")
     }
 
     @FXML
@@ -678,11 +670,8 @@ class MainWindowController : Initializable {
 
     @FXML
     private fun addButtonPressed(event: ActionEvent) {
-        when {
-            customappTextField.text != null ->
-                if (customappTextField.text.trim().isNotEmpty())
-                    uninstaller.apps.add(App("Custom app", customappTextField.text.trim()))
-        }
+        if (customappTextField.text != null && customappTextField.text.trim().isNotEmpty())
+            uninstaller.apps.add(App("Custom app", customappTextField.text.trim()))
         customappTextField.text = null
         uninstaller.tv.refresh()
     }
@@ -694,7 +683,7 @@ class MainWindowController : Initializable {
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
         alert.headerText =
-                "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.2.3${System.lineSeparator()}Created by Saki_EU"
+                "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.3${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 

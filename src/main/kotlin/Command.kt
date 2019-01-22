@@ -24,7 +24,7 @@ open class Command() {
         tic = control
     }
 
-    private fun init(arg: String) {
+    fun init(arg: String) {
         arguments = arg.split(" ").toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
@@ -45,39 +45,11 @@ open class Command() {
         scan.close()
     }
 
-    private fun init(image: File?, arg: String) {
-        arguments = arg.split(" ").toTypedArray()
-        arguments[0] = prefix + arguments[0]
-        pb.command(*arguments)
-        pb.command().add(image?.absolutePath)
-        try {
-            proc = pb.start()
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-        }
-        scan = Scanner(proc.inputStream)
-        var line: String
-        while (scan.hasNext()) {
-            line = scan.nextLine() + System.lineSeparator()
-            output += line
-            tic?.appendText(line)
-        }
-        scan.close()
-    }
-
     fun exec(arg: String): String {
         pb.redirectErrorStream(true)
         output = ""
         tic?.text = ""
         init(arg)
-        return output
-    }
-
-    fun exec(image: File?, arg: String): String {
-        pb.redirectErrorStream(true)
-        output = ""
-        tic?.text = ""
-        init(image, arg)
         return output
     }
 
@@ -112,17 +84,6 @@ open class Command() {
         tic?.text = ""
         for (s in args) {
             init(s)
-            proc.waitFor()
-        }
-        return output
-    }
-
-    fun exec(image: File?, vararg args: String): String {
-        pb.redirectErrorStream(true)
-        output = ""
-        tic?.text = ""
-        for (s in args) {
-            init(image, s)
             proc.waitFor()
         }
         return output
