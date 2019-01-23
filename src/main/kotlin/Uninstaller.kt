@@ -126,7 +126,7 @@ class Uninstaller(
         t = Thread {
             for (app in undesirable) {
                 arguments =
-                        ("adb shell pm uninstall --user 0 ${app.packagenameProperty().get()}").split(" ").toTypedArray()
+                    ("adb shell pm uninstall --user 0 ${app.packagenameProperty().get()}").split(" ").toTypedArray()
                 arguments[0] = prefix + arguments[0]
                 pb.command(*arguments)
                 try {

@@ -549,13 +549,13 @@ class MainWindowController : Initializable {
             var url = URL("http://google.com")
             when (branchComboBox.value) {
                 "Global Stable" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
                 "Global Developer" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
                 "China Stable" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
                 "China Developer" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
             }
             val huc = url.openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
@@ -582,13 +582,13 @@ class MainWindowController : Initializable {
             var url = URL("http://google.com")
             when (branchComboBox.value) {
                 "Global Stable" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
                 "Global Developer" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
                 "China Stable" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
                 "China Developer" -> url =
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
             }
             val huc = url.openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
@@ -683,7 +683,7 @@ class MainWindowController : Initializable {
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
         alert.headerText =
-                "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.3${System.lineSeparator()}Created by Saki_EU"
+            "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.3${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
