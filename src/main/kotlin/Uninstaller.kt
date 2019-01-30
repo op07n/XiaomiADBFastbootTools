@@ -25,7 +25,7 @@ class Uninstaller(
 
     fun loadApps(device: Device) {
         apps = FXCollections.observableArrayList()
-        apps.add(App("Analytics", "com.miui.analytics", true))
+        apps.add(App("Analytics", "com.miui.analytics"))
         apps.add(App("App Vault", "com.miui.personalassistant"))
         apps.add(App("App Vault", "com.mi.android.globalpersonalassistant"))
         apps.add(App("Browser", "com.android.browser"))
@@ -63,30 +63,34 @@ class Uninstaller(
         apps.add(App("Google Play Movies", "com.google.android.videos"))
         apps.add(App("Google Play Music", "com.google.android.music"))
         apps.add(App("Google Zhuyin Input", "com.google.android.apps.inputmethod.zhuyin"))
-        apps.add(App("KLO Bugreport", "com.miui.klo.bugreport", true))
-        apps.add(App("MAB", "com.xiaomi.ab", true))
+        apps.add(App("Joyose", "com.xiaomi.joyose"))
+        apps.add(App("KLO Bugreport", "com.miui.klo.bugreport"))
+        apps.add(App("MAB", "com.xiaomi.ab"))
         apps.add(App("Mail", "com.android.email"))
         apps.add(App("Mi Account", "com.xiaomi.account"))
         apps.add(App("Mi AI", "com.miui.voiceassist"))
         apps.add(App("Mi App Store", "com.xiaomi.mipicks"))
         apps.add(App("Mi Cloud", "com.miui.cloudservice"))
         apps.add(App("Mi Cloud Backup", "com.miui.cloudbackup"))
+        apps.add(App("Mi Cloud Sync", "com.miui.micloudsync"))
         apps.add(App("Mi Credit", "com.xiaomi.payment"))
         apps.add(App("Mi Drop", "com.xiaomi.midrop"))
         apps.add(App("Mi File Manager", "com.mi.android.globalFileexplorer"))
+        apps.add(App("Mi Pay", "com.mipay.wallet.in"))
         apps.add(App("Mi Recycle", "com.xiaomi.mirecycle"))
         apps.add(App("Mi Roaming", "com.miui.virtualsim"))
         apps.add(App("Mi Video", "com.miui.video"))
         apps.add(App("Mi Video", "com.miui.videoplayer"))
         apps.add(App("Mi Wallet", "com.mipay.wallet"))
-        apps.add(App("MiuiDaemon", "com.miui.daemon", true))
+        apps.add(App("MiuiDaemon", "com.miui.daemon"))
         apps.add(App("Mobile Device Information Provider", "com.amazon.appmanager"))
-        apps.add(App("MSA", "com.miui.msa.global", true))
-        apps.add(App("MSA", "com.miui.systemAdSolution", true))
+        apps.add(App("MSA", "com.miui.msa.global"))
+        apps.add(App("MSA", "com.miui.systemAdSolution"))
         apps.add(App("Music", "com.miui.player"))
+        apps.add(App("News", "com.mi.globalTrendNews"))
         apps.add(App("Notes", "com.miui.notes"))
-        apps.add(App("PAI", "android.autoinstalls.config.Xiaomi.${device.codename}", true))
-        apps.add(App("Quick Apps", "com.miui.hybrid", true))
+        apps.add(App("PAI", "android.autoinstalls.config.Xiaomi.${device.codename}"))
+        apps.add(App("Quick Apps", "com.miui.hybrid"))
         apps.add(App("Recorder", "com.android.soundrecorder"))
         apps.add(App("Scanner", "com.xiaomi.scanner"))
         apps.add(App("Screen Recorder", "com.miui.screenrecorder"))
@@ -122,6 +126,7 @@ class Uninstaller(
         } else return
         val n = undesirable.size
         tic?.text = ""
+        progress.progress = 0.0
         progressind.isVisible = true
         t = Thread {
             for (app in undesirable) {

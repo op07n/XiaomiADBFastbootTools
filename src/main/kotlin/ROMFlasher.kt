@@ -61,6 +61,7 @@ class ROMFlasher(
 
     fun exec(arg: String) {
         tic.text = ""
+        val sb = StringBuffer("")
         val script: File
         if (System.getProperty("os.name").toLowerCase().contains("win")) {
             script = File(directory, "$arg.bat")
@@ -76,17 +77,19 @@ class ROMFlasher(
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        scan = Scanner(proc.inputStream)
+        scan = Scanner(proc.inputStream).useDelimiter("")
+        progress.progress = 0.0
         progressind.isVisible = true
         t = Thread {
             while (scan.hasNext()) {
-                val line = scan.nextLine() + System.lineSeparator()
+                sb.append(scan.next())
+                val line = sb.toString()
                 if (line.contains("pause"))
                     break
                 Platform.runLater {
-                    tic.appendText(line)
-                    if (line.contains("Finished.") || line.contains("finished."))
-                        progress.progress += 1.0 / n
+                    tic.text = line
+                    tic.appendText("")
+                    progress.progress = 1.0 * (line.toLowerCase().split("finished.").size - 1) / n
                 }
             }
             scan.close()

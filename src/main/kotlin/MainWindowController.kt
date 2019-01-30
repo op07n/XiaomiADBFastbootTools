@@ -481,7 +481,10 @@ class MainWindowController : Initializable {
     private fun flashromButtonPressed(event: ActionEvent) {
         if (rom != null && scriptComboBox.value != null && checkFastboot()) {
             val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
-            progressBar.progress = 0.0
+            serialLabel.text = "-"
+            bootloaderLabel.text = "-"
+            codenameLabel.text = "-"
+            antiLabel.text = "-"
             uninstallerPane.isDisable = true
             camera2Pane.isDisable = true
             devicepropertiesPane.isDisable = true
@@ -644,7 +647,6 @@ class MainWindowController : Initializable {
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            progressBar.progress = 0.0
             uninstallerPane.isDisable = true
             camera2Pane.isDisable = true
             devicepropertiesPane.isDisable = true
@@ -683,7 +685,7 @@ class MainWindowController : Initializable {
         alert.title = "About"
         alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
         alert.headerText =
-            "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.3${System.lineSeparator()}Created by Saki_EU"
+            "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.4${System.lineSeparator()}Created by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
 
