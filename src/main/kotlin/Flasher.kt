@@ -46,6 +46,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
 
     fun exec(image: File?, vararg args: String) {
         tic?.text = ""
+        val sb = StringBuffer("")
         progressind.isVisible = true
         t = Thread {
             for (s in args) {
@@ -58,11 +59,12 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
-                scan = Scanner(proc.inputStream)
+                scan = Scanner(proc.inputStream).useDelimiter("")
                 while (scan.hasNext()) {
-                    val line = scan.nextLine() + System.lineSeparator()
+                    sb.append(scan.next())
+                    val line = sb.toString()
                     Platform.runLater {
-                        tic?.appendText(line)
+                        tic?.text = line
                     }
                 }
                 scan.close()
