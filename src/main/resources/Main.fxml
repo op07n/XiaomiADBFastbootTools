@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainWindowController">
+<VBox prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -52,60 +52,11 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0">
                            <children>
-                              <GridPane layoutX="10.8" layoutY="23.8" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-3.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="10.0" prefWidth="147.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.0" minWidth="10.0" prefWidth="275.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
-                                 <children>
-                                    <Label text="Codename:" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="Bootloader:" GridPane.rowIndex="2">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="Serial No.:">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="serialLabel" text="serial" GridPane.columnIndex="1">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="codenameLabel" text="codename" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="bootloaderLabel" text="bl" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="Anti version:" GridPane.rowIndex="3">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="antiLabel" text="anti" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </GridPane>
+                              <TextArea fx:id="infoTextArea" editable="false" layoutX="104.0" layoutY="-16.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </TextArea>
                            </children>
                         </AnchorPane>
                     </content>
@@ -149,12 +100,13 @@
                                     <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="232.0" />
                                  </columnConstraints>
                                  <rowConstraints>
-                                    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="287.0" valignment="TOP" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="155.0" valignment="TOP" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="196.0" valignment="TOP" />
+                                    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="261.0" valignment="TOP" vgrow="SOMETIMES" />
+                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="101.0" valignment="TOP" vgrow="SOMETIMES" />
+                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="145.0" valignment="TOP" />
+                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="131.0" valignment="TOP" />
                                  </rowConstraints>
                                  <children>
-                                    <TitledPane fx:id="uninstallerPane" animated="false" collapsible="false" disable="true" prefHeight="638.0" prefWidth="565.0" text="Uninstaller" GridPane.rowSpan="3">
+                                    <TitledPane fx:id="uninstallerPane" animated="false" collapsible="false" disable="true" prefHeight="638.0" prefWidth="565.0" text="Uninstaller" GridPane.rowSpan="4">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
@@ -211,24 +163,24 @@
                                              <children>
                                                 <Button fx:id="reboottwrpButton" layoutX="14.0" layoutY="50.0" mnemonicParsing="false" onAction="#reboottwrpButtonPressed" text="Reboot to Recovery" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font size="16.0" />
                                                    </font></Button>
                                                 <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
+                                                <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="enableEISButton" layoutX="14.0" layoutY="145.0" mnemonicParsing="false" onAction="#enableEISButtonPressed" text="Enable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="134.0">
+                                                <Button fx:id="enableEISButton" layoutX="14.0" layoutY="145.0" mnemonicParsing="false" onAction="#enableEISButtonPressed" text="Enable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="disableEISButton" layoutX="73.0" layoutY="203.0" mnemonicParsing="false" onAction="#disableEISButtonPressed" text="Disable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="181.0">
+                                                <Button fx:id="disableEISButton" layoutX="73.0" layoutY="203.0" mnemonicParsing="false" onAction="#disableEISButtonPressed" text="Disable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="160.0">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
@@ -240,7 +192,7 @@
                                           <Font size="16.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane fx:id="devicepropertiesPane" animated="false" collapsible="false" disable="true" text="Device properties" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <TitledPane fx:id="devicepropertiesPane" animated="false" collapsible="false" disable="true" text="Device properties" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
@@ -249,7 +201,7 @@
                                                       <Font size="16.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="savepropertiesButton" layoutX="14.0" layoutY="83.0" mnemonicParsing="false" onAction="#savepropertiesButtonPressed" text="Save properties" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="47.0">
+                                                <Button fx:id="savepropertiesButton" layoutX="14.0" layoutY="83.0" mnemonicParsing="false" onAction="#savepropertiesButtonPressed" text="Save properties" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>
@@ -288,6 +240,22 @@
                                              </children>
                                           </AnchorPane>
                                       </content>
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </TitledPane>
+                                    <TitledPane fx:id="fileExplorerPane" collapsible="false" disable="true" text="File Explorer" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <content>
+                                          <AnchorPane>
+                                             <children>
+                                                <Button fx:id="openButton" mnemonicParsing="false" onAction="#openButtonPressed" text="Open" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
                                        <font>
                                           <Font size="16.0" />
                                        </font>

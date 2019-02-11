@@ -145,9 +145,9 @@ class Uninstaller(
                     line += scan.nextLine() + System.lineSeparator()
                 scan.close()
                 Platform.runLater {
-                    tic?.appendText("App: ${app.appnameProperty().get()}${System.lineSeparator()}")
-                    tic?.appendText("Package: ${app.packagenameProperty().get()}${System.lineSeparator()}")
-                    tic?.appendText("Result: $line${System.lineSeparator()}")
+                    tic?.appendText("App: ${app.appnameProperty().get()}\n")
+                    tic?.appendText("Package: ${app.packagenameProperty().get()}\n")
+                    tic?.appendText("Result: $line\n")
                     progress.progress += 1.0 / n
                 }
             }

@@ -2,20 +2,20 @@ import javafx.application.Platform
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.geometry.Pos
 import javafx.scene.Node
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.cell.CheckBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.stage.DirectoryChooser
-import javafx.stage.FileChooser
-import javafx.stage.StageStyle
+import javafx.stage.*
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -27,7 +27,7 @@ import java.net.URI
 import java.net.URL
 import java.util.*
 
-class MainWindowController : Initializable {
+class MainController : Initializable {
 
     @FXML
     private lateinit var optionsMenu: Menu
@@ -44,13 +44,7 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var aboutMenuItem: MenuItem
     @FXML
-    private lateinit var serialLabel: Label
-    @FXML
-    private lateinit var codenameLabel: Label
-    @FXML
-    private lateinit var bootloaderLabel: Label
-    @FXML
-    private lateinit var antiLabel: Label
+    private lateinit var infoTextArea: TextArea
     @FXML
     private lateinit var outputTextArea: TextArea
     @FXML
@@ -81,6 +75,8 @@ class MainWindowController : Initializable {
     private lateinit var disableEISButton: Button
     @FXML
     private lateinit var enableEISButton: Button
+    @FXML
+    private lateinit var openButton: Button
     @FXML
     private lateinit var readpropertiesButton: Button
     @FXML
@@ -134,6 +130,8 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var uninstallerPane: TitledPane
     @FXML
+    private lateinit var fileExplorerPane: TitledPane
+    @FXML
     private lateinit var camera2Pane: TitledPane
     @FXML
     private lateinit var devicepropertiesPane: TitledPane
@@ -146,28 +144,26 @@ class MainWindowController : Initializable {
     @FXML
     private lateinit var dpiPane: TitledPane
 
-    var image: File? = null
-    var rom: File? = null
-    val comm = Command()
-    val device = Device()
-    lateinit var displayedcomm: Command
-    lateinit var flasher: Flasher
-    lateinit var uninstaller: Uninstaller
+    private var image: File? = null
+    private var rom: File? = null
+    private val comm = Command()
+    private val device = Device()
+    private lateinit var displayedcomm: Command
+    private lateinit var flasher: Flasher
+    private lateinit var uninstaller: Uninstaller
 
     companion object {
-        var thread = Thread()
+        val version = "6.0"
+        lateinit var thread: Thread
     }
 
     fun setUI() {
         when (device.mode) {
             0 -> {
-                serialLabel.text = "-"
-                bootloaderLabel.text = "-"
-                codenameLabel.text = "-"
-                antiLabel.text = "-"
-
+                infoTextArea.text = ""
                 uninstallerPane.isDisable = true
                 camera2Pane.isDisable = true
+                fileExplorerPane.isDisable = true
                 devicepropertiesPane.isDisable = true
                 dpiPane.isDisable = true
                 flasherPane.isDisable = true
@@ -177,18 +173,23 @@ class MainWindowController : Initializable {
                 recoveryMenuItem.isDisable = true
             }
             1 -> {
-                serialLabel.text = device.serial
-                codenameLabel.text = device.codename
-                codenameTextField.text = device.codename
+                infoTextArea.text = ""
+                infoTextArea.appendText("Serial number:\t\t${device.serial}\n")
+                infoTextArea.appendText("Codename:\t\t${device.codename}\n")
+                infoTextArea.appendText("Bootloader:\t\t")
                 if (device.bootloader)
-                    bootloaderLabel.text = "unlocked"
-                else bootloaderLabel.text = "locked"
-                if (device.anti != -1)
-                    antiLabel.text = device.anti.toString()
-                else antiLabel.text = "unknown"
+                    infoTextArea.appendText("unlocked\n")
+                else infoTextArea.appendText("locked\n")
+                codenameTextField.text = device.codename
+                if (!device.recovery) {
+                    if (device.dpi != -1)
+                        dpiTextField.text = device.dpi.toString()
+                    else dpiTextField.text = "ERROR"
+                }
 
                 uninstallerPane.isDisable = false
                 camera2Pane.isDisable = false
+                fileExplorerPane.isDisable = false
                 devicepropertiesPane.isDisable = false
                 dpiPane.isDisable = device.recovery
                 flasherPane.isDisable = true
@@ -198,18 +199,20 @@ class MainWindowController : Initializable {
                 recoveryMenuItem.isDisable = false
             }
             2 -> {
-                serialLabel.text = device.serial
-                codenameLabel.text = device.codename
-                codenameTextField.text = device.codename
+                infoTextArea.text = ""
+                infoTextArea.appendText("Serial number:\t\t${device.serial}\n")
+                infoTextArea.appendText("Codename:\t\t${device.codename}\n")
+                infoTextArea.appendText("Bootloader:\t\t")
                 if (device.bootloader)
-                    bootloaderLabel.text = "unlocked"
-                else bootloaderLabel.text = "locked"
+                    infoTextArea.appendText("unlocked\n")
+                else infoTextArea.appendText("locked\n")
                 if (device.anti != -1)
-                    antiLabel.text = device.anti.toString()
-                else antiLabel.text = "unknown"
+                    infoTextArea.appendText("Anti version:\t\t${device.anti}\n")
+                codenameTextField.text = device.codename
 
                 uninstallerPane.isDisable = true
                 camera2Pane.isDisable = true
+                fileExplorerPane.isDisable = true
                 devicepropertiesPane.isDisable = true
                 dpiPane.isDisable = true
                 flasherPane.isDisable = false
@@ -222,45 +225,18 @@ class MainWindowController : Initializable {
     }
 
     fun checkADB(): Boolean {
-        if (device.readADB()) {
-            setUI()
-            return true
-        }
-        return false
+        val adb = device.readADB()
+        setUI()
+        return adb
     }
 
     fun checkFastboot(): Boolean {
-        if (device.readFastboot()) {
-            setUI()
-            return true
-        }
-        return false
+        val fb = device.readFastboot()
+        setUI()
+        return fb
     }
 
-    override fun initialize(url: URL, rb: ResourceBundle?) {
-        setUI()
-        outputTextArea.text = "Looking for devices..."
-        progressIndicator.isVisible = true
-        partitionComboBox.items.addAll(
-            "boot", "cust", "modem", "persist", "recovery", "system"
-        )
-        scriptComboBox.items.addAll(
-            "Clean install", "Clean install and lock", "Update"
-        )
-        branchComboBox.items.addAll(
-            "Global Stable", "Global Developer", "China Stable", "China Developer"
-        )
-
-        checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
-        checkTableColumn.setCellFactory { _ -> CheckBoxTableCell() }
-        appTableColumn.cellValueFactory = PropertyValueFactory("appname")
-        packageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
-        uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
-
-        displayedcomm = Command(outputTextArea)
-        flasher = Flasher(outputTextArea, progressIndicator)
-        uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
-
+    fun checkDevice() {
         thread = Thread {
             comm.exec("adb start-server")
             while (File(System.getProperty("user.home") + "/temp").exists()) {
@@ -273,11 +249,6 @@ class MainWindowController : Initializable {
                         outputTextArea.text = "Device found in ADB mode!"
                         uninstaller.loadApps(device)
                         Platform.runLater { setUI() }
-                        if (!device.recovery) {
-                            if (device.dpi != -1)
-                                dpiTextField.text = device.dpi.toString()
-                            else dpiTextField.text = "ERROR"
-                        }
                         continue
                     }
                     if (device.readFastboot()) {
@@ -299,6 +270,32 @@ class MainWindowController : Initializable {
         }
         thread.isDaemon = true
         thread.start()
+    }
+
+    override fun initialize(url: URL, rb: ResourceBundle?) {
+        outputTextArea.text = "Looking for devices..."
+        progressIndicator.isVisible = true
+        checkDevice()
+        setUI()
+        partitionComboBox.items.addAll(
+            "boot", "cust", "modem", "persist", "recovery", "system"
+        )
+        scriptComboBox.items.addAll(
+            "Clean install", "Clean install and lock", "Update"
+        )
+        branchComboBox.items.addAll(
+            "Global Stable", "Global Developer", "China Stable", "China Developer"
+        )
+
+        checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
+        checkTableColumn.setCellFactory { CheckBoxTableCell() }
+        appTableColumn.cellValueFactory = PropertyValueFactory("appname")
+        packageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+        uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
+
+        displayedcomm = Command(outputTextArea)
+        flasher = Flasher(outputTextArea, progressIndicator)
+        uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
     }
 
     @FXML
@@ -377,6 +374,44 @@ class MainWindowController : Initializable {
     }
 
     @FXML
+    private fun openButtonPressed(event: ActionEvent) {
+        if (checkADB()) {
+            val fxmlLoader = FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml"))
+            val parent = fxmlLoader.load<Parent>()
+            fxmlLoader.getController<FileExplorerController>().device = device
+            val scene = Scene(parent)
+            val stage = Stage()
+            stage.scene = scene
+            stage.initModality(Modality.APPLICATION_MODAL)
+            stage.scene = scene
+            stage.title = "File Explorer"
+            stage.isResizable = false
+            stage.showAndWait()
+        }
+    }
+
+    @FXML
+    private fun dpiButtonPressed(event: ActionEvent) {
+        if (checkADB()) {
+            val attempt = displayedcomm.exec("adb shell wm density ${dpiTextField.text.trim()}")
+            when {
+                attempt.contains("permission") -> {
+                    outputTextArea.text = "ERROR: Please allow USB debugging (Security settings)!"
+                }
+                attempt.contains("bad number") -> {
+                    outputTextArea.text = "ERROR: Invalid value!"
+                }
+                attempt.isEmpty() -> {
+                    outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
+                }
+                else -> {
+                    outputTextArea.text = "ERROR: Unexpected result!\n\n$attempt"
+                }
+            }
+        }
+    }
+
+    @FXML
     private fun readpropertiesButtonPressed(event: ActionEvent) {
         if (checkADB())
             displayedcomm.exec("adb shell getprop")
@@ -398,27 +433,6 @@ class MainWindowController : Initializable {
                     fw.close()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
-                }
-            }
-        }
-    }
-
-    @FXML
-    private fun dpiButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            val attempt = displayedcomm.exec("adb shell wm density ${dpiTextField.text.trim()}")
-            when {
-                attempt.contains("permission") -> {
-                    outputTextArea.text = "ERROR: Please allow USB debugging (Security settings)!"
-                }
-                attempt.contains("bad number") -> {
-                    outputTextArea.text = "ERROR: Invalid value!"
-                }
-                attempt.isEmpty() -> {
-                    outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
-                }
-                else -> {
-                    outputTextArea.text = "ERROR: Unexpected result!\n\n$attempt"
                 }
             }
         }
@@ -481,12 +495,10 @@ class MainWindowController : Initializable {
     private fun flashromButtonPressed(event: ActionEvent) {
         if (rom != null && scriptComboBox.value != null && checkFastboot()) {
             val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
-            serialLabel.text = "-"
-            bootloaderLabel.text = "-"
-            codenameLabel.text = "-"
-            antiLabel.text = "-"
+            infoTextArea.text = ""
             uninstallerPane.isDisable = true
             camera2Pane.isDisable = true
+            fileExplorerPane.isDisable = true
             devicepropertiesPane.isDisable = true
             dpiPane.isDisable = true
             flasherPane.isDisable = true
@@ -649,6 +661,7 @@ class MainWindowController : Initializable {
         if (checkADB()) {
             uninstallerPane.isDisable = true
             camera2Pane.isDisable = true
+            fileExplorerPane.isDisable = true
             devicepropertiesPane.isDisable = true
             dpiPane.isDisable = true
             flasherPane.isDisable = true
@@ -659,6 +672,7 @@ class MainWindowController : Initializable {
             uninstaller.uninstall {
                 uninstallerPane.isDisable = false
                 camera2Pane.isDisable = false
+                fileExplorerPane.isDisable = false
                 devicepropertiesPane.isDisable = false
                 dpiPane.isDisable = device.recovery
                 flasherPane.isDisable = true
@@ -683,28 +697,26 @@ class MainWindowController : Initializable {
         val alert = Alert(AlertType.INFORMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
-        alert.graphic = ImageView(Image(this.javaClass.classLoader.getResource("smallicon.png").toString()))
+        alert.graphic = ImageView("icon.png")
         alert.headerText =
-            "Xiaomi ADB/Fastboot Tools${System.lineSeparator()}Version 5.4${System.lineSeparator()}Created by Saki_EU"
+            "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU"
         val vb = VBox()
         vb.alignment = Pos.CENTER
-
-
-        val discord = Hyperlink("Xiaomi Discord")
+        val discord = Hyperlink("Xiaomi Community on Discord")
         discord.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
             else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
         discord.font = Font(14.0)
-        val twitter = Hyperlink("Twitter")
+        val twitter = Hyperlink("@Saki_EU")
         twitter.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
             else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
         }
         twitter.font = Font(14.0)
-        val github = Hyperlink("Project page on GitHub")
+        val github = Hyperlink("Repository on GitHub")
         github.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
@@ -713,6 +725,7 @@ class MainWindowController : Initializable {
         github.font = Font(14.0)
         vb.children.addAll(discord, twitter, github)
         alert.dialogPane.content = vb
+        alert.isResizable = false
         alert.showAndWait()
     }
 }

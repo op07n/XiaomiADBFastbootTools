@@ -94,7 +94,7 @@ class ROMFlasher(
             }
             scan.close()
             Platform.runLater {
-                tic.appendText(System.lineSeparator() + "Done!")
+                tic.appendText("\nDone!")
                 progress.progress = 0.0
                 progressind.isVisible = false
             }

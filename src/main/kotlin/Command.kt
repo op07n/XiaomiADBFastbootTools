@@ -24,8 +24,8 @@ open class Command() {
         tic = control
     }
 
-    fun init(arg: String) {
-        arguments = arg.split(" ").toTypedArray()
+    fun init(arg: String, lim: Int) {
+        arguments = arg.split(" ", limit = lim).toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         try {
@@ -45,11 +45,11 @@ open class Command() {
         scan.close()
     }
 
-    fun exec(arg: String): String {
+    fun exec(arg: String, lim: Int = 0): String {
         pb.redirectErrorStream(true)
         output = ""
         tic?.text = ""
-        init(arg)
+        init(arg, lim)
         return output
     }
 
@@ -78,12 +78,12 @@ open class Command() {
         return output
     }
 
-    fun exec(vararg args: String): String {
+    fun exec(vararg args: String, lim: Int = 0): String {
         pb.redirectErrorStream(true)
         output = ""
         tic?.text = ""
         for (s in args) {
-            init(s)
+            init(s, lim)
             proc.waitFor()
         }
         return output
