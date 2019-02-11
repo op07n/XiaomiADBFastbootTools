@@ -8,8 +8,9 @@
 
 * **Uninstaller** - Remove factory apps and services on demand
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
-* **Device properties** - Retrieve tons of statistics and information about your device
+* **File Explorer** - Transfer files between a device and a computer using ADB
 * **Screen density** - Tweak screen density by overriding the DPI value
+* **Device properties** - Retrieve tons of statistics and information about your device
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
 * **Wiper** - Wipe the cache or perform a factory reset
 * **OEM Unlocker & Locker** - Lock or unlock the bootloader (Unlocking is only supported by Android One devices)
