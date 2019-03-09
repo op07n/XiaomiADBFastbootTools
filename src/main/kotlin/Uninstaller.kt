@@ -73,6 +73,7 @@ class Uninstaller(
         apps.add(App("Mi Cloud", "com.miui.cloudservice"))
         apps.add(App("Mi Cloud Backup", "com.miui.cloudbackup"))
         apps.add(App("Mi Cloud Sync", "com.miui.micloudsync"))
+        apps.add(App("Mi Credit", "com.micredit.in"))
         apps.add(App("Mi Credit", "com.xiaomi.payment"))
         apps.add(App("Mi Drop", "com.xiaomi.midrop"))
         apps.add(App("Mi File Manager", "com.mi.android.globalFileexplorer"))

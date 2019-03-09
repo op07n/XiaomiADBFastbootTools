@@ -93,8 +93,12 @@ class XiaomiADBFastbootTools : Application() {
         huc.requestMethod = "GET"
         huc.setRequestProperty("Referer", "https://github.com/")
         huc.instanceFollowRedirects = false
-        huc.connect()
-        huc.disconnect()
+        try {
+            huc.connect()
+            huc.disconnect()
+        } catch (e: IOException){
+            return
+        }
         val link = huc.getHeaderField("Location")
         val latest = link.substringAfterLast('/')
         if (versionToInt(latest) > versionToInt(MainController.version)) {

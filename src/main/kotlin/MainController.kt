@@ -153,7 +153,7 @@ class MainController : Initializable {
     private lateinit var uninstaller: Uninstaller
 
     companion object {
-        val version = "6.0"
+        val version = "6.0.1"
         lateinit var thread: Thread
     }
 
