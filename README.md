@@ -51,11 +51,11 @@
 
 3. Wait for the application to detect your device. The device info should appear in the top left section.
 
-## Frequently Asked Questions
+## FAQ & Troubleshooting
 
-**The application doesn't launch, is there anything I should have installed?**
+**The application doesn't work properly. Is there anything I should have installed?**
 
-Yes, it was developed in Kotlin and needs the Java Runtime Environment to run. You can install Java from [here](https://java.com/en/download/).
+Yes, it was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run, version 1.8.171 or later. You can install the latest JRE from [here](https://java.com/en/download/).
 
 **The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
