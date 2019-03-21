@@ -6,7 +6,8 @@
 
 ## Modules
 
-* **Uninstaller** - Remove factory apps and services on demand
+* **Uninstaller** - Remove system apps and services on demand
+* **Reinstaller** - Reinstall removed system apps and services
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
 * **File Explorer** - Transfer files between a device and a computer using ADB
 * **Screen density** - Tweak screen density by overriding the DPI value
@@ -53,7 +54,7 @@
 
 ## FAQ & Troubleshooting
 
-**The application doesn't work properly. Is there anything I should have installed?**
+**The application doesn't work. Is there anything I should have installed?**
 
 Yes, it was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run, version 1.8.171 or later. You can install the latest JRE from [here](https://java.com/en/download/).
 
@@ -79,7 +80,7 @@ There are many factory apps Global MIUI doesn't let you uninstall but China MIUI
 
 **How do I regain uninstalled system apps?**
 
-When you uninstall apps, you erase them from `/data` so you need to factory reset (wipe `/data`) to make your device reinstall them.
+Simply reinstall them using the Reinstaller module when connected in ADB mode.
 
 **The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?**
 
