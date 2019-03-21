@@ -9,9 +9,7 @@ open class Command() {
     protected var tic: TextInputControl? = null
     protected var prefix: String
     protected lateinit var proc: Process
-    protected lateinit var scan: Scanner
     protected lateinit var output: String
-    protected lateinit var arguments: Array<String>
 
     init {
         pb.directory(File(System.getProperty("user.home") + "/temp"))
@@ -25,7 +23,7 @@ open class Command() {
     }
 
     fun init(arg: String, lim: Int) {
-        arguments = arg.split(" ", limit = lim).toTypedArray()
+        val arguments = arg.split(" ", limit = lim).toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         try {
@@ -33,7 +31,7 @@ open class Command() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        scan = Scanner(proc.inputStream)
+        val scan = Scanner(proc.inputStream)
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()
@@ -54,7 +52,7 @@ open class Command() {
     }
 
     fun exec(arg: String, err: Boolean): String {
-        arguments = arg.split(" ").toTypedArray()
+        val arguments = arg.split(" ").toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         pb.redirectErrorStream(false)
@@ -65,9 +63,9 @@ open class Command() {
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        if (err)
-            scan = Scanner(proc.errorStream)
-        else scan = Scanner(proc.inputStream)
+        val scan = if (err)
+            Scanner(proc.errorStream)
+        else Scanner(proc.inputStream)
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()

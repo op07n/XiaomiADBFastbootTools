@@ -24,19 +24,8 @@ class FileExplorerController : Initializable {
     private lateinit var statusTextField: TextField
     @FXML
     private lateinit var progressBar: ProgressBar
-    @FXML
-    private lateinit var pushButton: Button
-    @FXML
-    private lateinit var pullButton: Button
-    @FXML
-    private lateinit var newFolderButton: Button
-    @FXML
-    private lateinit var renameButton: Button
-    @FXML
-    private lateinit var deleteButton: Button
 
     lateinit var fileExplorer: FileExplorer
-
     lateinit var device: Device
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {

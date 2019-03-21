@@ -11,7 +11,6 @@ import kotlin.collections.ArrayList
 class FileExplorer(var status: TextField, var progress: ProgressBar) : Command() {
 
     var path = "/"
-    lateinit var t: Thread
 
     init {
         pb.redirectErrorStream(false)
@@ -64,7 +63,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        scan = Scanner(proc.inputStream).useDelimiter("")
+        val scan = Scanner(proc.inputStream).useDelimiter("")
         while (scan.hasNextLine()) {
             val line = scan.nextLine()
             Platform.runLater {
@@ -79,14 +78,14 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun pull(selected: List<AndroidFile>, to: File, func: () -> Unit) {
-        t = Thread {
+        val t = Thread {
             if (selected.isEmpty()) {
-                arguments = arrayOf("${prefix}adb", "pull", path, to.absolutePath)
+                val arguments = arrayOf("${prefix}adb", "pull", path, to.absolutePath)
                 pb.command(*arguments)
                 init()
             } else {
                 for (file in selected) {
-                    arguments = arrayOf("${prefix}adb", "pull", path + file.name, to.absolutePath)
+                    val arguments = arrayOf("${prefix}adb", "pull", path + file.name, to.absolutePath)
                     pb.command(*arguments)
                     init()
                 }
@@ -103,9 +102,9 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun push(selected: List<File>, func: () -> Unit) {
-        t = Thread {
+        val t = Thread {
             for (file in selected) {
-                arguments = arrayOf("${prefix}adb", "push", file.absolutePath, path)
+                val arguments = arrayOf("${prefix}adb", "push", file.absolutePath, path)
                 pb.command(*arguments)
                 init()
             }
@@ -121,11 +120,11 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun delete(selected: List<AndroidFile>, func: () -> Unit) {
-        t = Thread {
+        val t = Thread {
             for (file in selected) {
-                if (file.dir)
-                    arguments = arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + file.name))
-                else arguments = arrayOf("${prefix}adb", "shell", "rm", "-f", format(path + file.name))
+                val arguments = if (file.dir)
+                    arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + file.name))
+                else arrayOf("${prefix}adb", "shell", "rm", "-f", format(path + file.name))
                 pb.command(*arguments)
                 init("rm")
             }
@@ -141,8 +140,8 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun mkdir(name: String, func: () -> Unit) {
-        t = Thread {
-            arguments = arrayOf("${prefix}adb", "shell", "mkdir", format(path + name))
+        val t = Thread {
+            val arguments = arrayOf("${prefix}adb", "shell", "mkdir", format(path + name))
             pb.command(*arguments)
             init("mkdir")
             Platform.runLater {
@@ -157,8 +156,8 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
-        t = Thread {
-            arguments = arrayOf("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
+        val t = Thread {
+            val arguments = arrayOf("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             pb.command(*arguments)
             init("mv")
             Platform.runLater {

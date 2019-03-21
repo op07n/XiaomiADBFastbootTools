@@ -30,19 +30,9 @@ import java.util.*
 class MainController : Initializable {
 
     @FXML
-    private lateinit var optionsMenu: Menu
-    @FXML
     private lateinit var rebootMenu: Menu
     @FXML
-    private lateinit var systemMenuItem: MenuItem
-    @FXML
     private lateinit var recoveryMenuItem: MenuItem
-    @FXML
-    private lateinit var fastbootMenuItem: MenuItem
-    @FXML
-    private lateinit var edlMenuItem: MenuItem
-    @FXML
-    private lateinit var aboutMenuItem: MenuItem
     @FXML
     private lateinit var infoTextArea: TextArea
     @FXML
@@ -54,51 +44,29 @@ class MainController : Initializable {
     @FXML
     private lateinit var uninstallerTableView: TableView<App>
     @FXML
-    private lateinit var checkTableColumn: TableColumn<App, Boolean>
+    private lateinit var reinstallerTableView: TableView<App>
     @FXML
-    private lateinit var appTableColumn: TableColumn<App, String>
+    private lateinit var uncheckTableColumn: TableColumn<App, Boolean>
     @FXML
-    private lateinit var packageTableColumn: TableColumn<App, String>
+    private lateinit var unappTableColumn: TableColumn<App, String>
     @FXML
-    private lateinit var customappTextField: TextField
+    private lateinit var unpackageTableColumn: TableColumn<App, String>
     @FXML
-    private lateinit var uninstallButton: Button
+    private lateinit var recheckTableColumn: TableColumn<App, Boolean>
     @FXML
-    private lateinit var addButton: Button
+    private lateinit var reappTableColumn: TableColumn<App, String>
     @FXML
-    private lateinit var reboottwrpButton: Button
+    private lateinit var repackageTableColumn: TableColumn<App, String>
     @FXML
-    private lateinit var disableButton: Button
+    private lateinit var uncustomappTextField: TextField
     @FXML
-    private lateinit var enableButton: Button
-    @FXML
-    private lateinit var disableEISButton: Button
-    @FXML
-    private lateinit var enableEISButton: Button
-    @FXML
-    private lateinit var openButton: Button
-    @FXML
-    private lateinit var readpropertiesButton: Button
-    @FXML
-    private lateinit var savepropertiesButton: Button
+    private lateinit var recustomappTextField: TextField
     @FXML
     private lateinit var dpiTextField: TextField
-    @FXML
-    private lateinit var dpiButton: Button
-    @FXML
-    private lateinit var antirbButton: Button
-    @FXML
-    private lateinit var browseimageButton: Button
-    @FXML
-    private lateinit var browseromButton: Button
     @FXML
     private lateinit var partitionComboBox: ComboBox<String>
     @FXML
     private lateinit var scriptComboBox: ComboBox<String>
-    @FXML
-    private lateinit var flashimageButton: Button
-    @FXML
-    private lateinit var flashromButton: Button
     @FXML
     private lateinit var autobootCheckBox: CheckBox
     @FXML
@@ -106,29 +74,13 @@ class MainController : Initializable {
     @FXML
     private lateinit var romLabel: Label
     @FXML
-    private lateinit var bootButton: Button
-    @FXML
-    private lateinit var cacheButton: Button
-    @FXML
-    private lateinit var dataButton: Button
-    @FXML
-    private lateinit var cachedataButton: Button
-    @FXML
-    private lateinit var unlockButton: Button
-    @FXML
-    private lateinit var lockButton: Button
-    @FXML
     private lateinit var codenameTextField: TextField
     @FXML
     private lateinit var branchComboBox: ComboBox<String>
     @FXML
-    private lateinit var getlinkButton: Button
-    @FXML
-    private lateinit var downloadromButton: Button
-    @FXML
     private lateinit var versionLabel: Label
     @FXML
-    private lateinit var uninstallerPane: TitledPane
+    private lateinit var installerPane: TabPane
     @FXML
     private lateinit var fileExplorerPane: TitledPane
     @FXML
@@ -150,10 +102,10 @@ class MainController : Initializable {
     private val device = Device()
     private lateinit var displayedcomm: Command
     private lateinit var flasher: Flasher
-    private lateinit var uninstaller: Uninstaller
+    private lateinit var installer: Installer
 
     companion object {
-        val version = "6.0.1"
+        val version = "6.1"
         lateinit var thread: Thread
     }
 
@@ -161,7 +113,7 @@ class MainController : Initializable {
         when (device.mode) {
             0 -> {
                 infoTextArea.text = ""
-                uninstallerPane.isDisable = true
+                installerPane.isDisable = true
                 camera2Pane.isDisable = true
                 fileExplorerPane.isDisable = true
                 devicepropertiesPane.isDisable = true
@@ -187,7 +139,7 @@ class MainController : Initializable {
                     else dpiTextField.text = "ERROR"
                 }
 
-                uninstallerPane.isDisable = false
+                installerPane.isDisable = false
                 camera2Pane.isDisable = false
                 fileExplorerPane.isDisable = false
                 devicepropertiesPane.isDisable = false
@@ -210,7 +162,7 @@ class MainController : Initializable {
                     infoTextArea.appendText("Anti version:\t\t${device.anti}\n")
                 codenameTextField.text = device.codename
 
-                uninstallerPane.isDisable = true
+                installerPane.isDisable = true
                 camera2Pane.isDisable = true
                 fileExplorerPane.isDisable = true
                 devicepropertiesPane.isDisable = true
@@ -247,7 +199,7 @@ class MainController : Initializable {
                     if (device.readADB()) {
                         progressIndicator.isVisible = false
                         outputTextArea.text = "Device found in ADB mode!"
-                        uninstaller.loadApps(device)
+                        installer.loadApps(device)
                         Platform.runLater { setUI() }
                         continue
                     }
@@ -276,7 +228,6 @@ class MainController : Initializable {
         outputTextArea.text = "Looking for devices..."
         progressIndicator.isVisible = true
         checkDevice()
-        setUI()
         partitionComboBox.items.addAll(
             "boot", "cust", "modem", "persist", "recovery", "system"
         )
@@ -287,15 +238,21 @@ class MainController : Initializable {
             "Global Stable", "Global Developer", "China Stable", "China Developer"
         )
 
-        checkTableColumn.cellValueFactory = PropertyValueFactory("selected")
-        checkTableColumn.setCellFactory { CheckBoxTableCell() }
-        appTableColumn.cellValueFactory = PropertyValueFactory("appname")
-        packageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
-        uninstallerTableView.columns.setAll(checkTableColumn, appTableColumn, packageTableColumn)
+        uncheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
+        uncheckTableColumn.setCellFactory { CheckBoxTableCell() }
+        unappTableColumn.cellValueFactory = PropertyValueFactory("appname")
+        unpackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+        recheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
+        recheckTableColumn.setCellFactory { CheckBoxTableCell() }
+        reappTableColumn.cellValueFactory = PropertyValueFactory("appname")
+        repackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+        uninstallerTableView.columns.setAll(uncheckTableColumn, unappTableColumn, unpackageTableColumn)
+        reinstallerTableView.columns.setAll(recheckTableColumn, reappTableColumn, repackageTableColumn)
 
         displayedcomm = Command(outputTextArea)
         flasher = Flasher(outputTextArea, progressIndicator)
-        uninstaller = Uninstaller(uninstallerTableView, progressBar, progressIndicator, outputTextArea)
+        installer =
+            Installer(uninstallerTableView, reinstallerTableView, progressBar, progressIndicator, outputTextArea)
     }
 
     @FXML
@@ -305,17 +262,14 @@ class MainController : Initializable {
                 outputTextArea.text = "Device already in recovery mode!"
             } else {
                 comm.exec("adb reboot recovery")
+                checkADB()
             }
         }
     }
 
-    fun checkcamera2(): Boolean {
-        return comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
-    }
+    private fun checkcamera2(): Boolean = comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
 
-    fun checkEIS(): Boolean {
-        return comm.exec("adb shell getprop persist.camera.eis.enable").contains("1")
-    }
+    private fun checkEIS(): Boolean = comm.exec("adb shell getprop persist.camera.eis.enable").contains("1")
 
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
@@ -402,7 +356,7 @@ class MainController : Initializable {
                     outputTextArea.text = "ERROR: Invalid value!"
                 }
                 attempt.isEmpty() -> {
-                    outputTextArea.text = "Done!\nIf you notice any weird behaviour, please reboot the device."
+                    outputTextArea.text = "Done!\nIf you notice any weird behaviour, reboot the device."
                 }
                 else -> {
                     outputTextArea.text = "ERROR: Unexpected result!\n\n$attempt"
@@ -496,7 +450,7 @@ class MainController : Initializable {
         if (rom != null && scriptComboBox.value != null && checkFastboot()) {
             val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
             infoTextArea.text = ""
-            uninstallerPane.isDisable = true
+            installerPane.isDisable = true
             camera2Pane.isDisable = true
             fileExplorerPane.isDisable = true
             devicepropertiesPane.isDisable = true
@@ -628,38 +582,59 @@ class MainController : Initializable {
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
         when (device.mode) {
-            1 -> if (checkADB()) comm.exec("adb reboot")
-            2 -> if (checkFastboot()) comm.exec("fastboot reboot")
+            1 -> if (checkADB()) {
+                comm.exec("adb reboot")
+                checkADB()
+            }
+            2 -> if (checkFastboot()) {
+                comm.exec("fastboot reboot")
+                checkFastboot()
+            }
         }
     }
 
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
         when (device.mode) {
-            1 -> if (checkADB()) comm.exec("adb reboot recovery")
+            1 -> if (checkADB()) {
+                comm.exec("adb reboot recovery")
+                checkADB()
+            }
         }
     }
 
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
         when (device.mode) {
-            1 -> if (checkADB()) comm.exec("adb reboot bootloader")
-            2 -> if (checkFastboot()) comm.exec("fastboot reboot bootloader")
+            1 -> if (checkADB()) {
+                comm.exec("adb reboot bootloader")
+                checkADB()
+            }
+            2 -> if (checkFastboot()) {
+                comm.exec("fastboot reboot bootloader")
+                checkFastboot()
+            }
         }
     }
 
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
         when (device.mode) {
-            1 -> if (checkADB()) comm.exec("adb reboot edl")
-            2 -> if (checkFastboot()) comm.exec("fastboot oem edl")
+            1 -> if (checkADB()) {
+                comm.exec("adb reboot edl")
+                checkADB()
+            }
+            2 -> if (checkFastboot()) {
+                comm.exec("fastboot oem edl")
+                checkFastboot()
+            }
         }
     }
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            uninstallerPane.isDisable = true
+            installerPane.isDisable = true
             camera2Pane.isDisable = true
             fileExplorerPane.isDisable = true
             devicepropertiesPane.isDisable = true
@@ -669,8 +644,8 @@ class MainController : Initializable {
             oemPane.isDisable = true
             rebootMenu.isDisable = true
             recoveryMenuItem.isDisable = true
-            uninstaller.uninstall {
-                uninstallerPane.isDisable = false
+            installer.uninstall {
+                installerPane.isDisable = false
                 camera2Pane.isDisable = false
                 fileExplorerPane.isDisable = false
                 devicepropertiesPane.isDisable = false
@@ -685,11 +660,47 @@ class MainController : Initializable {
     }
 
     @FXML
-    private fun addButtonPressed(event: ActionEvent) {
-        if (customappTextField.text != null && customappTextField.text.trim().isNotEmpty())
-            uninstaller.apps.add(App("Custom app", customappTextField.text.trim()))
-        customappTextField.text = null
-        uninstaller.tv.refresh()
+    private fun reinstallButtonPressed(event: ActionEvent) {
+        if (checkADB()) {
+            installerPane.isDisable = true
+            camera2Pane.isDisable = true
+            fileExplorerPane.isDisable = true
+            devicepropertiesPane.isDisable = true
+            dpiPane.isDisable = true
+            flasherPane.isDisable = true
+            wiperPane.isDisable = true
+            oemPane.isDisable = true
+            rebootMenu.isDisable = true
+            recoveryMenuItem.isDisable = true
+            installer.reinstall {
+                installerPane.isDisable = false
+                camera2Pane.isDisable = false
+                fileExplorerPane.isDisable = false
+                devicepropertiesPane.isDisable = false
+                dpiPane.isDisable = device.recovery
+                flasherPane.isDisable = true
+                wiperPane.isDisable = true
+                oemPane.isDisable = true
+                rebootMenu.isDisable = false
+                recoveryMenuItem.isDisable = false
+            }
+        }
+    }
+
+    @FXML
+    private fun unaddButtonPressed(event: ActionEvent) {
+        if (uncustomappTextField.text != null && uncustomappTextField.text.trim().isNotEmpty())
+            installer.uninstallTableView.items.add(App("Custom app", uncustomappTextField.text.trim(), true))
+        uncustomappTextField.text = null
+        installer.uninstallTableView.refresh()
+    }
+
+    @FXML
+    private fun readdButtonPressed(event: ActionEvent) {
+        if (recustomappTextField.text != null && recustomappTextField.text.trim().isNotEmpty())
+            installer.reinstallTableView.items.add(App("Custom app", recustomappTextField.text.trim(), true))
+        recustomappTextField.text = null
+        installer.reinstallTableView.refresh()
     }
 
     @FXML
@@ -709,7 +720,7 @@ class MainController : Initializable {
             else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
         discord.font = Font(14.0)
-        val twitter = Hyperlink("@Saki_EU")
+        val twitter = Hyperlink("Saki_EU on Twitter")
         twitter.onAction = EventHandler {
             if (System.getProperty("os.name").toLowerCase().contains("linux"))
                 Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")

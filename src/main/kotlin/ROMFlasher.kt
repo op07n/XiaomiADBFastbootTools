@@ -12,10 +12,9 @@ class ROMFlasher(
     var directory: File
 ) {
 
-    var pb: ProcessBuilder = ProcessBuilder()
-    lateinit var proc: Process
-    lateinit var scan: Scanner
-    lateinit var t: Thread
+    private val pb: ProcessBuilder = ProcessBuilder()
+    private lateinit var proc: Process
+    private lateinit var scan: Scanner
 
     init {
         pb.directory(File(System.getProperty("user.home") + "/temp"))
@@ -80,7 +79,7 @@ class ROMFlasher(
         scan = Scanner(proc.inputStream).useDelimiter("")
         progress.progress = 0.0
         progressind.isVisible = true
-        t = Thread {
+        val t = Thread {
             while (scan.hasNext()) {
                 sb.append(scan.next())
                 val line = sb.toString()

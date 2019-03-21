@@ -7,8 +7,6 @@ import java.util.*
 
 class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Command(tic) {
 
-    lateinit var t: Thread
-
     init {
         pb.redirectErrorStream(true)
     }
@@ -16,7 +14,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
     fun exec(image: File?, arg: String) {
         tic?.text = ""
         val sb = StringBuffer("")
-        arguments = arg.split(" ").toTypedArray()
+        val arguments = arg.split(" ").toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         pb.command().add(image?.absolutePath)
@@ -25,9 +23,9 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
-        scan = Scanner(proc.inputStream).useDelimiter("")
+        val scan = Scanner(proc.inputStream).useDelimiter("")
         progressind.isVisible = true
-        t = Thread {
+        val t = Thread {
             while (scan.hasNext()) {
                 sb.append(scan.next())
                 val line = sb.toString()
@@ -48,9 +46,9 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
         tic?.text = ""
         val sb = StringBuffer("")
         progressind.isVisible = true
-        t = Thread {
+        val t = Thread {
             for (s in args) {
-                arguments = s.split(" ").toTypedArray()
+                val arguments = s.split(" ").toTypedArray()
                 arguments[0] = prefix + arguments[0]
                 pb.command(*arguments)
                 pb.command().add(image?.absolutePath)
@@ -59,7 +57,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
-                scan = Scanner(proc.inputStream).useDelimiter("")
+                val scan = Scanner(proc.inputStream).useDelimiter("")
                 while (scan.hasNext()) {
                     sb.append(scan.next())
                     val line = sb.toString()

@@ -26,7 +26,7 @@ import java.net.URL
 
 class XiaomiADBFastbootTools : Application() {
 
-    val command = Command()
+    private val command = Command()
 
     companion object {
         @JvmStatic
@@ -96,7 +96,7 @@ class XiaomiADBFastbootTools : Application() {
         try {
             huc.connect()
             huc.disconnect()
-        } catch (e: IOException){
+        } catch (e: IOException) {
             return
         }
         val link = huc.getHeaderField("Location")
@@ -126,7 +126,8 @@ class XiaomiADBFastbootTools : Application() {
     @Throws(Exception::class)
     override fun start(stage: Stage) {
         if (File(System.getProperty("user.home") + "/temp").exists()) {
-            command.exec("adb kill-server")
+            if (File(System.getProperty("user.home") + "/temp/adb").exists() || File(System.getProperty("user.home") + "/temp/adb.exe").exists())
+                command.exec("adb kill-server")
             try {
                 FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
             } catch (ex: IOException) {
