@@ -30,6 +30,7 @@ open class Command() {
             proc = pb.start()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         val scan = Scanner(proc.inputStream)
         var line: String
@@ -62,6 +63,7 @@ open class Command() {
             proc = pb.start()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         val scan = if (err)
             Scanner(proc.errorStream)

@@ -387,6 +387,7 @@ class MainController : Initializable {
                     fw.close()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
+                    ExceptionAlert(ex)
                 }
             }
         }

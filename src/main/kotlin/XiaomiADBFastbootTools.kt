@@ -43,11 +43,11 @@ class XiaomiADBFastbootTools : Application() {
             bytes = IOUtils.toByteArray(this.javaClass.classLoader.getResourceAsStream(file))
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
-        var newfile: File
-        if (file.lastIndexOf("/") != -1)
-            newfile = File(System.getProperty("user.home") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
-        else newfile = File(System.getProperty("user.home") + "/temp/$file")
+        val newfile = if (file.lastIndexOf("/") != -1)
+            File(System.getProperty("user.home") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
+        else File(System.getProperty("user.home") + "/temp/$file")
         if (!newfile.exists()) {
             try {
                 newfile.createNewFile()
@@ -57,6 +57,7 @@ class XiaomiADBFastbootTools : Application() {
                 fos.close()
             } catch (ex: IOException) {
                 ex.printStackTrace()
+                ExceptionAlert(ex)
             }
 
         }
@@ -126,12 +127,15 @@ class XiaomiADBFastbootTools : Application() {
     @Throws(Exception::class)
     override fun start(stage: Stage) {
         if (File(System.getProperty("user.home") + "/temp").exists()) {
-            if (File(System.getProperty("user.home") + "/temp/adb").exists() || File(System.getProperty("user.home") + "/temp/adb.exe").exists())
-                command.exec("adb kill-server")
             try {
                 FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
             } catch (ex: IOException) {
                 ex.printStackTrace()
+                val alert = Alert(Alert.AlertType.ERROR)
+                alert.title = "Fatal Error"
+                alert.headerText = "ERROR: Please kill adb in Task Manager and try again!"
+                alert.showAndWait()
+                Platform.exit()
             }
         }
         setupFiles()

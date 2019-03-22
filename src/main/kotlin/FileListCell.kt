@@ -29,6 +29,7 @@ class FileListCell : ListCell<AndroidFile>() {
             fxmlLoader.load<Parent>()
         } catch (e: IOException) {
             e.printStackTrace()
+            ExceptionAlert(e)
         }
     }
 

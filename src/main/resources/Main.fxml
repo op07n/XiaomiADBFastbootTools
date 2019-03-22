@@ -29,7 +29,7 @@
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
-        <Menu fx:id="optionsMenu" mnemonicParsing="false" text="Menu">
+        <Menu fx:id="optionsMenu" mnemonicParsing="false" text="Options">
           <items>
                   <Menu fx:id="rebootMenu" disable="true" mnemonicParsing="false" text="Reboot device to">
                     <items>

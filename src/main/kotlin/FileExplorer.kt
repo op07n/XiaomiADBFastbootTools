@@ -62,6 +62,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
             proc = pb.start()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         val scan = Scanner(proc.inputStream).useDelimiter("")
         while (scan.hasNextLine()) {

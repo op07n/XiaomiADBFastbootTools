@@ -26,6 +26,7 @@ class ROMFlasher(
             scan = Scanner(FileReader(file))
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
+            ExceptionAlert(e)
         }
         var cnt = 0
         while (scan.hasNext())
@@ -40,6 +41,7 @@ class ROMFlasher(
             scan = Scanner(FileReader(File(directory, "$arg.sh")))
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
+            ExceptionAlert(e)
         }
         var content = ""
         while (scan.hasNext()) {
@@ -54,6 +56,7 @@ class ROMFlasher(
             fw.close()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         script.setExecutable(true, false)
     }
@@ -75,6 +78,7 @@ class ROMFlasher(
             proc = pb.start()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         scan = Scanner(proc.inputStream).useDelimiter("")
         progress.progress = 0.0

@@ -109,7 +109,9 @@ class Installer(
     }
 
     private fun createTables() {
-        val installed = command.exec("adb shell cmd package list packages")
+        var installed = command.exec("adb shell cmd package list packages")
+        if (installed.contains("not found"))
+            installed = command.exec("adb shell pm list packages")
         val all = command.exec("adb shell cmd package list packages -u")
         uninstallTableView.items.clear()
         reinstallTableView.items.clear()
@@ -147,6 +149,7 @@ class Installer(
                     proc = pb.start()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
+                    ExceptionAlert(ex)
                 }
                 val scan = Scanner(proc.inputStream)
                 var line = ""
@@ -196,6 +199,7 @@ class Installer(
                     proc = pb.start()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
+                    ExceptionAlert(ex)
                 }
                 val scan = Scanner(proc.inputStream)
                 var line = ""

@@ -22,6 +22,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
             proc = pb.start()
         } catch (ex: IOException) {
             ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         val scan = Scanner(proc.inputStream).useDelimiter("")
         progressind.isVisible = true
@@ -56,6 +57,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                     proc = pb.start()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
+                    ExceptionAlert(ex)
                 }
                 val scan = Scanner(proc.inputStream).useDelimiter("")
                 while (scan.hasNext()) {
