@@ -191,7 +191,7 @@ class MainController : Initializable {
     fun checkDevice() {
         thread = Thread {
             comm.exec("adb start-server")
-            while (File(System.getProperty("user.home") + "/temp").exists()) {
+            while (File(System.getProperty("user.dir") + "/temp").exists()) {
                 if (device.mode == 0) {
                     if (!outputTextArea.text.contains("Looking"))
                         outputTextArea.text = "Looking for devices..."

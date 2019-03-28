@@ -36,7 +36,7 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     fun createFile(file: String, exec: Boolean) {
-        val temp = File(System.getProperty("user.home") + "/temp")
+        val temp = File(System.getProperty("user.dir") + "/temp")
         temp.mkdir()
         var bytes: ByteArray? = null
         try {
@@ -46,8 +46,8 @@ class XiaomiADBFastbootTools : Application() {
             ExceptionAlert(ex)
         }
         val newfile = if (file.lastIndexOf("/") != -1)
-            File(System.getProperty("user.home") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
-        else File(System.getProperty("user.home") + "/temp/$file")
+            File(System.getProperty("user.dir") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
+        else File(System.getProperty("user.dir") + "/temp/$file")
         if (!newfile.exists()) {
             try {
                 newfile.createNewFile()
@@ -74,8 +74,8 @@ class XiaomiADBFastbootTools : Application() {
             createFile("windows/AdbWinUsbApi.dll", false)
         }
         if (os.contains("mac")) {
-            createFile("macos/adb", true)
-            createFile("macos/fastboot", true)
+            createFile("darwin/adb", true)
+            createFile("darwin/fastboot", true)
         }
         if (os.contains("linux")) {
             createFile("linux/adb", true)
@@ -126,9 +126,9 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        if (File(System.getProperty("user.home") + "/temp").exists()) {
+        if (File(System.getProperty("user.dir") + "/temp").exists()) {
             try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
+                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/temp"))
             } catch (ex: IOException) {
                 ex.printStackTrace()
                 val alert = Alert(Alert.AlertType.ERROR)
@@ -146,7 +146,7 @@ class XiaomiADBFastbootTools : Application() {
         stage.icons.add(Image("icon.png"))
         stage.show()
         stage.isResizable = false
-        if (!File(System.getProperty("user.home") + "/temp/adb").exists() && !File(System.getProperty("user.home") + "/temp/adb.exe").exists()) {
+        if (!File(System.getProperty("user.dir") + "/temp/adb").exists() && !File(System.getProperty("user.dir") + "/temp/adb.exe").exists()) {
             val alert = Alert(Alert.AlertType.ERROR)
             alert.title = "Fatal Error"
             alert.headerText = "ERROR: Couldn't initialize ADB!"
@@ -159,9 +159,9 @@ class XiaomiADBFastbootTools : Application() {
     override fun stop() {
         MainController.thread.interrupt()
         command.exec("adb kill-server")
-        while (File(System.getProperty("user.home") + "/temp").exists()) {
+        while (File(System.getProperty("user.dir") + "/temp").exists()) {
             try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.home") + "/temp"))
+                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/temp"))
             } catch (ex: IOException) {
                 Thread.sleep(500)
                 continue
