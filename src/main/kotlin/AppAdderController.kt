@@ -21,7 +21,7 @@ class AppAdderController : Initializable {
     @FXML
     private fun loadButtonPressed(event: ActionEvent) {
         val fc = FileChooser()
-        val fileExtensions = FileChooser.ExtensionFilter("Image File", "*.*")
+        val fileExtensions = FileChooser.ExtensionFilter("Text File", "*")
         fc.extensionFilters.add(fileExtensions)
         fc.title = "Select an image"
         val file = fc.showOpenDialog((event.source as Node).scene.window)
