@@ -45,7 +45,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
         val lines = exec("adb shell ls -l $path", 5)
         val files = FXCollections.observableArrayList<AndroidFile>()
         for (line in lines.split('\n')) {
-            if (line.contains(':') && !line.contains("ls:")) {
+            if (':' in line && "ls:" !in line) {
                 val file = makeFile(line)
                 if (file != null)
                     files.add(file)

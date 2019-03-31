@@ -36,7 +36,7 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     fun createFile(file: String, exec: Boolean) {
-        val temp = File(System.getProperty("user.dir") + "/temp")
+        val temp = File(System.getProperty("user.dir") + "/xaft_tmp")
         temp.mkdir()
         var bytes: ByteArray? = null
         try {
@@ -46,8 +46,8 @@ class XiaomiADBFastbootTools : Application() {
             ExceptionAlert(ex)
         }
         val newfile = if (file.lastIndexOf("/") != -1)
-            File(System.getProperty("user.dir") + "/temp/${file.substring(file.lastIndexOf("/") + 1)}")
-        else File(System.getProperty("user.dir") + "/temp/$file")
+            File(System.getProperty("user.dir") + "/xaft_tmp/${file.substring(file.lastIndexOf("/") + 1)}")
+        else File(System.getProperty("user.dir") + "/xaft_tmp/$file")
         if (!newfile.exists()) {
             try {
                 newfile.createNewFile()
@@ -67,17 +67,17 @@ class XiaomiADBFastbootTools : Application() {
     fun setupFiles() {
         val os = System.getProperty("os.name").toLowerCase()
         createFile("dummy.img", false)
-        if (os.contains("win")) {
+        if ("win" in os) {
             createFile("windows/adb.exe", true)
             createFile("windows/fastboot.exe", true)
             createFile("windows/AdbWinApi.dll", false)
             createFile("windows/AdbWinUsbApi.dll", false)
         }
-        if (os.contains("mac")) {
+        if ("mac" in os) {
             createFile("darwin/adb", true)
             createFile("darwin/fastboot", true)
         }
-        if (os.contains("linux")) {
+        if ("linux" in os) {
             createFile("linux/adb", true)
             createFile("linux/fastboot", true)
         }
@@ -113,7 +113,7 @@ class XiaomiADBFastbootTools : Application() {
             vb.alignment = Pos.CENTER
             val download = Hyperlink("Download")
             download.onAction = EventHandler {
-                if (System.getProperty("os.name").toLowerCase().contains("linux"))
+                if ("linux" in System.getProperty("os.name").toLowerCase())
                     Runtime.getRuntime().exec("xdg-open $link")
                 else Desktop.getDesktop().browse(URI(link))
             }
@@ -126,9 +126,9 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        if (File(System.getProperty("user.dir") + "/temp").exists()) {
+        if (File(System.getProperty("user.dir") + "/xaft_tmp").exists()) {
             try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/temp"))
+                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/xaft_tmp"))
             } catch (ex: IOException) {
                 ex.printStackTrace()
                 val alert = Alert(Alert.AlertType.ERROR)
@@ -146,7 +146,7 @@ class XiaomiADBFastbootTools : Application() {
         stage.icons.add(Image("icon.png"))
         stage.show()
         stage.isResizable = false
-        if (!File(System.getProperty("user.dir") + "/temp/adb").exists() && !File(System.getProperty("user.dir") + "/temp/adb.exe").exists()) {
+        if (!File(System.getProperty("user.dir") + "/xaft_tmp/adb").exists() && !File(System.getProperty("user.dir") + "/xaft_tmp/adb.exe").exists()) {
             val alert = Alert(Alert.AlertType.ERROR)
             alert.title = "Fatal Error"
             alert.headerText = "ERROR: Couldn't initialize ADB!"
@@ -159,9 +159,9 @@ class XiaomiADBFastbootTools : Application() {
     override fun stop() {
         MainController.thread.interrupt()
         command.exec("adb kill-server")
-        while (File(System.getProperty("user.dir") + "/temp").exists()) {
+        while (File(System.getProperty("user.dir") + "/xaft_tmp").exists()) {
             try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/temp"))
+                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/xaft_tmp"))
             } catch (ex: IOException) {
                 Thread.sleep(500)
                 continue

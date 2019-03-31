@@ -6,18 +6,21 @@ class Device {
     var anti = 0
     var auth = false
     var dpi = -1
+    var width = -1
+    var height = -1
     var comm = Command()
     var recovery = false
+    var reinstaller = true
     var mode = 0
 
     fun readADB(): Boolean {
         var op = comm.exec("adb get-serialno", true)
         auth = false
-        if (op.contains("no devices")) {
+        if ("no devices" in op) {
             mode = 0
             return false
         }
-        if (op.contains("unauthorized")) {
+        if ("unauthorized" in op) {
             mode = 0
             auth = true
             return false
@@ -33,10 +36,21 @@ class Device {
         anti = -1
         if (!recovery) {
             op = comm.exec("adb shell wm density")
-            try {
-                dpi = op.substring(op.lastIndexOf(":") + 2).trim().toInt()
+            dpi = try {
+                op.substring(op.lastIndexOf(':') + 2).trim().toInt()
             } catch (e: Exception) {
-                dpi = -1
+                -1
+            }
+            op = comm.exec("adb shell wm size")
+            width = try {
+                op.substring(op.lastIndexOf(':') + 2, op.lastIndexOf('x')).toInt()
+            } catch (e: Exception) {
+                -1
+            }
+            height = try {
+                op.substring(op.lastIndexOf('x') + 1).trim().toInt()
+            } catch (e: Exception) {
+                -1
             }
         }
         mode = 1
@@ -58,9 +72,9 @@ class Device {
         bootloader = comm.exec("fastboot oem device-info", true).contains("unlocked: true")
         op = comm.exec("fastboot getvar anti", true)
         op = op.substring(0, op.indexOf(System.lineSeparator()))
-        if (op.length != 7)
-            anti = -1
-        else anti = op.substring(6).toInt()
+        anti = if (op.length != 7)
+            -1
+        else op.substring(6).toInt()
         mode = 2
         return true
     }

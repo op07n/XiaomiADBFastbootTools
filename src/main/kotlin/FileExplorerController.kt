@@ -25,7 +25,7 @@ class FileExplorerController : Initializable {
     @FXML
     private lateinit var progressBar: ProgressBar
 
-    lateinit var fileExplorer: FileExplorer
+    private lateinit var fileExplorer: FileExplorer
     lateinit var device: Device
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {

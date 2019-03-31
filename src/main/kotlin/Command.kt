@@ -12,9 +12,9 @@ open class Command() {
     protected lateinit var output: String
 
     init {
-        pb.directory(File(System.getProperty("user.dir") + "/temp"))
-        if (System.getProperty("os.name").toLowerCase().contains("win"))
-            prefix = System.getProperty("user.dir") + "/temp/"
+        pb.directory(File(System.getProperty("user.dir") + "/xaft_tmp"))
+        if ("win" in System.getProperty("os.name").toLowerCase())
+            prefix = System.getProperty("user.dir") + "/xaft_tmp/"
         else prefix = "./"
     }
 
@@ -36,7 +36,7 @@ open class Command() {
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()
-            if (line.contains("fastboot format"))
+            if ("fastboot format" in line)
                 continue
             output += line
             tic?.appendText(line)

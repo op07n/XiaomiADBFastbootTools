@@ -17,7 +17,7 @@ class ROMFlasher(
     private lateinit var scan: Scanner
 
     init {
-        pb.directory(File(System.getProperty("user.dir") + "/temp"))
+        pb.directory(File(System.getProperty("user.dir") + "/xaft_tmp"))
         pb.redirectErrorStream(true)
     }
 
@@ -30,7 +30,7 @@ class ROMFlasher(
         }
         var cnt = 0
         while (scan.hasNext())
-            if (scan.nextLine().contains("fastboot"))
+            if ("fastboot" in scan.nextLine())
                 cnt++
         scan.close()
         return cnt
@@ -65,7 +65,7 @@ class ROMFlasher(
         tic.text = ""
         val sb = StringBuffer("")
         val script: File
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+        if ("win" in System.getProperty("os.name").toLowerCase()) {
             script = File(directory, "$arg.bat")
             pb.command("cmd.exe", "/c", script.absolutePath)
         } else {
@@ -87,7 +87,7 @@ class ROMFlasher(
             while (scan.hasNext()) {
                 sb.append(scan.next())
                 val line = sb.toString()
-                if (line.contains("pause"))
+                if ("pause" in line)
                     break
                 Platform.runLater {
                     tic.text = line
