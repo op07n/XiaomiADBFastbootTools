@@ -255,8 +255,8 @@ class MainController : Initializable {
         val alert = Alert(Alert.AlertType.CONFIRMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.isResizable = false
-        alert.dialogPane.prefWidth *= 0.5
-        alert.dialogPane.prefHeight *= 0.5
+        alert.dialogPane.prefWidth *= 0.6
+        alert.dialogPane.prefHeight *= 0.6
         alert.headerText = "Are you sure?"
         val yes = ButtonType("Yes")
         val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
@@ -480,7 +480,7 @@ class MainController : Initializable {
         when (device.mode) {
             1 -> if (checkADB()) {
                 val fc = FileChooser()
-                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*.*")
+                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*")
                 fc.extensionFilters.add(fileExtensions)
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
@@ -495,7 +495,7 @@ class MainController : Initializable {
             }
             2 -> if (checkFastboot()) {
                 val fc = FileChooser()
-                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*.*")
+                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*")
                 fc.extensionFilters.add(fileExtensions)
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
