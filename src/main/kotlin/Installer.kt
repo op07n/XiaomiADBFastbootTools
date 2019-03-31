@@ -106,15 +106,15 @@ class Installer(
             "Yellow Pages;com.miui.yellowpage",
             "YouTube;com.google.android.youtube"
         )
+        val packages = command.exec("adb shell cmd package install-existing xaft")
+        device.reinstaller = !("not found" in packages || "Unknown command" in packages)
         createTables()
     }
 
     fun createTables() {
-        var installed = command.exec("adb shell cmd package list packages")
-        if ("not found" in installed || "Can't find" in installed) {
-            device.reinstaller = false
-            installed = command.exec("adb shell pm list packages")
-        } else device.reinstaller = true
+        val installed = if (device.reinstaller)
+            command.exec("adb shell cmd package list packages")
+        else command.exec("adb shell pm list packages")
         val all = command.exec("adb shell cmd package list packages -u")
         uninstallTableView.items.clear()
         reinstallTableView.items.clear()
