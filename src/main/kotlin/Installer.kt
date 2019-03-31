@@ -143,23 +143,31 @@ class Installer(
             apps.add("${app.split('.').last()};$app")
     }
 
-    fun uninstall(func: () -> Unit) {
-        val undesired = FXCollections.observableArrayList<App>()
-        if (uninstallTableView.items.size != 0) {
-            for (app in uninstallTableView.items)
+    fun isAppSelected(option: Int): Boolean {
+        val list = if (option == 0)
+            uninstallTableView.items
+        else reinstallTableView.items
+        if (list.isNotEmpty()) {
+            for (app in list)
                 if (app.selectedProperty().get())
-                    undesired.add(app)
-            if (undesired.size == 0)
-                return
-        } else return
+                    return true
+            return false
+        } else return false
+    }
+
+    fun uninstall(func: () -> Unit) {
+        val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        for (app in undesired)
-            n += app.packagenameProperty().get().lines().size
+        for (app in uninstallTableView.items)
+            if (app.selectedProperty().get()) {
+                selected.add(app)
+                n += app.packagenameProperty().get().lines().size
+            }
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
         val t = Thread {
-            for (app in undesired)
+            for (app in selected)
                 for (pkg in app.packagenameProperty().get().lines()) {
                     val arguments =
                         ("adb shell pm uninstall --user 0 $pkg").split(' ').toTypedArray()
@@ -187,8 +195,8 @@ class Installer(
                 tic?.appendText("Done!")
                 progress.progress = 0.0
                 progressind.isVisible = false
-                func()
                 createTables()
+                func()
             }
         }
         t.isDaemon = true
@@ -196,22 +204,18 @@ class Installer(
     }
 
     fun reinstall(func: () -> Unit) {
-        val desired = FXCollections.observableArrayList<App>()
-        if (reinstallTableView.items.size != 0) {
-            for (app in reinstallTableView.items)
-                if (app.selectedProperty().get())
-                    desired.add(app)
-            if (desired.size == 0)
-                return
-        } else return
+        val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        for (app in desired)
-            n += app.packagenameProperty().get().lines().size
+        for (app in reinstallTableView.items)
+            if (app.selectedProperty().get()) {
+                selected.add(app)
+                n += app.packagenameProperty().get().lines().size
+            }
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
         val t = Thread {
-            for (app in desired)
+            for (app in selected)
                 for (pkg in app.packagenameProperty().get().lines()) {
                     val arguments =
                         ("adb shell cmd package install-existing $pkg").split(' ')
@@ -243,8 +247,8 @@ class Installer(
                 tic?.appendText("Done!")
                 progress.progress = 0.0
                 progressind.isVisible = false
-                func()
                 createTables()
+                func()
             }
         }
         t.isDaemon = true

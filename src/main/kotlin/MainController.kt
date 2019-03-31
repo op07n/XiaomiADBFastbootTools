@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.2"
+        val version = "6.2.1"
         lateinit var thread: Thread
     }
 
@@ -249,6 +249,21 @@ class MainController : Initializable {
         }
         thread.isDaemon = true
         thread.start()
+    }
+
+    private fun confirm(func: () -> Unit) {
+        val alert = Alert(Alert.AlertType.CONFIRMATION)
+        alert.initStyle(StageStyle.UTILITY)
+        alert.isResizable = false
+        alert.dialogPane.prefWidth *= 0.5
+        alert.dialogPane.prefHeight *= 0.5
+        alert.headerText = "Are you sure?"
+        val yes = ButtonType("Yes")
+        val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
+        alert.buttonTypes.setAll(yes, no)
+        val result = alert.showAndWait()
+        if (result.get() == yes)
+            func()
     }
 
     override fun initialize(url: URL, rb: ResourceBundle?) {
@@ -519,9 +534,11 @@ class MainController : Initializable {
     @FXML
     private fun flashimageButtonPressed(event: ActionEvent) {
         if (image != null && partitionComboBox.value != null && image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
-            if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
-                flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
-            else flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
+            confirm {
+                if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
+                    flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
+                else flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
+            }
         }
     }
 
@@ -552,18 +569,20 @@ class MainController : Initializable {
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
         if (rom != null && scriptComboBox.value != null && checkFastboot()) {
-            val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
-            setPanels(0)
-            when (scriptComboBox.value) {
-                "Clean install" -> rf.exec("flash_all")
-                "Clean install and lock" -> rf.exec("flash_all_lock")
-                "Update" -> when {
-                    File(rom, "flash_all_except_storage.sh").exists() -> rf.exec("flash_all_except_storage")
-                    File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
-                    File(
-                        rom,
-                        "flash_all_except_data_storage.sh"
-                    ).exists() -> rf.exec("flash_all_except_data_storage")
+            confirm {
+                val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
+                setPanels(0)
+                when (scriptComboBox.value) {
+                    "Clean install" -> rf.exec("flash_all")
+                    "Clean install and lock" -> rf.exec("flash_all_lock")
+                    "Update" -> when {
+                        File(rom, "flash_all_except_storage.sh").exists() -> rf.exec("flash_all_except_storage")
+                        File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
+                        File(
+                            rom,
+                            "flash_all_except_data_storage.sh"
+                        ).exists() -> rf.exec("flash_all_except_data_storage")
+                    }
                 }
             }
         }
@@ -584,19 +603,19 @@ class MainController : Initializable {
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            displayedcomm.exec("fastboot erase userdata")
+            confirm { displayedcomm.exec("fastboot erase userdata") }
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            displayedcomm.exec("fastboot erase cache", "fastboot erase userdata")
+            confirm { displayedcomm.exec("fastboot erase cache", "fastboot erase userdata") }
     }
 
     @FXML
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            displayedcomm.exec("fastboot oem lock")
+            confirm { displayedcomm.exec("fastboot oem lock") }
     }
 
     @FXML
@@ -758,7 +777,7 @@ class MainController : Initializable {
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
+        if (installer.isAppSelected(0) && checkADB()) {
             setPanels(0)
             installer.uninstall {
                 setPanels(1)
@@ -768,7 +787,7 @@ class MainController : Initializable {
 
     @FXML
     private fun reinstallButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
+        if (installer.isAppSelected(1) && checkADB()) {
             setPanels(0)
             installer.reinstall {
                 setPanels(1)
