@@ -6,11 +6,12 @@
 
 ## Modules
 
-* **Uninstaller** - Remove system apps and services on demand
+* **Uninstaller** - Uninstall system apps and services on demand
 * **Reinstaller** - Reinstall removed system apps and services
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
 * **File Explorer** - Transfer files between a device and a computer using ADB
 * **Screen density** - Tweak screen density by overriding the DPI value
+* **Screen resolution** - Tweak screen resolution by overriding the width and height values
 * **Device properties** - Retrieve tons of statistics and information about your device
 * **Flasher** - Flash any partition with an image, boot to any image or flash a Fastboot ROM (unlocked bootloader required)
 * **Wiper** - Wipe the cache or perform a factory reset
