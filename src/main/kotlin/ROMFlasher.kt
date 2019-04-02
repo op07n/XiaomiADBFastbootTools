@@ -17,7 +17,7 @@ class ROMFlasher(
     private lateinit var scan: Scanner
 
     init {
-        pb.directory(File(System.getProperty("user.dir") + "/xaft_tmp"))
+        pb.directory(File(System.getProperty("user.home"), "xaft_tmp"))
         pb.redirectErrorStream(true)
     }
 

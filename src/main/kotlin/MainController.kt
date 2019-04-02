@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.2.2"
+        val version = "6.2.3"
         lateinit var thread: Thread
     }
 
@@ -237,7 +237,7 @@ class MainController : Initializable {
     private fun checkDevice() {
         thread = Thread {
             comm.exec("adb start-server")
-            while (File(System.getProperty("user.dir") + "/xaft_tmp").exists()) {
+            while (File(System.getProperty("user.home"), "xaft_tmp").exists()) {
                 if (device.mode == 0)
                     Platform.runLater { loadDevice() }
                 try {

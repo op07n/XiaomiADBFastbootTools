@@ -12,9 +12,9 @@ open class Command() {
     protected lateinit var output: String
 
     init {
-        pb.directory(File(System.getProperty("user.dir") + "/xaft_tmp"))
+        pb.directory(File(System.getProperty("user.home"), "xaft_tmp"))
         if ("win" in System.getProperty("os.name").toLowerCase())
-            prefix = System.getProperty("user.dir") + "/xaft_tmp/"
+            prefix = System.getProperty("user.home") + "/xaft_tmp/"
         else prefix = "./"
     }
 

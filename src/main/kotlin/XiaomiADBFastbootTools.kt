@@ -13,11 +13,8 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import java.awt.Desktop
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
@@ -27,6 +24,7 @@ import java.net.URL
 class XiaomiADBFastbootTools : Application() {
 
     private val command = Command()
+    private val tmp = File(System.getProperty("user.home"), "xaft_tmp")
 
     companion object {
         @JvmStatic
@@ -35,31 +33,20 @@ class XiaomiADBFastbootTools : Application() {
         }
     }
 
-    fun createFile(file: String, exec: Boolean) {
-        val temp = File(System.getProperty("user.dir") + "/xaft_tmp")
-        temp.mkdir()
-        var bytes: ByteArray? = null
-        try {
-            bytes = IOUtils.toByteArray(this.javaClass.classLoader.getResourceAsStream(file))
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            ExceptionAlert(ex)
-        }
-        val newfile = if (file.lastIndexOf("/") != -1)
-            File(System.getProperty("user.dir") + "/xaft_tmp/${file.substring(file.lastIndexOf("/") + 1)}")
-        else File(System.getProperty("user.dir") + "/xaft_tmp/$file")
+    private fun createFile(file: String, exec: Boolean) {
+        tmp.mkdir()
+        val bytes = this.javaClass.classLoader.getResourceAsStream(file).readBytes()
+        val newfile = if ('/' in file)
+            File(tmp, file.substringAfterLast('/'))
+        else File(tmp, file)
         if (!newfile.exists()) {
             try {
                 newfile.createNewFile()
-                val fos = FileOutputStream(newfile)
-                fos.write(bytes)
-                fos.flush()
-                fos.close()
+                newfile.writeBytes(bytes)
             } catch (ex: IOException) {
                 ex.printStackTrace()
                 ExceptionAlert(ex)
             }
-
         }
         newfile.setExecutable(exec, false)
     }
@@ -126,17 +113,12 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        if (File(System.getProperty("user.dir") + "/xaft_tmp").exists()) {
-            try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/xaft_tmp"))
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-                val alert = Alert(Alert.AlertType.ERROR)
-                alert.title = "Fatal Error"
-                alert.headerText = "ERROR: Please kill adb in Task Manager and try again!"
-                alert.showAndWait()
-                Platform.exit()
-            }
+        if (tmp.exists() && !tmp.deleteRecursively()) {
+            val alert = Alert(Alert.AlertType.ERROR)
+            alert.title = "Fatal Error"
+            alert.headerText = "ERROR: Please kill adb in Task Manager and try again!"
+            alert.showAndWait()
+            Platform.exit()
         }
         setupFiles()
         val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("Main.fxml"))
@@ -146,27 +128,21 @@ class XiaomiADBFastbootTools : Application() {
         stage.icons.add(Image("icon.png"))
         stage.show()
         stage.isResizable = false
-        if (!File(System.getProperty("user.dir") + "/xaft_tmp/adb").exists() && !File(System.getProperty("user.dir") + "/xaft_tmp/adb.exe").exists()) {
+        checkVersion()
+        if (!File(tmp, "adb").exists() && !File(tmp, "adb.exe").exists()) {
             val alert = Alert(Alert.AlertType.ERROR)
             alert.title = "Fatal Error"
             alert.headerText = "ERROR: Couldn't initialize ADB!"
             alert.showAndWait()
             Platform.exit()
         }
-        checkVersion()
     }
 
     override fun stop() {
         MainController.thread.interrupt()
         command.exec("adb kill-server")
-        while (File(System.getProperty("user.dir") + "/xaft_tmp").exists()) {
-            try {
-                FileUtils.deleteDirectory(File(System.getProperty("user.dir") + "/xaft_tmp"))
-            } catch (ex: IOException) {
-                Thread.sleep(500)
-                continue
-            }
-        }
+        while (tmp.exists() && !tmp.deleteRecursively())
+            Thread.sleep(500)
     }
 
 }
