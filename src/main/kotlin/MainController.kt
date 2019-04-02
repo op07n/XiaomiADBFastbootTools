@@ -480,8 +480,7 @@ class MainController : Initializable {
         when (device.mode) {
             1 -> if (checkADB()) {
                 val fc = FileChooser()
-                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*")
-                fc.extensionFilters.add(fileExtensions)
+                fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
                 if (f != null) {
@@ -495,8 +494,7 @@ class MainController : Initializable {
             }
             2 -> if (checkFastboot()) {
                 val fc = FileChooser()
-                val fileExtensions = FileChooser.ExtensionFilter("Text File", "*")
-                fc.extensionFilters.add(fileExtensions)
+                fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
                 if (f != null) {
@@ -524,8 +522,7 @@ class MainController : Initializable {
     @FXML
     private fun browseimageButtonPressed(event: ActionEvent) {
         val fc = FileChooser()
-        val fileExtensions = FileChooser.ExtensionFilter("Image File", "*.*")
-        fc.extensionFilters.add(fileExtensions)
+        fc.extensionFilters.add(FileChooser.ExtensionFilter("Image File", "*.*"))
         fc.title = "Select an image"
         image = fc.showOpenDialog((event.source as Node).scene.window)
         imageLabel.text = image?.name
@@ -658,7 +655,7 @@ class MainController : Initializable {
             val link = huc.getHeaderField("Location")
             if (link != null && "bigota" in link) {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text += "\n\n${link}\n\nLink copied to clipboard!"
+                outputTextArea.text += "\n\n$link\n\nLink copied to clipboard!"
                 Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
             } else {
                 versionLabel.text = "-"
@@ -671,16 +668,22 @@ class MainController : Initializable {
     private fun downloadromButtonPressed(event: ActionEvent) {
         if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
             val codename = codenameTextField.text.trim()
-            var url = URL("http://google.com")
-            when (branchComboBox.value) {
-                "Global Stable" -> url =
+            val url = when (branchComboBox.value) {
+                "Global Stable" ->
                     URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-                "Global Developer" -> url =
+                "Global Developer" ->
                     URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-                "China Stable" -> url =
+                "China Stable" ->
                     URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-                "China Developer" -> url =
+                "China Developer" ->
                     URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+                "EEA Stable" ->
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
+                "Russia Stable" ->
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
+                "India Stable" ->
+                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
+                else -> URL("http://google.com")
             }
             val huc = url.openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
@@ -693,7 +696,7 @@ class MainController : Initializable {
                 versionLabel.text = link.substringAfter(".com/").substringBefore("/")
                 outputTextArea.text += "\n\nStarting download in browser..."
                 if ("linux" in System.getProperty("os.name").toLowerCase())
-                    Runtime.getRuntime().exec("xdg-open ${link}")
+                    Runtime.getRuntime().exec("xdg-open $link")
                 else Desktop.getDesktop().browse(URI(link))
             } else {
                 versionLabel.text = "-"
@@ -813,6 +816,7 @@ class MainController : Initializable {
 
     @FXML
     private fun aboutMenuItemPressed(event: ActionEvent) {
+        val linux = "linux" in System.getProperty("os.name").toLowerCase()
         val alert = Alert(AlertType.INFORMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
@@ -823,21 +827,21 @@ class MainController : Initializable {
         vb.alignment = Pos.CENTER
         val discord = Hyperlink("Xiaomi Community on Discord")
         discord.onAction = EventHandler {
-            if ("linux" in System.getProperty("os.name").toLowerCase())
+            if (linux)
                 Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
             else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
         discord.font = Font(14.0)
         val twitter = Hyperlink("Saki_EU on Twitter")
         twitter.onAction = EventHandler {
-            if ("linux" in System.getProperty("os.name").toLowerCase())
+            if (linux)
                 Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
             else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
         }
         twitter.font = Font(14.0)
         val github = Hyperlink("Repository on GitHub")
         github.onAction = EventHandler {
-            if ("linux" in System.getProperty("os.name").toLowerCase())
+            if (linux)
                 Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
             else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
         }

@@ -7,15 +7,15 @@ open class Command() {
 
     protected var pb: ProcessBuilder = ProcessBuilder()
     protected var tic: TextInputControl? = null
-    protected var prefix: String
+    protected val prefix: String
     protected lateinit var proc: Process
     protected lateinit var output: String
 
     init {
         pb.directory(File(System.getProperty("user.home"), "xaft_tmp"))
-        if ("win" in System.getProperty("os.name").toLowerCase())
-            prefix = System.getProperty("user.home") + "/xaft_tmp/"
-        else prefix = "./"
+        prefix = if ("win" in System.getProperty("os.name").toLowerCase())
+            System.getProperty("user.home") + "/xaft_tmp/"
+        else "./"
     }
 
     constructor(control: TextInputControl) : this() {

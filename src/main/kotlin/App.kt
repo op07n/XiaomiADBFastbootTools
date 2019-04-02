@@ -9,8 +9,6 @@ class App(name: String, packages: List<String>, checked: Boolean = false) {
     private val packagename = SimpleStringProperty()
     private val selected = SimpleBooleanProperty()
 
-    constructor(name: String, pkg: String, checked: Boolean = false) : this(name, listOf(pkg), checked)
-
     init {
         appname.set(name)
         var pkgs = ""

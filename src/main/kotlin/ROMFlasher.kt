@@ -2,7 +2,8 @@ import javafx.application.Platform
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
-import java.io.*
+import java.io.File
+import java.io.IOException
 import java.util.*
 
 class ROMFlasher(
@@ -21,39 +22,13 @@ class ROMFlasher(
         pb.redirectErrorStream(true)
     }
 
-    private fun getCmdCount(file: File): Int {
-        try {
-            scan = Scanner(FileReader(file))
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            ExceptionAlert(e)
-        }
-        var cnt = 0
-        while (scan.hasNext())
-            if ("fastboot" in scan.nextLine())
-                cnt++
-        scan.close()
-        return cnt
-    }
+    private fun getCmdCount(file: File): Int = file.readText().split("fastboot").size - 1
 
     private fun createScript(arg: String) {
-        try {
-            scan = Scanner(FileReader(File(directory, "$arg.sh")))
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            ExceptionAlert(e)
-        }
-        var content = ""
-        while (scan.hasNext()) {
-            content += scan.nextLine().replace("fastboot", "./fastboot") + System.lineSeparator()
-        }
-        scan.close()
+        val content = File(directory, "$arg.sh").readText().replace("fastboot", "./fastboot")
         val script = File(directory, "script.sh")
         try {
-            val fw = FileWriter(script)
-            fw.write(content)
-            fw.flush()
-            fw.close()
+            script.writeText(content)
         } catch (ex: IOException) {
             ex.printStackTrace()
             ExceptionAlert(ex)
@@ -101,6 +76,8 @@ class ROMFlasher(
                 progress.progress = 0.0
                 progressind.isVisible = false
             }
+            if ("script" in script.name)
+                script.delete()
         }
         t.isDaemon = true
         t.start()

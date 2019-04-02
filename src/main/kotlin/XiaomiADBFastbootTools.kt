@@ -34,7 +34,6 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     private fun createFile(file: String, exec: Boolean) {
-        tmp.mkdir()
         val bytes = this.javaClass.classLoader.getResourceAsStream(file).readBytes()
         val newfile = if ('/' in file)
             File(tmp, file.substringAfterLast('/'))
@@ -53,20 +52,23 @@ class XiaomiADBFastbootTools : Application() {
 
     fun setupFiles() {
         val os = System.getProperty("os.name").toLowerCase()
+        tmp.mkdir()
         createFile("dummy.img", false)
-        if ("win" in os) {
-            createFile("windows/adb.exe", true)
-            createFile("windows/fastboot.exe", true)
-            createFile("windows/AdbWinApi.dll", false)
-            createFile("windows/AdbWinUsbApi.dll", false)
-        }
-        if ("mac" in os) {
-            createFile("darwin/adb", true)
-            createFile("darwin/fastboot", true)
-        }
-        if ("linux" in os) {
-            createFile("linux/adb", true)
-            createFile("linux/fastboot", true)
+        when {
+            "win" in os -> {
+                createFile("windows/adb.exe", true)
+                createFile("windows/fastboot.exe", true)
+                createFile("windows/AdbWinApi.dll", false)
+                createFile("windows/AdbWinUsbApi.dll", false)
+            }
+            "mac" in os -> {
+                createFile("darwin/adb", true)
+                createFile("darwin/fastboot", true)
+            }
+            else -> {
+                createFile("linux/adb", true)
+                createFile("linux/fastboot", true)
+            }
         }
     }
 
