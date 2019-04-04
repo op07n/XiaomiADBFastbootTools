@@ -31,7 +31,7 @@
       <menus>
         <Menu fx:id="optionsMenu" mnemonicParsing="false" text="Options">
           <items>
-                  <MenuItem fx:id="reloadMenuItem" mnemonicParsing="false" onAction="#reloadMenuItemPressed" text="Reload device" />
+                  <MenuItem fx:id="reloadMenuItem" disable="true" mnemonicParsing="false" onAction="#reloadMenuItemPressed" text="Reload device" />
             <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#aboutMenuItemPressed" text="About" />
           </items>
         </Menu>
