@@ -4,6 +4,7 @@ import javafx.scene.control.TextInputControl
 import java.io.File
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
 
 class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Command(tic) {
 
@@ -26,7 +27,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
         }
         val scan = Scanner(proc.inputStream).useDelimiter("")
         progressind.isVisible = true
-        val t = Thread {
+        thread(true, true) {
             while (scan.hasNext()) {
                 sb.append(scan.next())
                 val line = sb.toString()
@@ -39,15 +40,13 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                 progressind.isVisible = false
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun exec(image: File?, vararg args: String) {
         tic?.text = ""
         val sb = StringBuffer("")
         progressind.isVisible = true
-        val t = Thread {
+        thread(true, true) {
             for (s in args) {
                 val arguments = s.split(" ").toTypedArray()
                 arguments[0] = prefix + arguments[0]
@@ -74,7 +73,5 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                 progressind.isVisible = false
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 }

@@ -7,6 +7,7 @@ import javafx.scene.control.TextInputControl
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
 
 
 class Installer(
@@ -166,7 +167,7 @@ class Installer(
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
-        val t = Thread {
+        thread(true, true) {
             for (app in selected)
                 for (pkg in app.packagenameProperty().get().lines()) {
                     val arguments =
@@ -199,8 +200,6 @@ class Installer(
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun reinstall(func: () -> Unit) {
@@ -214,7 +213,7 @@ class Installer(
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
-        val t = Thread {
+        thread(true, true) {
             for (app in selected)
                 for (pkg in app.packagenameProperty().get().lines()) {
                     val arguments =
@@ -251,7 +250,5 @@ class Installer(
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 }

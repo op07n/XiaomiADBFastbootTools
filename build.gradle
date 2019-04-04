@@ -13,9 +13,6 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "org.openjfx:javafx-graphics:11:linux"
-    compile "org.openjfx:javafx-graphics:11:win"
-    compile "org.openjfx:javafx-graphics:11:mac"
 }
 
 jar {
@@ -36,7 +33,7 @@ compileTestKotlin {
 }
 
 javafx {
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.graphics' ]
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml' ]
 }
 
 mainClassName = 'Main'

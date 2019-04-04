@@ -5,6 +5,7 @@ import javafx.scene.control.TextInputControl
 import java.io.File
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
 
 class ROMFlasher(
     var progress: ProgressBar,
@@ -58,7 +59,7 @@ class ROMFlasher(
         scan = Scanner(proc.inputStream).useDelimiter("")
         progress.progress = 0.0
         progressind.isVisible = true
-        val t = Thread {
+        thread(true, true) {
             while (scan.hasNext()) {
                 sb.append(scan.next())
                 val line = sb.toString()
@@ -79,8 +80,6 @@ class ROMFlasher(
             if ("script" in script.name)
                 script.delete()
         }
-        t.isDaemon = true
-        t.start()
     }
 
 }

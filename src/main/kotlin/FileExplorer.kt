@@ -7,6 +7,7 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
 
 class FileExplorer(var status: TextField, var progress: ProgressBar) : Command() {
 
@@ -79,7 +80,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun pull(selected: List<AndroidFile>, to: File, func: () -> Unit) {
-        val t = Thread {
+        thread(true, true) {
             if (selected.isEmpty()) {
                 val arguments = arrayOf("${prefix}adb", "pull", path, to.absolutePath)
                 pb.command(*arguments)
@@ -98,12 +99,10 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun push(selected: List<File>, func: () -> Unit) {
-        val t = Thread {
+        thread(true, true) {
             for (file in selected) {
                 val arguments = arrayOf("${prefix}adb", "push", file.absolutePath, path)
                 pb.command(*arguments)
@@ -116,12 +115,10 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun delete(selected: List<AndroidFile>, func: () -> Unit) {
-        val t = Thread {
+        thread(true, true) {
             for (file in selected) {
                 val arguments = if (file.dir)
                     arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + file.name))
@@ -136,12 +133,10 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun mkdir(name: String, func: () -> Unit) {
-        val t = Thread {
+        thread(true, true) {
             val arguments = arrayOf("${prefix}adb", "shell", "mkdir", format(path + name))
             pb.command(*arguments)
             init("mkdir")
@@ -152,12 +147,10 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
     fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
-        val t = Thread {
+        thread(true, true) {
             val arguments = arrayOf("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             pb.command(*arguments)
             init("mv")
@@ -168,8 +161,6 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 func()
             }
         }
-        t.isDaemon = true
-        t.start()
     }
 
 }
