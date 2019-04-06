@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
+<VBox prefHeight="720.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -53,7 +53,7 @@
     </MenuBar>
       <HBox VBox.vgrow="ALWAYS">
          <children>
-            <VBox prefWidth="450.0" HBox.hgrow="NEVER">
+            <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" HBox.hgrow="NEVER">
                <children>
                   <TitledPane animated="false" collapsible="false" prefHeight="175.0" text="Device Info">
                     <content>
@@ -103,8 +103,8 @@
                            <children>
                               <GridPane alignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <columnConstraints>
-                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="570.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="240.0" />
+                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="560.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
                                  </columnConstraints>
                                  <rowConstraints>
                                     <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
@@ -134,7 +134,7 @@
                                                               <columns>
                                                                 <TableColumn fx:id="uncheckTableColumn" prefWidth="35.0" />
                                                                 <TableColumn fx:id="unappTableColumn" editable="false" prefWidth="205.0" text="App name" />
-                                                                  <TableColumn fx:id="unpackageTableColumn" editable="false" prefWidth="320.0" text="Package name" />
+                                                                  <TableColumn fx:id="unpackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
                                                               </columns>
                                                             </TableView>
                                                             <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="570.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
@@ -172,7 +172,7 @@
                                                                <columns>
                                                                   <TableColumn fx:id="recheckTableColumn" prefWidth="35.0" />
                                                                   <TableColumn fx:id="reappTableColumn" editable="false" prefWidth="205.0" text="App name" />
-                                                                  <TableColumn fx:id="repackageTableColumn" editable="false" prefWidth="320.0" text="Package name" />
+                                                                  <TableColumn fx:id="repackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
                                                                </columns>
                                                             </TableView>
                                                             <Button fx:id="reinstallButton" mnemonicParsing="false" onAction="#reinstallButtonPressed" prefWidth="570.0" text="Reinstall!" textFill="#00c800" GridPane.columnSpan="2" GridPane.rowIndex="2">
@@ -195,7 +195,7 @@
                                     </TabPane>
                                     <FlowPane alignment="TOP_RIGHT" columnHalignment="CENTER" vgap="10.0" GridPane.columnIndex="1">
                                        <children>
-                                          <TitledPane fx:id="camera2Pane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Camera2 (TWRP)">
+                                          <TitledPane fx:id="camera2Pane" animated="false" collapsible="false" disable="true" prefWidth="220.0" text="Camera2 (TWRP)">
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
@@ -226,7 +226,7 @@
                                                 <Font size="15.0" />
                                              </font>
                                           </TitledPane>
-                                          <TitledPane fx:id="fileExplorerPane" collapsible="false" disable="true" prefWidth="240.0" text="File Explorer">
+                                          <TitledPane fx:id="fileExplorerPane" collapsible="false" disable="true" prefWidth="220.0" text="File Explorer">
                                              <content>
                                                 <AnchorPane>
                                                    <children>
@@ -242,7 +242,7 @@
                                                 <Font size="15.0" />
                                              </font>
                                           </TitledPane>
-                                          <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Screen density">
+                                          <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefWidth="220.0" text="Screen density">
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
@@ -278,7 +278,7 @@
                                                 <Font size="15.0" />
                                              </font>
                                           </TitledPane>
-                                          <TitledPane fx:id="resolutionPane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Screen resolution">
+                                          <TitledPane fx:id="resolutionPane" animated="false" collapsible="false" disable="true" prefWidth="220.0" text="Screen resolution">
                                              <content>
                                                 <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
@@ -343,8 +343,8 @@
                            <children>
                               <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <columnConstraints>
-                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="603.0" />
-                                    <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="217.0" />
+                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="580.0" />
+                                    <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" />
                                  </columnConstraints>
                                  <rowConstraints>
                                     <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" valignment="TOP" vgrow="ALWAYS" />
@@ -458,17 +458,17 @@
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
-                                                <Button fx:id="cacheButton" mnemonicParsing="false" onAction="#cacheButtonPressed" text="Wipe cache" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                <Button fx:id="cacheButton" mnemonicParsing="false" onAction="#cacheButtonPressed" text="Wipe cache" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" text="Wipe userdata" textFill="RED" AnchorPane.leftAnchor="155.0" AnchorPane.topAnchor="0.0">
+                                                <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" text="Wipe userdata" textFill="RED" AnchorPane.leftAnchor="140.0" AnchorPane.topAnchor="0.0">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" text="Wipe cache and userdata" textFill="RED" AnchorPane.leftAnchor="330.0" AnchorPane.topAnchor="0.0">
+                                                <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" text="Wipe cache and userdata" textFill="RED" AnchorPane.leftAnchor="305.0" AnchorPane.topAnchor="0.0">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
@@ -484,12 +484,12 @@
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
-                                                <Button fx:id="lockButton" mnemonicParsing="false" onAction="#lockButtonPressed" text="Lock" textFill="RED" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                <Button fx:id="lockButton" mnemonicParsing="false" onAction="#lockButtonPressed" text="Lock" textFill="RED" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
                                                 </Button>
-                                                <Button fx:id="unlockButton" mnemonicParsing="false" onAction="#unlockButtonPressed" text="Unlock" textFill="#00c800" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="0.0">
+                                                <Button fx:id="unlockButton" mnemonicParsing="false" onAction="#unlockButtonPressed" text="Unlock" textFill="#00c800" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="0.0">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
@@ -514,7 +514,7 @@
                                                       <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" valignment="CENTER" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <FlowPane hgap="30.0">
+                                                      <FlowPane hgap="25.0">
                                                          <children>
                                                             <TextField fx:id="codenameTextField" promptText="Codename">
                                                                <font>
