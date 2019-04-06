@@ -69,11 +69,15 @@ The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everyt
 
 **What apps are safe to uninstall?**
 
-All applications in the list are safe to uninstall. You'll lose some features but the phone will keep working just fine. Some apps, like Gallery, aren't listed because uninstalling them would soft brick your phone.
+All applications in the list are safe to uninstall. You might lose access to some services but the device will keep working just fine. Some apps, like Gallery, aren't listed because uninstalling them would soft brick your device.
 
 **Do uninstalled system apps affect OTA updates?**
 
 No, you are free to install updates without the fear of bricking your device or losing data.
+
+**Do uninstalled system apps come back with updates?**
+
+No, uninstalled apps should only come back when you reinstall them or factory reset your device.
 
 **Why does the Uninstaller hang on some apps?**
 
@@ -83,9 +87,9 @@ There are many factory apps Global MIUI doesn't let you uninstall but China MIUI
 
 Simply reinstall them using the Reinstaller module when connected in ADB mode.
 
-**The app is called Xiaomi ADB/Fastboot Tools. Does that mean it only works with Xiaomi devices?**
+**The app is called Xiaomi ADB/Fastboot Tools. Does that mean that it only works with Xiaomi devices?**
 
-ADB and Fastboot are universal interfaces for Android devices but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
+ADB and Fastboot are universal interfaces on Android but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
 
 **Does this replace MiFlash or MiUnlock?**
 
