@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.2.3"
+        val version = "6.2.4"
         lateinit var thread: Thread
     }
 
@@ -831,21 +831,21 @@ class MainController : Initializable {
                 Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
             else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
         }
-        discord.font = Font(14.0)
+        discord.font = Font(15.0)
         val twitter = Hyperlink("Saki_EU on Twitter")
         twitter.onAction = EventHandler {
             if (linux)
                 Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
             else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
         }
-        twitter.font = Font(14.0)
+        twitter.font = Font(15.0)
         val github = Hyperlink("Repository on GitHub")
         github.onAction = EventHandler {
             if (linux)
                 Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
             else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
         }
-        github.font = Font(14.0)
+        github.font = Font(15.0)
         vb.children.addAll(discord, twitter, github)
         alert.dialogPane.content = vb
         alert.isResizable = false

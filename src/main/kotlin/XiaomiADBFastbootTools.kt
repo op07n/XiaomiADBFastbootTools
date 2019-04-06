@@ -106,7 +106,7 @@ class XiaomiADBFastbootTools : Application() {
                     Runtime.getRuntime().exec("xdg-open $link")
                 else Desktop.getDesktop().browse(URI(link))
             }
-            download.font = Font(14.0)
+            download.font = Font(15.0)
             vb.children.add(download)
             alert.dialogPane.content = vb
             alert.showAndWait()

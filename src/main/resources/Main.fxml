@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
+<VBox prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -51,11 +51,11 @@
             </Menu>
       </menus>
     </MenuBar>
-      <HBox prefHeight="771.0" prefWidth="1280.0">
+      <HBox VBox.vgrow="ALWAYS">
          <children>
-            <VBox prefWidth="450.0">
+            <VBox prefWidth="450.0" HBox.hgrow="NEVER">
                <children>
-                  <TitledPane animated="false" collapsible="false" prefHeight="200.0" text="Device Info">
+                  <TitledPane animated="false" collapsible="false" prefHeight="175.0" text="Device Info">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0">
                            <children>
@@ -68,10 +68,10 @@
                         </AnchorPane>
                     </content>
                      <font>
-                        <Font size="16.0" />
+                        <Font size="15.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="571.0" text="Status">
+                  <TitledPane animated="false" collapsible="false" prefHeight="516.0" text="Status">
                      <content>
                         <GridPane>
                            <columnConstraints>
@@ -90,61 +90,61 @@
                         </GridPane>
                      </content>
                      <font>
-                        <Font size="16.0" />
+                        <Font size="15.0" />
                      </font>
                   </TitledPane>
                </children>
             </VBox>
-            <TabPane prefWidth="830.0">
+            <TabPane HBox.hgrow="ALWAYS">
                <tabs>
                   <Tab fx:id="adbTab" closable="false" text="ADB">
                      <content>
                         <AnchorPane>
                            <children>
-                              <GridPane AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <GridPane alignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <columnConstraints>
-                                    <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="578.0" />
-                                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="232.0" />
+                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="570.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="240.0" />
                                  </columnConstraints>
                                  <rowConstraints>
-                                    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="222.0" valignment="TOP" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="102.0" valignment="TOP" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="182.0" valignment="TOP" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="212.0" valignment="TOP" />
+                                    <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
                                  </rowConstraints>
                                  <children>
-                                    <TabPane fx:id="installerPane" disable="true" prefHeight="638.0" prefWidth="565.0" GridPane.rowSpan="4">
+                                    <TabPane fx:id="installerPane" disable="true" GridPane.rowSpan="4">
                                        <tabs>
                                           <Tab fx:id="uninstallerTab" closable="false" text="Uninstaller">
                                              <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
-                                                      <GridPane layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="15.0">
+                                                      <GridPane alignment="CENTER" layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                          <columnConstraints>
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="467.0" minWidth="10.0" prefWidth="467.0" />
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
                                                          </columnConstraints>
                                                          <rowConstraints>
-                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="570.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="uninstallerTableView" editable="true" GridPane.columnSpan="2">
                                                               <columns>
                                                                 <TableColumn fx:id="uncheckTableColumn" prefWidth="35.0" />
-                                                                <TableColumn fx:id="unappTableColumn" editable="false" prefWidth="200.0" text="App name" />
-                                                                  <TableColumn fx:id="unpackageTableColumn" editable="false" prefWidth="309.0" text="Package name" />
+                                                                <TableColumn fx:id="unappTableColumn" editable="false" prefWidth="205.0" text="App name" />
+                                                                  <TableColumn fx:id="unpackageTableColumn" editable="false" prefWidth="320.0" text="Package name" />
                                                               </columns>
                                                             </TableView>
-                                                            <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="545.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+                                                            <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="570.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <Button fx:id="unaddButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="545.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+                                                            <Button fx:id="unaddButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="570.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.rowIndex="1">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -157,32 +157,32 @@
                                              <content>
                                                 <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
-                                                      <GridPane layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="15.0">
+                                                      <GridPane alignment="CENTER" layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                          <columnConstraints>
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="467.0" minWidth="10.0" prefWidth="467.0" />
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
                                                          </columnConstraints>
                                                          <rowConstraints>
-                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="570.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="reinstallerTableView" editable="true" GridPane.columnSpan="2">
                                                                <columns>
                                                                   <TableColumn fx:id="recheckTableColumn" prefWidth="35.0" />
-                                                                  <TableColumn fx:id="reappTableColumn" editable="false" prefWidth="200.0" text="App name" />
-                                                                  <TableColumn fx:id="repackageTableColumn" editable="false" prefWidth="309.0" text="Package name" />
+                                                                  <TableColumn fx:id="reappTableColumn" editable="false" prefWidth="205.0" text="App name" />
+                                                                  <TableColumn fx:id="repackageTableColumn" editable="false" prefWidth="320.0" text="Package name" />
                                                                </columns>
                                                             </TableView>
-                                                            <Button fx:id="reinstallButton" mnemonicParsing="false" onAction="#reinstallButtonPressed" prefWidth="545.0" text="Reinstall!" textFill="#00c800" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+                                                            <Button fx:id="reinstallButton" mnemonicParsing="false" onAction="#reinstallButtonPressed" prefWidth="570.0" text="Reinstall!" textFill="#00c800" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <Button fx:id="readdButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="545.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                                            <Button fx:id="readdButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="570.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.rowIndex="1">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -193,140 +193,144 @@
                                           </Tab>
                                        </tabs>
                                     </TabPane>
-                                    <TitledPane fx:id="camera2Pane" animated="false" collapsible="false" disable="true" text="Camera2 (TWRP)" GridPane.columnIndex="1">
-                                      <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0">
-                                             <children>
-                                                <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="enableEISButton" layoutX="14.0" layoutY="145.0" mnemonicParsing="false" onAction="#enableEISButtonPressed" text="Enable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="disableEISButton" layoutX="73.0" layoutY="203.0" mnemonicParsing="false" onAction="#disableEISButtonPressed" text="Disable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                      </content>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TitledPane>
-                                    <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefWidth="239.0" text="Screen density" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                      <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="200.0">
-                                             <children>
-                                                <Label layoutX="14.0" layoutY="15.0" text="Value:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <TextField fx:id="dpiTextField" layoutX="64.0" layoutY="10.0" prefHeight="30.0" prefWidth="59.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="-3.0">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </TextField>
-                                                <Label layoutX="136.0" layoutY="14.0" text="dpi" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <Button fx:id="applyDpiButton" layoutX="56.0" layoutY="69.0" mnemonicParsing="false" onAction="#applyDpiButtonPressed" text="Apply" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="resetDpiButton" mnemonicParsing="false" onAction="#resetDpiButtonPressed" text="Reset to default" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                      </content>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TitledPane>
-                                    <TitledPane fx:id="fileExplorerPane" collapsible="false" disable="true" text="File Explorer" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                       <content>
-                                          <AnchorPane>
-                                             <children>
-                                                <Button fx:id="openButton" mnemonicParsing="false" onAction="#openButtonPressed" text="Open" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                       </content>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TitledPane>
-                                    <TitledPane fx:id="resolutionPane" animated="false" collapsible="false" disable="true" text="Screen resolution" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                       <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="200.0">
-                                             <children>
-                                                <Label layoutX="14.0" layoutY="15.0" text="Width:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <TextField fx:id="widthTextField" layoutX="64.0" layoutY="10.0" prefHeight="30.0" prefWidth="59.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="37.0" AnchorPane.topAnchor="-3.0">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </TextField>
-                                                <Label layoutX="136.0" layoutY="14.0" text="px" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <Button fx:id="applyResButton" layoutX="56.0" layoutY="69.0" mnemonicParsing="false" onAction="#applyResButtonPressed" text="Apply" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="77.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="resetResButton" mnemonicParsing="false" onAction="#resetResButtonPressed" text="Reset to default" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Button>
-                                                <Label layoutX="22.0" layoutY="54.0" text="Height:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <TextField fx:id="heightTextField" layoutX="30.0" layoutY="50.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="37.0" AnchorPane.topAnchor="37.0">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </TextField>
-                                                <Label layoutX="185.0" layoutY="59.0" text="px" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Label>
-                                             </children>
-                                          </AnchorPane>
-                                       </content>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TitledPane>
+                                    <FlowPane alignment="TOP_RIGHT" columnHalignment="CENTER" vgap="10.0" GridPane.columnIndex="1">
+                                       <children>
+                                          <TitledPane fx:id="camera2Pane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Camera2 (TWRP)">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0">
+                                                   <children>
+                                                      <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="enableEISButton" layoutX="14.0" layoutY="145.0" mnemonicParsing="false" onAction="#enableEISButtonPressed" text="Enable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="72.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="disableEISButton" layoutX="73.0" layoutY="203.0" mnemonicParsing="false" onAction="#disableEISButtonPressed" text="Disable EIS" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="108.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TitledPane>
+                                          <TitledPane fx:id="fileExplorerPane" collapsible="false" disable="true" prefWidth="240.0" text="File Explorer">
+                                             <content>
+                                                <AnchorPane>
+                                                   <children>
+                                                      <Button fx:id="openButton" mnemonicParsing="false" onAction="#openButtonPressed" text="Open" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TitledPane>
+                                          <TitledPane fx:id="dpiPane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Screen density">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0">
+                                                   <children>
+                                                      <Label layoutX="14.0" layoutY="15.0" text="Value:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField fx:id="dpiTextField" layoutX="64.0" layoutY="10.0" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="-3.0">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label layoutX="136.0" layoutY="14.0" text="dpi" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Button fx:id="applyDpiButton" layoutX="56.0" layoutY="69.0" mnemonicParsing="false" onAction="#applyDpiButtonPressed" text="Apply" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="33.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="resetDpiButton" mnemonicParsing="false" onAction="#resetDpiButtonPressed" text="Reset to default" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="69.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TitledPane>
+                                          <TitledPane fx:id="resolutionPane" animated="false" collapsible="false" disable="true" prefWidth="240.0" text="Screen resolution">
+                                             <content>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0">
+                                                   <children>
+                                                      <Label layoutX="14.0" layoutY="15.0" text="Width:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField fx:id="widthTextField" layoutX="64.0" layoutY="10.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="37.0" AnchorPane.topAnchor="-3.0">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label layoutX="136.0" layoutY="14.0" text="px" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Button fx:id="applyResButton" layoutX="56.0" layoutY="69.0" mnemonicParsing="false" onAction="#applyResButtonPressed" text="Apply" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="69.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="resetResButton" mnemonicParsing="false" onAction="#resetResButtonPressed" text="Reset to default" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="105.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Label layoutX="22.0" layoutY="54.0" text="Height:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="36.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField fx:id="heightTextField" layoutX="30.0" layoutY="50.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="37.0" AnchorPane.topAnchor="33.0">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </TextField>
+                                                      <Label layoutX="185.0" layoutY="59.0" text="px" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="36.0">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TitledPane>
+                                       </children>
+                                    </FlowPane>
                                  </children>
                               </GridPane>
                            </children>
@@ -337,63 +341,63 @@
                     <content>
                       <AnchorPane>
                            <children>
-                              <GridPane AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <columnConstraints>
-                                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="555.0" />
-                                    <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="255.0" />
+                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="603.0" />
+                                    <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="217.0" />
                                  </columnConstraints>
                                  <rowConstraints>
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="281.0" valignment="TOP" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="142.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="251.0" valignment="TOP" vgrow="SOMETIMES" />
+                                    <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" valignment="TOP" vgrow="ALWAYS" />
+                                    <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="115.0" valignment="CENTER" vgrow="ALWAYS" />
+                                    <RowConstraints fillHeight="false" minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                                  </rowConstraints>
                                  <children>
-                                    <TitledPane fx:id="flasherPane" animated="false" collapsible="false" disable="true" prefHeight="300.0" text="Flasher" GridPane.columnSpan="2" GridPane.valignment="CENTER">
+                                    <TitledPane fx:id="flasherPane" animated="false" collapsible="false" disable="true" text="Flasher" GridPane.columnSpan="2">
                                       <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                        <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
                                                 <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <columnConstraints>
                                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                                    </columnConstraints>
                                                    <rowConstraints>
-                                                      <RowConstraints fillHeight="false" minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                      <RowConstraints fillHeight="false" minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                      <RowConstraints fillHeight="false" minHeight="8.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                      <RowConstraints fillHeight="false" minHeight="0.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                      <RowConstraints fillHeight="false" minHeight="4.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                      <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                      <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="35.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                      <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                      <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="35.0" valignment="CENTER" vgrow="ALWAYS" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <FlowPane hgap="50.0">
+                                                      <FlowPane hgap="130.0">
                                                          <children>
                                                             <Button fx:id="antirbButton" mnemonicParsing="false" onAction="#antirbButtonPressed" text="Disable anti-rollback safeguard">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                             <CheckBox fx:id="autobootCheckBox" mnemonicParsing="false" text="Autoboot to Recovery when it's flashed">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </CheckBox>
                                                          </children>
                                                       </FlowPane>
-                                                      <FlowPane hgap="30.0" GridPane.rowIndex="1">
+                                                      <FlowPane hgap="25.0" GridPane.rowIndex="1">
                                                          <children>
-                                                            <Button fx:id="browseimageButton" mnemonicParsing="false" onAction="#browseimageButtonPressed" prefWidth="150.0" text="Select image">
+                                                            <Button fx:id="browseimageButton" mnemonicParsing="false" onAction="#browseimageButtonPressed" prefWidth="160.0" text="Select image">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <ComboBox fx:id="partitionComboBox" editable="true" promptText="Partition" />
-                                                            <Button fx:id="flashimageButton" mnemonicParsing="false" onAction="#flashimageButtonPressed" prefWidth="150.0" text="Flash image" textFill="RED">
+                                                            <ComboBox fx:id="partitionComboBox" editable="true" prefWidth="175.0" promptText="Partition" />
+                                                            <Button fx:id="flashimageButton" mnemonicParsing="false" onAction="#flashimageButtonPressed" prefWidth="160.0" text="Flash image" textFill="RED">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <Button fx:id="bootButton" mnemonicParsing="false" onAction="#bootButtonPressed" prefWidth="150.0" text="Boot to image">
+                                                            <Button fx:id="bootButton" mnemonicParsing="false" onAction="#bootButtonPressed" prefWidth="160.0" text="Boot to image">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -402,12 +406,12 @@
                                                          <children>
                                                             <Label text="Image:">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                             <Label fx:id="imageLabel" text="-">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                          </children>
@@ -416,27 +420,27 @@
                                                          <children>
                                                             <Label text="ROM:">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                             <Label fx:id="romLabel" text="-">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                          </children>
                                                       </FlowPane>
-                                                      <FlowPane hgap="30.0" GridPane.rowIndex="3">
+                                                      <FlowPane hgap="25.0" GridPane.rowIndex="3">
                                                          <children>
-                                                            <Button fx:id="browseromButton" mnemonicParsing="false" onAction="#browseromButtonPressed" text="Select ROM folder">
+                                                            <Button fx:id="browseromButton" mnemonicParsing="false" onAction="#browseromButtonPressed" prefWidth="160.0" text="Select ROM folder">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <ComboBox fx:id="scriptComboBox" prefWidth="200.0" promptText="Method" />
-                                                            <Button fx:id="flashromButton" mnemonicParsing="false" onAction="#flashromButtonPressed" prefWidth="150.0" text="Flash ROM" textFill="RED">
+                                                            <ComboBox fx:id="scriptComboBox" prefWidth="175.0" promptText="Method" />
+                                                            <Button fx:id="flashromButton" mnemonicParsing="false" onAction="#flashromButtonPressed" prefWidth="160.0" text="Flash ROM" textFill="RED">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -447,65 +451,57 @@
                                           </AnchorPane>
                                       </content>
                                        <font>
-                                          <Font size="16.0" />
+                                          <Font size="15.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane fx:id="wiperPane" animated="false" collapsible="false" disable="true" prefHeight="120.0" text="Wiper" GridPane.rowIndex="1">
+                                    <TitledPane fx:id="wiperPane" animated="false" collapsible="false" disable="true" text="Wiper" GridPane.rowIndex="1">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
-                                                <FlowPane hgap="20.0" layoutX="22.799999237060547" layoutY="22.799999237060547" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
-                                                   <children>
-                                                      <Button fx:id="cacheButton" mnemonicParsing="false" onAction="#cacheButtonPressed" text="Wipe cache">
-                                                         <font>
-                                                            <Font size="19.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" prefHeight="35.0" text="Wipe data" textFill="RED">
-                                                         <font>
-                                                            <Font size="19.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" prefHeight="35.0" text="Wipe cache and data" textFill="RED">
-                                                         <font>
-                                                            <Font size="19.0" />
-                                                         </font>
-                                                      </Button>
-                                                   </children>
-                                                </FlowPane>
+                                                <Button fx:id="cacheButton" mnemonicParsing="false" onAction="#cacheButtonPressed" text="Wipe cache" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="dataButton" mnemonicParsing="false" onAction="#dataButtonPressed" text="Wipe userdata" textFill="RED" AnchorPane.leftAnchor="155.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="cachedataButton" mnemonicParsing="false" onAction="#cachedataButtonPressed" text="Wipe cache and userdata" textFill="RED" AnchorPane.leftAnchor="330.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Button>
                                              </children>
                                           </AnchorPane>
                                       </content>
                                        <font>
-                                          <Font size="16.0" />
+                                          <Font size="15.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane fx:id="oemPane" animated="false" collapsible="false" disable="true" prefHeight="120.0" prefWidth="240.0" text="OEM Unlocker / Locker" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <TitledPane fx:id="oemPane" animated="false" collapsible="false" disable="true" text="OEM Unlocker / Locker" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
-                                                <FlowPane hgap="30.0" layoutX="27.799999237060547" layoutY="22.799999237060547" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                                   <children>
-                                                      <Button fx:id="lockButton" mnemonicParsing="false" onAction="#lockButtonPressed" text="Lock" textFill="RED">
-                                                         <font>
-                                                            <Font size="19.0" />
-                                                         </font>
-                                                      </Button>
-                                                      <Button fx:id="unlockButton" mnemonicParsing="false" onAction="#unlockButtonPressed" text="Unlock" textFill="#00c800">
-                                                         <font>
-                                                            <Font size="19.0" />
-                                                         </font>
-                                                      </Button>
-                                                   </children>
-                                                </FlowPane>
+                                                <Button fx:id="lockButton" mnemonicParsing="false" onAction="#lockButtonPressed" text="Lock" textFill="RED" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="unlockButton" mnemonicParsing="false" onAction="#unlockButtonPressed" text="Unlock" textFill="#00c800" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="0.0">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Button>
                                              </children>
                                           </AnchorPane>
                                       </content>
                                        <font>
-                                          <Font size="16.0" />
+                                          <Font size="15.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane animated="false" collapsible="false" prefHeight="150.0" prefWidth="810.0" text="ROM Downloader" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                    <TitledPane animated="false" collapsible="false" prefWidth="810.0" text="ROM Downloader" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>
@@ -514,8 +510,8 @@
                                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                                    </columnConstraints>
                                                    <rowConstraints>
-                                                      <RowConstraints fillHeight="false" minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                      <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" valignment="CENTER" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
                                                       <FlowPane hgap="30.0">
@@ -528,12 +524,12 @@
                                                             <ComboBox fx:id="branchComboBox" prefWidth="200.0" promptText="Branch" />
                                                             <Button fx:id="getlinkButton" mnemonicParsing="false" onAction="#getlinkButtonPressed" prefWidth="150.0" text="Get link">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                             <Button fx:id="downloadromButton" mnemonicParsing="false" onAction="#downloadromButtonPressed" prefWidth="150.0" text="Download ROM">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -542,12 +538,12 @@
                                                          <children>
                                                             <Label text="Latest version:">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                             <Label fx:id="versionLabel" text="-">
                                                                <font>
-                                                                  <Font size="16.0" />
+                                                                  <Font size="15.0" />
                                                                </font>
                                                             </Label>
                                                          </children>
@@ -558,7 +554,7 @@
                                           </AnchorPane>
                                       </content>
                                        <font>
-                                          <Font size="16.0" />
+                                          <Font size="15.0" />
                                        </font>
                                     </TitledPane>
                                  </children>
