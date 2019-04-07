@@ -127,7 +127,7 @@
                                                          <rowConstraints>
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="uninstallerTableView" editable="true" GridPane.columnSpan="2">
@@ -165,7 +165,7 @@
                                                          <rowConstraints>
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="reinstallerTableView" editable="true" GridPane.columnSpan="2">
