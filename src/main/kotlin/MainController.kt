@@ -573,12 +573,12 @@ class MainController : Initializable {
                     "Clean install" -> rf.exec("flash_all")
                     "Clean install and lock" -> rf.exec("flash_all_lock")
                     "Update" -> when {
-                        File(rom, "flash_all_except_storage.sh").exists() -> rf.exec("flash_all_except_storage")
-                        File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
                         File(
                             rom,
                             "flash_all_except_data_storage.sh"
                         ).exists() -> rf.exec("flash_all_except_data_storage")
+                        File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
+                        else -> rf.exec("flash_all_except_storage")
                     }
                 }
             }
