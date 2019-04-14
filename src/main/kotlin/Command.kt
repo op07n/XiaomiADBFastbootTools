@@ -82,8 +82,8 @@ open class Command() {
         pb.redirectErrorStream(true)
         output = ""
         tic?.text = ""
-        for (s in args) {
-            init(s, lim)
+        args.forEach {
+            init(it, lim)
             proc.waitFor()
         }
         return output

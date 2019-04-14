@@ -12,8 +12,9 @@ class App(name: String, packages: List<String>, checked: Boolean = false) {
     init {
         appname.set(name)
         var pkgs = ""
-        for (pkg in packages)
-            pkgs += "$pkg\n"
+        packages.forEach {
+            pkgs += "$it\n"
+        }
         packagename.set(pkgs.trim())
         selected.set(checked)
     }

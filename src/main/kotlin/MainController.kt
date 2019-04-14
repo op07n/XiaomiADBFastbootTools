@@ -483,7 +483,7 @@ class MainController : Initializable {
                 fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
-                if (f != null) {
+                f?.let {
                     try {
                         f.writeText(comm.exec("adb shell getprop"))
                     } catch (ex: Exception) {
@@ -497,7 +497,7 @@ class MainController : Initializable {
                 fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
-                if (f != null) {
+                f?.let {
                     try {
                         f.writeText(comm.exec("fastboot getvar all"))
                     } catch (ex: Exception) {
@@ -530,11 +530,15 @@ class MainController : Initializable {
 
     @FXML
     private fun flashimageButtonPressed(event: ActionEvent) {
-        if (image != null && partitionComboBox.value != null && image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
-            confirm {
-                if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
-                    flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
-                else flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
+        image?.let {
+            partitionComboBox.value?.let {
+                if (image!!.absolutePath.isNotEmpty() && partitionComboBox.value.trim().isNotEmpty() && checkFastboot()) {
+                    confirm {
+                        if (autobootCheckBox.isSelected && partitionComboBox.value.trim() == "recovery")
+                            flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}", "fastboot boot")
+                        else flasher.exec(image, "fastboot flash ${partitionComboBox.value.trim()}")
+                    }
+                }
             }
         }
     }
@@ -546,7 +550,7 @@ class MainController : Initializable {
         rom = dc.showDialog((event.source as Node).scene.window)
         outputTextArea.text = ""
         romLabel.text = "-"
-        if (rom != null) {
+        rom?.let {
             if (File(rom, "images").exists()) {
                 romLabel.text = rom?.name
                 outputTextArea.text = "Fastboot ROM found!"
@@ -565,20 +569,24 @@ class MainController : Initializable {
 
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
-        if (rom != null && scriptComboBox.value != null && checkFastboot()) {
-            confirm {
-                val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
-                setPanels(0)
-                when (scriptComboBox.value) {
-                    "Clean install" -> rf.exec("flash_all")
-                    "Clean install and lock" -> rf.exec("flash_all_lock")
-                    "Update" -> when {
-                        File(
-                            rom,
-                            "flash_all_except_data_storage.sh"
-                        ).exists() -> rf.exec("flash_all_except_data_storage")
-                        File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
-                        else -> rf.exec("flash_all_except_storage")
+        rom?.let {
+            scriptComboBox.value?.let {
+                if (checkFastboot()) {
+                    confirm {
+                        val rf = ROMFlasher(progressBar, progressIndicator, outputTextArea, rom!!)
+                        setPanels(0)
+                        when (scriptComboBox.value) {
+                            "Clean install" -> rf.exec("flash_all")
+                            "Clean install and lock" -> rf.exec("flash_all_lock")
+                            "Update" -> when {
+                                File(
+                                    rom,
+                                    "flash_all_except_data_storage.sh"
+                                ).exists() -> rf.exec("flash_all_except_data_storage")
+                                File(rom, "flash_all_except_data.sh").exists() -> rf.exec("flash_all_except_data")
+                                else -> rf.exec("flash_all_except_storage")
+                            }
+                        }
                     }
                 }
             }
@@ -587,8 +595,10 @@ class MainController : Initializable {
 
     @FXML
     private fun bootButtonPressed(event: ActionEvent) {
-        if (image != null && image!!.absolutePath.isNotEmpty() && checkFastboot())
-            flasher.exec(image, "fastboot boot")
+        image?.let {
+            if (image!!.absolutePath.isNotEmpty() && checkFastboot())
+                flasher.exec(image, "fastboot boot")
+        }
     }
 
     @FXML
@@ -623,84 +633,92 @@ class MainController : Initializable {
 
     @FXML
     private fun getlinkButtonPressed(event: ActionEvent) {
-        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
-            val codename = codenameTextField.text.trim()
-            val url = when (branchComboBox.value) {
-                "Global Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-                "Global Developer" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-                "China Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-                "China Developer" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
-                "EEA Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
-                "Russia Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
-                "India Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
-                else -> URL("http://google.com")
-            }
-            val huc = url.openConnection() as HttpURLConnection
-            huc.requestMethod = "GET"
-            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-            huc.instanceFollowRedirects = false
-            try {
-                huc.connect()
-                huc.disconnect()
-            } catch (e: IOException) {
-                return
-            }
-            val link = huc.getHeaderField("Location")
-            if (link != null && "bigota" in link) {
-                versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text += "\n\n$link\n\nLink copied to clipboard!"
-                Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
-            } else {
-                versionLabel.text = "-"
-                outputTextArea.text += "\n\nLink not found!"
+        branchComboBox.value?.let {
+            if (codenameTextField.text.trim().isNotEmpty()) {
+                val codename = codenameTextField.text.trim()
+                val url = when (branchComboBox.value) {
+                    "Global Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                    "Global Developer" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                    "China Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                    "China Developer" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+                    "EEA Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
+                    "Russia Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
+                    "India Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
+                    else -> URL("http://google.com")
+                }
+                val huc = url.openConnection() as HttpURLConnection
+                huc.requestMethod = "GET"
+                huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+                huc.instanceFollowRedirects = false
+                try {
+                    huc.connect()
+                    huc.disconnect()
+                } catch (e: IOException) {
+                    return
+                }
+                val link = huc.getHeaderField("Location")
+                link?.let {
+                    if ("bigota" in link) {
+                        versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                        outputTextArea.text += "\n\n$link\n\nLink copied to clipboard!"
+                        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
+                    } else {
+                        versionLabel.text = "-"
+                        outputTextArea.text += "\n\nLink not found!"
+                    }
+                }
             }
         }
     }
 
     @FXML
     private fun downloadromButtonPressed(event: ActionEvent) {
-        if (codenameTextField.text.trim().isNotEmpty() && branchComboBox.value != null) {
-            val codename = codenameTextField.text.trim()
-            val url = when (branchComboBox.value) {
-                "Global Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-                "Global Developer" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-                "China Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-                "China Developer" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
-                "EEA Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
-                "Russia Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
-                "India Stable" ->
-                    URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
-                else -> URL("http://google.com")
-            }
-            val huc = url.openConnection() as HttpURLConnection
-            huc.requestMethod = "GET"
-            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-            huc.instanceFollowRedirects = false
-            huc.connect()
-            huc.disconnect()
-            val link = huc.getHeaderField("Location")
-            if (link != null && "bigota" in link) {
-                versionLabel.text = link.substringAfter(".com/").substringBefore("/")
-                outputTextArea.text += "\n\nStarting download in browser..."
-                if ("linux" in System.getProperty("os.name").toLowerCase())
-                    Runtime.getRuntime().exec("xdg-open $link")
-                else Desktop.getDesktop().browse(URI(link))
-            } else {
-                versionLabel.text = "-"
-                outputTextArea.text += "\n\nLink not found!"
+        branchComboBox.value?.let {
+            if (codenameTextField.text.trim().isNotEmpty()) {
+                val codename = codenameTextField.text.trim()
+                val url = when (branchComboBox.value) {
+                    "Global Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
+                    "Global Developer" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
+                    "China Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
+                    "China Developer" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
+                    "EEA Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
+                    "Russia Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
+                    "India Stable" ->
+                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
+                    else -> URL("http://google.com")
+                }
+                val huc = url.openConnection() as HttpURLConnection
+                huc.requestMethod = "GET"
+                huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+                huc.instanceFollowRedirects = false
+                huc.connect()
+                huc.disconnect()
+                val link = huc.getHeaderField("Location")
+                link?.let {
+                    if ("bigota" in link) {
+                        versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                        outputTextArea.text += "\n\nStarting download in browser..."
+                        if ("linux" in System.getProperty("os.name").toLowerCase())
+                            Runtime.getRuntime().exec("xdg-open $link")
+                        else Desktop.getDesktop().browse(URI(link))
+                    } else {
+                        versionLabel.text = "-"
+                        outputTextArea.text += "\n\nLink not found!"
+                    }
+                }
             }
         }
     }

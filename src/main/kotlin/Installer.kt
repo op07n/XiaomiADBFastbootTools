@@ -119,11 +119,11 @@ class Installer(
         val all = command.exec("adb shell cmd package list packages -u")
         uninstallTableView.items.clear()
         reinstallTableView.items.clear()
-        for (line in apps) {
-            val app = line.split(';')
+        apps.forEach {
+            val app = it.split(';')
             val uninst = ArrayList<String>()
             val reinst = ArrayList<String>()
-            for (pkg in app[1].split(',')) {
+            app[1].split(',').forEach { pkg ->
                 if (installed.contains(pkg + System.lineSeparator()))
                     uninst.add(pkg)
                 else if (all.contains(pkg + System.lineSeparator()))
@@ -159,17 +159,18 @@ class Installer(
     fun uninstall(func: () -> Unit) {
         val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        for (app in uninstallTableView.items)
-            if (app.selectedProperty().get()) {
-                selected.add(app)
-                n += app.packagenameProperty().get().lines().size
+        uninstallTableView.items.forEach {
+            if (it.selectedProperty().get()) {
+                selected.add(it)
+                n += it.packagenameProperty().get().lines().size
             }
+        }
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
         thread(true, true) {
-            for (app in selected)
-                for (pkg in app.packagenameProperty().get().lines()) {
+            selected.forEach {
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     val arguments =
                         ("adb shell pm uninstall --user 0 $pkg").split(' ').toTypedArray()
                     arguments[0] = prefix + arguments[0]
@@ -186,12 +187,13 @@ class Installer(
                         line += scan.nextLine() + System.lineSeparator()
                     scan.close()
                     Platform.runLater {
-                        tic?.appendText("App: ${app.appnameProperty().get()}\n")
+                        tic?.appendText("App: ${it.appnameProperty().get()}\n")
                         tic?.appendText("Package: $pkg\n")
                         tic?.appendText("Result: $line\n")
                         progress.progress += 1.0 / n
                     }
                 }
+            }
             Platform.runLater {
                 tic?.appendText("Done!")
                 progress.progress = 0.0
@@ -205,17 +207,18 @@ class Installer(
     fun reinstall(func: () -> Unit) {
         val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        for (app in reinstallTableView.items)
-            if (app.selectedProperty().get()) {
-                selected.add(app)
-                n += app.packagenameProperty().get().lines().size
+        reinstallTableView.items.forEach {
+            if (it.selectedProperty().get()) {
+                selected.add(it)
+                n += it.packagenameProperty().get().lines().size
             }
+        }
         tic?.text = ""
         progress.progress = 0.0
         progressind.isVisible = true
         thread(true, true) {
-            for (app in selected)
-                for (pkg in app.packagenameProperty().get().lines()) {
+            selected.forEach {
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     val arguments =
                         ("adb shell cmd package install-existing $pkg").split(' ')
                             .toTypedArray()
@@ -236,12 +239,13 @@ class Installer(
                         line = "Success\n"
                     else line = "Failure [${line.substringAfter(pkg).trim()}]\n"
                     Platform.runLater {
-                        tic?.appendText("App: ${app.appnameProperty().get()}\n")
+                        tic?.appendText("App: ${it.appnameProperty().get()}\n")
                         tic?.appendText("Package: $pkg\n")
                         tic?.appendText("Result: $line\n")
                         progress.progress += 1.0 / n
                     }
                 }
+            }
             Platform.runLater {
                 tic?.appendText("Done!")
                 progress.progress = 0.0

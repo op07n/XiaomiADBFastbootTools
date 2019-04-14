@@ -29,10 +29,13 @@ class AppAdderController : Initializable {
 
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
-        if (appTextArea.text != null && appTextArea.text.trim().isNotEmpty()) {
-            for (line in appTextArea.text.trim().lines())
-                installer.addApp(line)
-            installer.createTables()
+        appTextArea.text?.let {
+            if (appTextArea.text.trim().isNotEmpty()) {
+                appTextArea.text.trim().lines().forEach {
+                    installer.addApp(it)
+                }
+                installer.createTables()
+            }
         }
         ((event.source as Node).scene.window as Stage).close()
     }

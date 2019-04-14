@@ -68,10 +68,11 @@ class FileExplorerController : Initializable {
             val fc = FileChooser()
             fc.title = "Select files to copy"
             val files = fc.showOpenMultipleDialog((event.source as Node).scene.window)
-            if (files != null)
+            files?.let {
                 fileExplorer.push(files) {
                     loadList()
                 }
+            }
         } else close(event)
     }
 
@@ -81,10 +82,11 @@ class FileExplorerController : Initializable {
             val dc = DirectoryChooser()
             dc.title = "Select the destination"
             val dir = dc.showDialog((event.source as Node).scene.window)
-            if (dir != null)
+            dir?.let {
                 fileExplorer.pull(listView.selectionModel.selectedItems, dir) {
                     loadList()
                 }
+            }
         } else close(event)
     }
 

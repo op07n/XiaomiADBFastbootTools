@@ -47,8 +47,8 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
         val sb = StringBuffer("")
         progressind.isVisible = true
         thread(true, true) {
-            for (s in args) {
-                val arguments = s.split(" ").toTypedArray()
+            args.forEach {
+                val arguments = it.split(" ").toTypedArray()
                 arguments[0] = prefix + arguments[0]
                 pb.command(*arguments)
                 pb.command().add(image?.absolutePath)

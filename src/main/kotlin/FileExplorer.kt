@@ -45,11 +45,12 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     fun getFiles(): ObservableList<AndroidFile> {
         val lines = exec("adb shell ls -l $path", 5)
         val files = FXCollections.observableArrayList<AndroidFile>()
-        for (line in lines.split('\n')) {
-            if (':' in line && "ls:" !in line) {
-                val file = makeFile(line)
-                if (file != null)
+        lines.split('\n').forEach {
+            if (':' in it && "ls:" !in it) {
+                val file = makeFile(it)
+                file?.let {
                     files.add(file)
+                }
             }
         }
         return files
@@ -86,8 +87,8 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
                 pb.command(*arguments)
                 init()
             } else {
-                for (file in selected) {
-                    val arguments = arrayOf("${prefix}adb", "pull", path + file.name, to.absolutePath)
+                selected.forEach {
+                    val arguments = arrayOf("${prefix}adb", "pull", path + it.name, to.absolutePath)
                     pb.command(*arguments)
                     init()
                 }
@@ -103,8 +104,8 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     fun push(selected: List<File>, func: () -> Unit) {
         thread(true, true) {
-            for (file in selected) {
-                val arguments = arrayOf("${prefix}adb", "push", file.absolutePath, path)
+            selected.forEach {
+                val arguments = arrayOf("${prefix}adb", "push", it.absolutePath, path)
                 pb.command(*arguments)
                 init()
             }
@@ -119,10 +120,10 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     fun delete(selected: List<AndroidFile>, func: () -> Unit) {
         thread(true, true) {
-            for (file in selected) {
-                val arguments = if (file.dir)
-                    arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + file.name))
-                else arrayOf("${prefix}adb", "shell", "rm", "-f", format(path + file.name))
+            selected.forEach {
+                val arguments = if (it.dir)
+                    arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + it.name))
+                else arrayOf("${prefix}adb", "shell", "rm", "-f", format(path + it.name))
                 pb.command(*arguments)
                 init("rm")
             }
