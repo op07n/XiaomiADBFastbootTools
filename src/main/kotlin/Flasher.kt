@@ -15,7 +15,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
     fun exec(image: File?, arg: String) {
         tic?.text = ""
         val sb = StringBuffer("")
-        val arguments = arg.split(" ").toTypedArray()
+        val arguments = arg.split(' ').toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         pb.command().add(image?.absolutePath)
@@ -48,7 +48,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
         progressind.isVisible = true
         thread(true, true) {
             args.forEach {
-                val arguments = it.split(" ").toTypedArray()
+                val arguments = it.split(' ').toTypedArray()
                 arguments[0] = prefix + arguments[0]
                 pb.command(*arguments)
                 pb.command().add(image?.absolutePath)

@@ -23,7 +23,7 @@ open class Command() {
     }
 
     fun init(arg: String, lim: Int) {
-        val arguments = arg.split(" ", limit = lim).toTypedArray()
+        val arguments = arg.split(' ', limit = lim).toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         try {
@@ -53,7 +53,7 @@ open class Command() {
     }
 
     fun exec(arg: String, err: Boolean): String {
-        val arguments = arg.split(" ").toTypedArray()
+        val arguments = arg.split(' ').toTypedArray()
         arguments[0] = prefix + arguments[0]
         pb.command(*arguments)
         pb.redirectErrorStream(false)
