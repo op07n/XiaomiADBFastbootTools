@@ -666,7 +666,7 @@ class MainController : Initializable {
                 val link = huc.getHeaderField("Location")
                 link?.let {
                     if ("bigota" in link) {
-                        versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                         outputTextArea.text += "\n\n$link\n\nLink copied to clipboard!"
                         Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
                     } else {
@@ -709,7 +709,7 @@ class MainController : Initializable {
                 val link = huc.getHeaderField("Location")
                 link?.let {
                     if ("bigota" in link) {
-                        versionLabel.text = link.substringAfter(".com/").substringBefore("/")
+                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                         outputTextArea.text += "\n\nStarting download in browser..."
                         if ("linux" in System.getProperty("os.name").toLowerCase())
                             Runtime.getRuntime().exec("xdg-open $link")
