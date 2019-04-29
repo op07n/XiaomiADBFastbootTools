@@ -3,52 +3,59 @@ class Device {
     var serial = ""
     var codename = ""
     var bootloader = false
+    var camera2 = false
     var anti = 0
-    var auth = false
     var dpi = -1
     var width = -1
     var height = -1
-    var comm = Command()
+
+    var mode = 0
+    var auth = false
     var recovery = false
     var reinstaller = true
-    var mode = 0
+
+    private val comm = Command()
+
+    private fun String.getProp(prop: String): String {
+        for (line in this.lines())
+            if (prop in line)
+                return line.substringAfterLast(':').trim().trim('[', ']')
+        return ""
+    }
 
     fun readADB(): Boolean {
-        var op = comm.exec("adb get-serialno", true)
+        val props = comm.exec("adb shell getprop")
         auth = false
-        if ("no devices" in op) {
+        if ("no devices" in props) {
             mode = 0
             return false
         }
-        if ("unauthorized" in op) {
+        if ("unauthorized" in props) {
             mode = 0
             auth = true
             return false
         }
         recovery = comm.exec("adb devices").contains("recovery")
-        op = comm.exec("adb get-serialno", false).trim()
-        if (mode == 1 && op == serial && dpi != -1)
+        if (mode == 1 && serial == props.getProp("ro.serialno") && dpi != -1)
             return true
-        serial = op
-        codename = comm.exec("adb shell getprop ro.build.product", false).trim()
-        bootloader = comm.exec("adb shell getprop ro.boot.flash.locked", false).contains("0") ||
-                comm.exec("adb shell getprop ro.secureboot.lockstate", false).contains("unlocked")
-        anti = -1
+        serial = props.getProp("ro.serialno")
+        codename = props.getProp("ro.build.product")
+        bootloader = props.getProp("ro.boot.flash.locked").contains("0")
+        camera2 = props.getProp("persist.sys.camera.camera2").contains("true")
         if (!recovery) {
-            op = comm.exec("adb shell wm density")
             dpi = try {
-                op.substring(op.lastIndexOf(':') + 2).trim().toInt()
+                comm.exec("adb shell wm density").substringAfterLast(':').trim().toInt()
             } catch (e: Exception) {
                 -1
             }
-            op = comm.exec("adb shell wm size")
+            val size = comm.exec("adb shell wm size")
             width = try {
-                op.substring(op.lastIndexOf(':') + 2, op.lastIndexOf('x')).toInt()
+                size.substringAfterLast(':').substringBefore('x').trim().toInt()
             } catch (e: Exception) {
                 -1
             }
             height = try {
-                op.substring(op.lastIndexOf('x') + 1).trim().toInt()
+                size.substringAfterLast('x').trim().toInt()
             } catch (e: Exception) {
                 -1
             }
@@ -58,23 +65,23 @@ class Device {
     }
 
     fun readFastboot(): Boolean {
-        var op = comm.exec("fastboot devices", false)
-        if (op.isEmpty()) {
+        val status = comm.exec("fastboot devices", false)
+        if (status.isEmpty()) {
             mode = 0
             return false
         }
-        if (mode == 2 && op.contains(serial))
+        if (mode == 2 && status.contains(serial))
             return true
         recovery = false
-        serial = op.substring(0, op.indexOf("fast")).trim()
-        op = comm.exec("fastboot getvar product", true)
-        codename = op.substring(9, op.indexOf(System.lineSeparator())).trim()
-        bootloader = comm.exec("fastboot oem device-info", true).contains("unlocked: true")
-        op = comm.exec("fastboot getvar anti", true)
-        op = op.substring(0, op.indexOf(System.lineSeparator()))
-        anti = if (op.length != 7)
-            -1
-        else op.substring(6).toInt()
+        val props = comm.exec("fastboot getvar all")
+        serial = props.getProp("serial")
+        codename = props.getProp("product")
+        bootloader = props.getProp("unlocked").contains("yes")
+        anti = try {
+            props.getProp("anti").toInt()
+        } catch (e: Exception) {
+            0
+        }
         mode = 2
         return true
     }

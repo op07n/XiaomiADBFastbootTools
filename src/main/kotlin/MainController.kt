@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.2.5"
+        val version = "6.3"
         lateinit var thread: Thread
     }
 
@@ -132,7 +132,7 @@ class MainController : Initializable {
                 reinstallerTab.isDisable = !device.reinstaller
                 camera2Pane.isDisable = false
                 fileExplorerPane.isDisable = false
-                resolutionPane.isDisable = false
+                resolutionPane.isDisable = device.recovery
                 dpiPane.isDisable = device.recovery
                 flasherPane.isDisable = true
                 wiperPane.isDisable = true
@@ -167,8 +167,12 @@ class MainController : Initializable {
                 infoTextArea.appendText("Codename:\t\t${device.codename}\n")
                 infoTextArea.appendText("Bootloader:\t\t")
                 if (device.bootloader)
-                    infoTextArea.appendText("unlocked\n\n")
-                else infoTextArea.appendText("locked\n\n")
+                    infoTextArea.appendText("unlocked\n")
+                else infoTextArea.appendText("locked\n")
+                infoTextArea.appendText("Camera2:\t\t\t")
+                if (device.camera2)
+                    infoTextArea.appendText("enabled")
+                else infoTextArea.appendText("unknown")
             }
             2 -> {
                 infoTextArea.text = ""
@@ -176,10 +180,10 @@ class MainController : Initializable {
                 infoTextArea.appendText("Codename:\t\t${device.codename}\n")
                 infoTextArea.appendText("Bootloader:\t\t")
                 if (device.bootloader)
-                    infoTextArea.appendText("unlocked\n")
-                else infoTextArea.appendText("locked\n")
-                if (device.anti != -1)
-                    infoTextArea.appendText("Anti version:\t\t${device.anti}\n")
+                    infoTextArea.appendText("unlocked")
+                else infoTextArea.appendText("locked")
+                if (device.anti != 0)
+                    infoTextArea.appendText("\nAnti version:\t\t${device.anti}")
             }
         }
     }
@@ -303,7 +307,7 @@ class MainController : Initializable {
             Installer(uninstallerTableView, reinstallerTableView, progressBar, progressIndicator, outputTextArea)
     }
 
-    private fun checkcamera2(): Boolean = comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
+    private fun checkCamera2(): Boolean = comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
 
     private fun checkEIS(): Boolean = comm.exec("adb shell getprop persist.camera.eis.enable").contains("1")
 
@@ -315,7 +319,7 @@ class MainController : Initializable {
                 return
             }
             comm.exec("adb shell setprop persist.camera.HAL3.enabled 0")
-            if (!checkcamera2())
+            if (!checkCamera2())
                 outputTextArea.text = "Camera2 disabled!"
             else outputTextArea.text = "ERROR: Couldn't disable Camera2!"
         }
@@ -329,7 +333,7 @@ class MainController : Initializable {
                 return
             }
             comm.exec("adb shell setprop persist.camera.HAL3.enabled 1")
-            if (checkcamera2())
+            if (checkCamera2())
                 outputTextArea.text = "Camera2 enabled!"
             else outputTextArea.text = "ERROR: Couldn't enable Camera2!"
         }
@@ -479,13 +483,14 @@ class MainController : Initializable {
     private fun savePropertiesMenuItemPressed(event: ActionEvent) {
         when (device.mode) {
             1 -> if (checkADB()) {
+                val props = comm.exec("adb shell getprop")
                 val fc = FileChooser()
                 fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
                 f?.let {
                     try {
-                        f.writeText(comm.exec("adb shell getprop"))
+                        f.writeText(props)
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                         ExceptionAlert(ex)
@@ -493,13 +498,14 @@ class MainController : Initializable {
                 }
             }
             2 -> if (checkFastboot()) {
+                val props = comm.exec("fastboot getvar all")
                 val fc = FileChooser()
                 fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
                 fc.title = "Save properties"
                 val f = fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)
                 f?.let {
                     try {
-                        f.writeText(comm.exec("fastboot getvar all"))
+                        f.writeText(props)
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                         ExceptionAlert(ex)

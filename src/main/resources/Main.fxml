@@ -199,12 +199,12 @@
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
-                                                      <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
+                                                      <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>

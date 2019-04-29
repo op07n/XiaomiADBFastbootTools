@@ -45,7 +45,7 @@ class Installer(
             "Feedback;com.miui.bugreport",
             "FM Radio;com.miui.fm",
             "Games;com.xiaomi.glgm",
-            "Gboard;com.google.android.inputmethod.latin"
+            "Gboard;com.google.android.inputmethod.latin",
             "Gmail;com.google.android.gm",
             "Google App;com.google.android.googlequicksearchbox",
             "Google Assistant;com.google.android.apps.googleassistant",
@@ -93,10 +93,10 @@ class Installer(
             "Notes;com.miui.notes",
             "Package Installer;com.miui.global.packageinstaller",
             "PAI;android.autoinstalls.config.Xiaomi.${device.codename}",
-            "PartnerBookmarks;com.android.providers.partnerbookmarks"
+            "PartnerBookmarks;com.android.providers.partnerbookmarks",
             "PartnerNetflixActivation;com.netflix.partner.activation",
             "Quick Apps;com.miui.hybrid",
-            "Quick Ball;com.miui.touchassistant"
+            "Quick Ball;com.miui.touchassistant",
             "Recorder;com.android.soundrecorder",
             "Scanner;com.xiaomi.scanner",
             "Screen Recorder;com.miui.screenrecorder",
