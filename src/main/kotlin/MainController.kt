@@ -221,7 +221,7 @@ class MainController : Initializable {
                 else heightTextField.text = "ERROR"
             }
             outputTextArea.text = "Device found in ADB mode!\n\n"
-            if (!device.reinstaller)
+            if (!device.reinstaller && !device.recovery)
                 outputTextArea.appendText("Note: The Reinstaller module doesn't support this device.")
             setUI()
             return
