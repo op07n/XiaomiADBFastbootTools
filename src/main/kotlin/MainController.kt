@@ -128,10 +128,10 @@ class MainController : Initializable {
                 reloadMenuItem.isDisable = true
             }
             1 -> {
-                installerPane.isDisable = false
-                reinstallerTab.isDisable = !device.reinstaller
-                camera2Pane.isDisable = false
-                fileExplorerPane.isDisable = false
+                installerPane.isDisable = device.recovery
+                reinstallerTab.isDisable = !(device.reinstaller && !device.recovery)
+                camera2Pane.isDisable = !device.recovery
+                fileExplorerPane.isDisable = device.recovery
                 resolutionPane.isDisable = device.recovery
                 dpiPane.isDisable = device.recovery
                 flasherPane.isDisable = true
