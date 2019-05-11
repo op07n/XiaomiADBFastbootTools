@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.3"
+        val version = "6.3.1"
         lateinit var thread: Thread
     }
 
@@ -255,13 +255,11 @@ class MainController : Initializable {
         thread.start()
     }
 
-    private fun confirm(func: () -> Unit) {
-        val alert = Alert(Alert.AlertType.CONFIRMATION)
+    private fun confirm(msg: String = "Are you sure you want to proceed?", func: () -> Unit) {
+        val alert = Alert(AlertType.CONFIRMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.isResizable = false
-        alert.dialogPane.prefWidth *= 0.6
-        alert.dialogPane.prefHeight *= 0.6
-        alert.headerText = "Are you sure?"
+        alert.headerText = msg.trim()
         val yes = ButtonType("Yes")
         val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
         alert.buttonTypes.setAll(yes, no)
@@ -616,19 +614,28 @@ class MainController : Initializable {
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm { displayedcomm.exec("fastboot erase userdata") }
+            confirm("All your data will be gone.\nAre you sure you want to proceed?") { displayedcomm.exec("fastboot erase userdata") }
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm { displayedcomm.exec("fastboot erase cache", "fastboot erase userdata") }
+            confirm("All your data will be gone.\nAre you sure you want to proceed?") {
+                displayedcomm.exec(
+                    "fastboot erase cache",
+                    "fastboot erase userdata"
+                )
+            }
     }
 
     @FXML
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm { displayedcomm.exec("fastboot oem lock") }
+            confirm("Your partitions must be intact in order to successfully lock the bootloader.\nAre you sure you want to proceed?") {
+                displayedcomm.exec(
+                    "fastboot oem lock"
+                )
+            }
     }
 
     @FXML
@@ -804,12 +811,13 @@ class MainController : Initializable {
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
-        if (installer.isAppSelected(0) && checkADB()) {
-            setPanels(0)
-            installer.uninstall {
-                setPanels(1)
+        if (installer.isAppSelected(0) && checkADB())
+            confirm("Uninstalling apps which aren't listed by default may brick your device.\nAre you sure you want to proceed?") {
+                setPanels(0)
+                installer.uninstall {
+                    setPanels(1)
+                }
             }
-        }
     }
 
     @FXML
