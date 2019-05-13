@@ -108,7 +108,7 @@ class MainController : Initializable {
     private lateinit var installer: Installer
 
     companion object {
-        val version = "6.3.1"
+        val version = "6.3.2"
         lateinit var thread: Thread
     }
 
