@@ -151,9 +151,13 @@ class Installer(
     }
 
     fun addApp(app: String) {
-        val existing = apps.find { app in it }
-        if (existing == null)
-            apps.add("${app.split('.').last()};$app")
+        if (';' in app) {
+            if (apps.find { app.substringAfterLast(';') in it } == null)
+                apps.add(app)
+        } else {
+            if (apps.find { app in it } == null)
+                apps.add("${app.substringAfterLast('.')};$app")
+        }
     }
 
     fun isAppSelected(option: Int): Boolean {

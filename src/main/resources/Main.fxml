@@ -501,7 +501,7 @@
                                           <Font size="15.0" />
                                        </font>
                                     </TitledPane>
-                                    <TitledPane animated="false" collapsible="false" prefWidth="810.0" text="ROM Downloader" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                    <TitledPane animated="false" collapsible="false" prefWidth="810.0" text="MIUI ROM Downloader" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                       <content>
                                         <AnchorPane minHeight="0.0" minWidth="0.0">
                                              <children>

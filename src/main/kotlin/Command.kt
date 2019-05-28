@@ -32,7 +32,7 @@ open class Command() {
             ex.printStackTrace()
             ExceptionAlert(ex)
         }
-        val scan = Scanner(proc.inputStream)
+        val scan = Scanner(proc.inputStream, "UTF-8")
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()
@@ -66,8 +66,8 @@ open class Command() {
             ExceptionAlert(ex)
         }
         val scan = if (err)
-            Scanner(proc.errorStream)
-        else Scanner(proc.inputStream)
+            Scanner(proc.errorStream, "UTF-8")
+        else Scanner(proc.inputStream, "UTF-8")
         var line: String
         while (scan.hasNext()) {
             line = scan.nextLine() + System.lineSeparator()

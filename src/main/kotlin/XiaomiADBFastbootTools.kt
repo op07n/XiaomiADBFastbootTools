@@ -38,22 +38,19 @@ class XiaomiADBFastbootTools : Application() {
         val newfile = if ('/' in file)
             File(tmp, file.substringAfterLast('/'))
         else File(tmp, file)
-        if (!newfile.exists()) {
-            try {
-                newfile.createNewFile()
-                newfile.writeBytes(bytes)
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-                ExceptionAlert(ex)
-            }
+        try {
+            newfile.writeBytes(bytes)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            ExceptionAlert(ex)
         }
         newfile.setExecutable(exec, false)
     }
 
-    fun setupFiles() {
+    private fun setupFiles() {
         val os = System.getProperty("os.name").toLowerCase()
         tmp.mkdir()
-        createFile("dummy.img", false)
+        File(tmp, "dummy.img").writeBytes(ByteArray(8192))
         when {
             "win" in os -> {
                 createFile("windows/adb.exe", true)
@@ -72,12 +69,12 @@ class XiaomiADBFastbootTools : Application() {
         }
     }
 
-    fun versionToInt(ver: String): Int {
+    private fun versionToInt(ver: String): Int {
         val bits = ("$ver.0").split('.')
         return bits[0].toInt() * 100 + bits[1].toInt() * 10 + bits[2].toInt()
     }
 
-    fun checkVersion() {
+    private fun checkVersion() {
         val huc =
             URL("https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection
         huc.requestMethod = "GET"
@@ -129,7 +126,6 @@ class XiaomiADBFastbootTools : Application() {
         stage.title = "Xiaomi ADB/Fastboot Tools"
         stage.icons.add(Image("icon.png"))
         stage.show()
-        stage.isResizable = false
         checkVersion()
         if (!File(tmp, "adb").exists() && !File(tmp, "adb.exe").exists()) {
             val alert = Alert(Alert.AlertType.ERROR)
