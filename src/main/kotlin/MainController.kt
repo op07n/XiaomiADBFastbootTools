@@ -884,10 +884,12 @@ class MainController : Initializable {
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
         if (appManager.isAppSelected(2) && checkADB())
-            setPanels(0)
-        appManager.disable {
-            setPanels(1)
-        }
+            confirm("Disabling apps which aren't listed by default may brick your device.\nAre you sure you want to proceed?") {
+                setPanels(0)
+                appManager.disable {
+                    setPanels(1)
+                }
+            }
     }
 
     @FXML

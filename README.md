@@ -6,8 +6,7 @@
 
 ## Modules
 
-* **Uninstaller** - Uninstall system apps and services on demand
-* **Reinstaller** - Reinstall removed system apps and services
+* **App Manager** - Uninstall/reinstall/disable/enable system apps and services on demand
 * **Camera2** - Enable Camera2 and EIS (TWRP required)
 * **File Explorer** - Transfer files between a device and a computer using ADB
 * **Screen density** - Tweak screen density by overriding the DPI value
@@ -23,7 +22,7 @@
 
 ## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
 
-**Warning: Use the program at your own risk. Removing apps which aren't listed in the Uninstaller by default may brick your device.**
+**Warning: Use the program at your own risk!**
 
 ## Instructions
 

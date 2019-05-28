@@ -100,7 +100,7 @@ class AppManager(
             "Music;com.miui.player",
             "News;com.mi.globalTrendNews",
             "Notes;com.miui.notes",
-            "Package AppManager;com.miui.global.packageinstaller",
+            "Package Installer;com.miui.global.packageinstaller",
             "PAI;android.autoinstalls.config.Xiaomi.${device.codename}",
             "PartnerBookmarks;com.android.providers.partnerbookmarks",
             "PartnerNetflixActivation;com.netflix.partner.activation",
