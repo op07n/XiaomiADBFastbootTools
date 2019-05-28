@@ -31,6 +31,10 @@ class MainController : Initializable {
     @FXML
     private lateinit var deviceMenu: Menu
     @FXML
+    private lateinit var appManagerMenu: Menu
+    @FXML
+    private lateinit var secondSpaceButton: CheckMenuItem
+    @FXML
     private lateinit var recoveryMenuItem: MenuItem
     @FXML
     private lateinit var reloadMenuItem: MenuItem
@@ -47,6 +51,10 @@ class MainController : Initializable {
     @FXML
     private lateinit var reinstallerTableView: TableView<App>
     @FXML
+    private lateinit var disablerTableView: TableView<App>
+    @FXML
+    private lateinit var enablerTableView: TableView<App>
+    @FXML
     private lateinit var uncheckTableColumn: TableColumn<App, Boolean>
     @FXML
     private lateinit var unappTableColumn: TableColumn<App, String>
@@ -58,6 +66,18 @@ class MainController : Initializable {
     private lateinit var reappTableColumn: TableColumn<App, String>
     @FXML
     private lateinit var repackageTableColumn: TableColumn<App, String>
+    @FXML
+    private lateinit var discheckTableColumn: TableColumn<App, Boolean>
+    @FXML
+    private lateinit var disappTableColumn: TableColumn<App, String>
+    @FXML
+    private lateinit var dispackageTableColumn: TableColumn<App, String>
+    @FXML
+    private lateinit var encheckTableColumn: TableColumn<App, Boolean>
+    @FXML
+    private lateinit var enappTableColumn: TableColumn<App, String>
+    @FXML
+    private lateinit var enpackageTableColumn: TableColumn<App, String>
     @FXML
     private lateinit var dpiTextField: TextField
     @FXML
@@ -81,9 +101,13 @@ class MainController : Initializable {
     @FXML
     private lateinit var versionLabel: Label
     @FXML
-    private lateinit var installerPane: TabPane
+    private lateinit var appManagerPane: TabPane
     @FXML
     private lateinit var reinstallerTab: Tab
+    @FXML
+    private lateinit var disablerTab: Tab
+    @FXML
+    private lateinit var enablerTab: Tab
     @FXML
     private lateinit var fileExplorerPane: TitledPane
     @FXML
@@ -105,17 +129,18 @@ class MainController : Initializable {
     private val device = Device()
     private lateinit var displayedcomm: Command
     private lateinit var flasher: Flasher
-    private lateinit var installer: Installer
+    private lateinit var appManager: AppManager
 
     companion object {
-        val version = "6.3.2"
+        val version = "6.4"
         lateinit var thread: Thread
     }
 
     private fun setPanels(mode: Int) {
         when (mode) {
             0 -> {
-                installerPane.isDisable = true
+                appManagerPane.isDisable = true
+                appManagerMenu.isDisable = true
                 camera2Pane.isDisable = true
                 fileExplorerPane.isDisable = true
                 resolutionPane.isDisable = true
@@ -128,8 +153,11 @@ class MainController : Initializable {
                 reloadMenuItem.isDisable = true
             }
             1 -> {
-                installerPane.isDisable = device.recovery
+                appManagerPane.isDisable = device.recovery
+                appManagerMenu.isDisable = device.recovery
                 reinstallerTab.isDisable = !(device.reinstaller && !device.recovery)
+                disablerTab.isDisable = !(device.disabler && !device.recovery)
+                enablerTab.isDisable = !(device.disabler && !device.recovery)
                 camera2Pane.isDisable = !device.recovery
                 fileExplorerPane.isDisable = device.recovery
                 resolutionPane.isDisable = device.recovery
@@ -142,7 +170,8 @@ class MainController : Initializable {
                 reloadMenuItem.isDisable = false
             }
             2 -> {
-                installerPane.isDisable = true
+                appManagerPane.isDisable = true
+                appManagerMenu.isDisable = true
                 camera2Pane.isDisable = true
                 fileExplorerPane.isDisable = true
                 resolutionPane.isDisable = true
@@ -207,7 +236,7 @@ class MainController : Initializable {
         progressIndicator.isVisible = true
         if (device.readADB()) {
             progressIndicator.isVisible = false
-            installer.loadApps(device)
+            appManager.loadApps(device)
             codenameTextField.text = device.codename
             if (!device.recovery) {
                 if (device.dpi != -1)
@@ -221,8 +250,8 @@ class MainController : Initializable {
                 else heightTextField.text = "ERROR"
             }
             outputTextArea.text = "Device found in ADB mode!\n\n"
-            if (!device.reinstaller && !device.recovery)
-                outputTextArea.appendText("Note: The Reinstaller module doesn't support this device.")
+            if (!device.recovery && (!device.reinstaller || !device.disabler))
+                outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.")
             setUI()
             return
         }
@@ -292,17 +321,39 @@ class MainController : Initializable {
         uncheckTableColumn.setCellFactory { CheckBoxTableCell() }
         unappTableColumn.cellValueFactory = PropertyValueFactory("appname")
         unpackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+
         recheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
         recheckTableColumn.setCellFactory { CheckBoxTableCell() }
         reappTableColumn.cellValueFactory = PropertyValueFactory("appname")
         repackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+
+        discheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
+        discheckTableColumn.setCellFactory { CheckBoxTableCell() }
+        disappTableColumn.cellValueFactory = PropertyValueFactory("appname")
+        dispackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+
+        encheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
+        encheckTableColumn.setCellFactory { CheckBoxTableCell() }
+        enappTableColumn.cellValueFactory = PropertyValueFactory("appname")
+        enpackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
+
         uninstallerTableView.columns.setAll(uncheckTableColumn, unappTableColumn, unpackageTableColumn)
         reinstallerTableView.columns.setAll(recheckTableColumn, reappTableColumn, repackageTableColumn)
+        disablerTableView.columns.setAll(discheckTableColumn, disappTableColumn, dispackageTableColumn)
+        enablerTableView.columns.setAll(encheckTableColumn, enappTableColumn, enpackageTableColumn)
 
         displayedcomm = Command(outputTextArea)
         flasher = Flasher(outputTextArea, progressIndicator)
-        installer =
-            Installer(uninstallerTableView, reinstallerTableView, progressBar, progressIndicator, outputTextArea)
+        appManager =
+            AppManager(
+                uninstallerTableView,
+                reinstallerTableView,
+                disablerTableView,
+                enablerTableView,
+                progressBar,
+                progressIndicator,
+                outputTextArea
+            )
     }
 
     private fun checkCamera2(): Boolean = comm.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
@@ -310,7 +361,7 @@ class MainController : Initializable {
     private fun checkEIS(): Boolean = comm.exec("adb shell getprop persist.camera.eis.enable").contains("1")
 
     @FXML
-    private fun disableButtonPressed(event: ActionEvent) {
+    private fun disableCamera2ButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
@@ -324,7 +375,7 @@ class MainController : Initializable {
     }
 
     @FXML
-    private fun enableButtonPressed(event: ActionEvent) {
+    private fun enableCamera2ButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             if (!device.recovery) {
                 outputTextArea.text = "ERROR: No device found in recovery mode!"
@@ -811,10 +862,10 @@ class MainController : Initializable {
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
-        if (installer.isAppSelected(0) && checkADB())
+        if (appManager.isAppSelected(0) && checkADB())
             confirm("Uninstalling apps which aren't listed by default may brick your device.\nAre you sure you want to proceed?") {
                 setPanels(0)
-                installer.uninstall {
+                appManager.uninstall {
                     setPanels(1)
                 }
             }
@@ -822,20 +873,47 @@ class MainController : Initializable {
 
     @FXML
     private fun reinstallButtonPressed(event: ActionEvent) {
-        if (installer.isAppSelected(1) && checkADB()) {
+        if (appManager.isAppSelected(1) && checkADB()) {
             setPanels(0)
-            installer.reinstall {
+            appManager.reinstall {
                 setPanels(1)
             }
         }
     }
 
     @FXML
-    private fun addButtonPressed(event: ActionEvent) {
+    private fun disableButtonPressed(event: ActionEvent) {
+        if (appManager.isAppSelected(2) && checkADB())
+            setPanels(0)
+        appManager.disable {
+            setPanels(1)
+        }
+    }
+
+    @FXML
+    private fun enableButtonPressed(event: ActionEvent) {
+        if (appManager.isAppSelected(3) && checkADB()) {
+            setPanels(0)
+            appManager.enable {
+                setPanels(1)
+            }
+        }
+    }
+
+    @FXML
+    private fun secondSpaceButtonPressed(event: ActionEvent) {
+        appManager.user = if (secondSpaceButton.isSelected)
+            10
+        else 0
+        appManager.createTables()
+    }
+
+    @FXML
+    private fun addAppsButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             val fxmlLoader = FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml"))
             val parent = fxmlLoader.load<Parent>()
-            fxmlLoader.getController<AppAdderController>().installer = installer
+            fxmlLoader.getController<AppAdderController>().appManager = appManager
             val scene = Scene(parent)
             val stage = Stage()
             stage.scene = scene

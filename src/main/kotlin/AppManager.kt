@@ -10,9 +10,11 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 
-class Installer(
-    var uninstallTableView: TableView<App>,
-    var reinstallTableView: TableView<App>,
+class AppManager(
+    var uninstallerTableView: TableView<App>,
+    var reinstallerTableView: TableView<App>,
+    var disablerTableView: TableView<App>,
+    var enablerTableView: TableView<App>,
     var progress: ProgressBar,
     var progressind: ProgressIndicator,
     control: TextInputControl
@@ -21,6 +23,7 @@ class Installer(
     private lateinit var apps: ArrayList<String>
     private val command = Command()
     private lateinit var device: Device
+    var user = 0
 
     init {
         pb.redirectErrorStream(false)
@@ -97,7 +100,7 @@ class Installer(
             "Music;com.miui.player",
             "News;com.mi.globalTrendNews",
             "Notes;com.miui.notes",
-            "Package Installer;com.miui.global.packageinstaller",
+            "Package AppManager;com.miui.global.packageinstaller",
             "PAI;android.autoinstalls.config.Xiaomi.${device.codename}",
             "PartnerBookmarks;com.android.providers.partnerbookmarks",
             "PartnerNetflixActivation;com.netflix.partner.activation",
@@ -119,35 +122,52 @@ class Installer(
             "Yellow Pages;com.miui.yellowpage",
             "YouTube;com.google.android.youtube"
         )
-        val packages = command.exec("adb shell cmd package install-existing xaft")
-        device.reinstaller = !("not found" in packages || "Unknown command" in packages)
+        val support = command.exec("adb shell cmd package install-existing xaft")
+        device.reinstaller = !("not found" in support || "Unknown command" in support)
+        device.disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
         createTables()
     }
 
     fun createTables() {
-        val installed = if (device.reinstaller)
-            command.exec("adb shell cmd package list packages")
-        else command.exec("adb shell pm list packages")
-        val all = command.exec("adb shell cmd package list packages -u")
-        uninstallTableView.items.clear()
-        reinstallTableView.items.clear()
+        val disabled = command.exec("adb shell pm list packages -d --user $user")
+        val enabled = command.exec("adb shell pm list packages -e --user $user")
+        val all = command.exec("adb shell pm list packages -u --user $user")
+        uninstallerTableView.items.clear()
+        reinstallerTableView.items.clear()
+        disablerTableView.items.clear()
+        enablerTableView.items.clear()
         apps.forEach {
             val app = it.split(';')
             val uninst = ArrayList<String>()
             val reinst = ArrayList<String>()
+            val disable = ArrayList<String>()
+            val enable = ArrayList<String>()
             app[1].split(',').forEach { pkg ->
-                if (installed.contains(pkg + System.lineSeparator()))
-                    uninst.add(pkg)
-                else if (all.contains(pkg + System.lineSeparator()))
-                    reinst.add(pkg)
+                when {
+                    pkg + System.lineSeparator() in disabled -> {
+                        uninst.add(pkg)
+                        enable.add(pkg)
+                    }
+                    pkg + System.lineSeparator() in enabled -> {
+                        uninst.add(pkg)
+                        disable.add(pkg)
+                    }
+                    pkg + System.lineSeparator() in all -> reinst.add(pkg)
+                }
             }
             if (uninst.isNotEmpty())
-                uninstallTableView.items.add(App(app[0], uninst))
+                uninstallerTableView.items.add(App(app[0], uninst))
             if (reinst.isNotEmpty())
-                reinstallTableView.items.add(App(app[0], reinst))
+                reinstallerTableView.items.add(App(app[0], reinst))
+            if (disable.isNotEmpty())
+                disablerTableView.items.add(App(app[0], disable))
+            if (enable.isNotEmpty())
+                enablerTableView.items.add(App(app[0], enable))
         }
-        uninstallTableView.refresh()
-        reinstallTableView.refresh()
+        uninstallerTableView.refresh()
+        reinstallerTableView.refresh()
+        disablerTableView.refresh()
+        enablerTableView.refresh()
     }
 
     fun addApp(app: String) {
@@ -161,9 +181,12 @@ class Installer(
     }
 
     fun isAppSelected(option: Int): Boolean {
-        val list = if (option == 0)
-            uninstallTableView.items
-        else reinstallTableView.items
+        val list = when (option) {
+            0 -> uninstallerTableView.items
+            1 -> reinstallerTableView.items
+            2 -> disablerTableView.items
+            else -> enablerTableView.items
+        }
         if (list.isNotEmpty()) {
             for (app in list)
                 if (app.selectedProperty().get())
@@ -175,7 +198,7 @@ class Installer(
     fun uninstall(func: () -> Unit) {
         val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        uninstallTableView.items.forEach {
+        uninstallerTableView.items.forEach {
             if (it.selectedProperty().get()) {
                 selected.add(it)
                 n += it.packagenameProperty().get().lines().size
@@ -188,7 +211,7 @@ class Installer(
             selected.forEach {
                 it.packagenameProperty().get().lines().forEach { pkg ->
                     val arguments =
-                        ("adb shell pm uninstall --user 0 $pkg").split(' ').toTypedArray()
+                        ("adb shell pm uninstall --user $user $pkg").split(' ').toTypedArray()
                     arguments[0] = prefix + arguments[0]
                     pb.command(*arguments)
                     try {
@@ -223,7 +246,7 @@ class Installer(
     fun reinstall(func: () -> Unit) {
         val selected = FXCollections.observableArrayList<App>()
         var n = 0
-        reinstallTableView.items.forEach {
+        reinstallerTableView.items.forEach {
             if (it.selectedProperty().get()) {
                 selected.add(it)
                 n += it.packagenameProperty().get().lines().size
@@ -236,7 +259,7 @@ class Installer(
             selected.forEach {
                 it.packagenameProperty().get().lines().forEach { pkg ->
                     val arguments =
-                        ("adb shell cmd package install-existing $pkg").split(' ')
+                        ("adb shell cmd package install-existing --user $user $pkg").split(' ')
                             .toTypedArray()
                     arguments[0] = prefix + arguments[0]
                     pb.command(*arguments)
@@ -251,9 +274,113 @@ class Installer(
                     while (scan.hasNext())
                         line += scan.nextLine() + System.lineSeparator()
                     scan.close()
-                    if ("installed for user" in line)
-                        line = "Success\n"
-                    else line = "Failure [${line.substringAfter(pkg).trim()}]\n"
+                    line = if ("installed for user" in line)
+                        "Success\n"
+                    else "Failure [${line.substringAfter(pkg).trim()}]\n"
+                    Platform.runLater {
+                        tic?.appendText("App: ${it.appnameProperty().get()}\n")
+                        tic?.appendText("Package: $pkg\n")
+                        tic?.appendText("Result: $line\n")
+                        progress.progress += 1.0 / n
+                    }
+                }
+            }
+            Platform.runLater {
+                tic?.appendText("Done!")
+                progress.progress = 0.0
+                progressind.isVisible = false
+                createTables()
+                func()
+            }
+        }
+    }
+
+    fun disable(func: () -> Unit) {
+        val selected = FXCollections.observableArrayList<App>()
+        var n = 0
+        disablerTableView.items.forEach {
+            if (it.selectedProperty().get()) {
+                selected.add(it)
+                n += it.packagenameProperty().get().lines().size
+            }
+        }
+        tic?.text = ""
+        progress.progress = 0.0
+        progressind.isVisible = true
+        thread(true, true) {
+            selected.forEach {
+                it.packagenameProperty().get().lines().forEach { pkg ->
+                    val arguments =
+                        ("adb shell pm disable-user --user $user $pkg").split(' ')
+                            .toTypedArray()
+                    arguments[0] = prefix + arguments[0]
+                    pb.command(*arguments)
+                    try {
+                        proc = pb.start()
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
+                        ExceptionAlert(ex)
+                    }
+                    val scan = Scanner(proc.inputStream)
+                    var line = ""
+                    while (scan.hasNext())
+                        line += scan.nextLine() + System.lineSeparator()
+                    scan.close()
+                    line = if ("disabled-user" in line)
+                        "Success\n"
+                    else "Failure\n"
+                    Platform.runLater {
+                        tic?.appendText("App: ${it.appnameProperty().get()}\n")
+                        tic?.appendText("Package: $pkg\n")
+                        tic?.appendText("Result: $line\n")
+                        progress.progress += 1.0 / n
+                    }
+                }
+            }
+            Platform.runLater {
+                tic?.appendText("Done!")
+                progress.progress = 0.0
+                progressind.isVisible = false
+                createTables()
+                func()
+            }
+        }
+    }
+
+    fun enable(func: () -> Unit) {
+        val selected = FXCollections.observableArrayList<App>()
+        var n = 0
+        enablerTableView.items.forEach {
+            if (it.selectedProperty().get()) {
+                selected.add(it)
+                n += it.packagenameProperty().get().lines().size
+            }
+        }
+        tic?.text = ""
+        progress.progress = 0.0
+        progressind.isVisible = true
+        thread(true, true) {
+            selected.forEach {
+                it.packagenameProperty().get().lines().forEach { pkg ->
+                    val arguments =
+                        ("adb shell pm enable --user $user $pkg").split(' ')
+                            .toTypedArray()
+                    arguments[0] = prefix + arguments[0]
+                    pb.command(*arguments)
+                    try {
+                        proc = pb.start()
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
+                        ExceptionAlert(ex)
+                    }
+                    val scan = Scanner(proc.inputStream)
+                    var line = ""
+                    while (scan.hasNext())
+                        line += scan.nextLine() + System.lineSeparator()
+                    scan.close()
+                    line = if ("enabled" in line)
+                        "Success\n"
+                    else "Failure\n"
                     Platform.runLater {
                         tic?.appendText("App: ${it.appnameProperty().get()}\n")
                         tic?.appendText("Package: $pkg\n")

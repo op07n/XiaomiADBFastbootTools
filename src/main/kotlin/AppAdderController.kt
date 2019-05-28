@@ -13,7 +13,7 @@ class AppAdderController : Initializable {
     @FXML
     private lateinit var appTextArea: TextArea
 
-    lateinit var installer: Installer
+    lateinit var appManager: AppManager
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
     }
@@ -32,9 +32,9 @@ class AppAdderController : Initializable {
         appTextArea.text?.let {
             if (appTextArea.text.trim().isNotEmpty()) {
                 appTextArea.text.trim().lines().forEach {
-                    installer.addApp(it)
+                    appManager.addApp(it.trim())
                 }
-                installer.createTables()
+                appManager.createTables()
             }
         }
         ((event.source as Node).scene.window as Stage).close()

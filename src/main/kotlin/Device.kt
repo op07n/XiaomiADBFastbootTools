@@ -13,6 +13,7 @@ class Device {
     var auth = false
     var recovery = false
     var reinstaller = true
+    var disabler = true
 
     private val comm = Command()
 

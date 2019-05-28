@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -47,6 +48,12 @@
                   </Menu>
                 <MenuItem fx:id="readPropertiesMenuItem" mnemonicParsing="false" onAction="#readPropertiesMenuItemPressed" text="Read properties" />
                   <MenuItem fx:id="savePropertiesMenuItem" mnemonicParsing="false" onAction="#savePropertiesMenuItemPressed" text="Save properties" />
+              </items>
+            </Menu>
+            <Menu fx:id="appManagerMenu" disable="true" mnemonicParsing="false" text="App Manager">
+              <items>
+                  <CheckMenuItem fx:id="secondSpaceButton" mnemonicParsing="false" onAction="#secondSpaceButtonPressed" text="Second Space" />
+                  <MenuItem fx:id="addAppsButton" mnemonicParsing="false" onAction="#addAppsButtonPressed" text="Add apps" />
               </items>
             </Menu>
       </menus>
@@ -113,7 +120,7 @@
                                     <RowConstraints />
                                  </rowConstraints>
                                  <children>
-                                    <TabPane fx:id="installerPane" disable="true" GridPane.rowSpan="4">
+                                    <TabPane fx:id="appManagerPane" disable="true" GridPane.rowSpan="4">
                                        <tabs>
                                           <Tab fx:id="uninstallerTab" closable="false" text="Uninstaller">
                                              <content>
@@ -125,9 +132,8 @@
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
                                                          </columnConstraints>
                                                          <rowConstraints>
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="555.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" valignment="CENTER" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="uninstallerTableView" editable="true" GridPane.columnSpan="2">
@@ -137,14 +143,9 @@
                                                                   <TableColumn fx:id="unpackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
                                                               </columns>
                                                             </TableView>
-                                                            <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefWidth="570.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+                                                            <Button fx:id="uninstallButton" mnemonicParsing="false" onAction="#uninstallButtonPressed" prefHeight="35.0" prefWidth="570.0" text="Uninstall!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
                                                                <font>
-                                                                  <Font size="15.0" />
-                                                               </font>
-                                                            </Button>
-                                                            <Button fx:id="unaddButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="570.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.rowIndex="1">
-                                                               <font>
-                                                                  <Font size="15.0" />
+                                                                  <Font size="16.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -163,9 +164,8 @@
                                                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
                                                          </columnConstraints>
                                                          <rowConstraints>
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="530.0" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" valignment="CENTER" vgrow="ALWAYS" />
-                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" valignment="BOTTOM" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="555.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" valignment="CENTER" vgrow="ALWAYS" />
                                                          </rowConstraints>
                                                          <children>
                                                             <TableView fx:id="reinstallerTableView" editable="true" GridPane.columnSpan="2">
@@ -175,14 +175,73 @@
                                                                   <TableColumn fx:id="repackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
                                                                </columns>
                                                             </TableView>
-                                                            <Button fx:id="reinstallButton" mnemonicParsing="false" onAction="#reinstallButtonPressed" prefWidth="570.0" text="Reinstall!" textFill="#00c800" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                                            <Button fx:id="reinstallButton" mnemonicParsing="false" onAction="#reinstallButtonPressed" prefHeight="35.0" prefWidth="570.0" text="Reinstall!" textFill="#00c800" GridPane.columnSpan="2" GridPane.rowIndex="1">
                                                                <font>
-                                                                  <Font size="15.0" />
+                                                                  <Font size="16.0" />
                                                                </font>
                                                             </Button>
-                                                            <Button fx:id="readdButton" mnemonicParsing="false" onAction="#addButtonPressed" prefWidth="570.0" text="Add apps to the list" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                          </Tab>
+                                          <Tab fx:id="disablerTab" closable="false" text="Disabler">
+                                             <content>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0">
+                                                   <children>
+                                                      <GridPane alignment="CENTER" layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                         <columnConstraints>
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="467.0" minWidth="10.0" prefWidth="467.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
+                                                         </columnConstraints>
+                                                         <rowConstraints>
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="555.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                         </rowConstraints>
+                                                         <children>
+                                                            <TableView fx:id="disablerTableView" editable="true" GridPane.columnSpan="2">
+                                                               <columns>
+                                                                  <TableColumn fx:id="discheckTableColumn" prefWidth="35.0" />
+                                                                  <TableColumn fx:id="disappTableColumn" editable="false" prefWidth="205.0" text="App name" />
+                                                                  <TableColumn fx:id="dispackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
+                                                               </columns>
+                                                            </TableView>
+                                                            <Button fx:id="disableButton" mnemonicParsing="false" onAction="#disableButtonPressed" prefHeight="35.0" prefWidth="570.0" text="Disable!" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
                                                                <font>
-                                                                  <Font size="15.0" />
+                                                                  <Font size="16.0" />
+                                                               </font>
+                                                            </Button>
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                          </Tab>
+                                          <Tab fx:id="enablerTab" closable="false" text="Enabler">
+                                             <content>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0">
+                                                   <children>
+                                                      <GridPane alignment="CENTER" layoutX="11.0" layoutY="11.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                         <columnConstraints>
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="467.0" minWidth="10.0" prefWidth="467.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="96.0" minWidth="10.0" prefWidth="65.0" />
+                                                         </columnConstraints>
+                                                         <rowConstraints>
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="555.0" vgrow="ALWAYS" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" valignment="CENTER" vgrow="ALWAYS" />
+                                                         </rowConstraints>
+                                                         <children>
+                                                            <TableView fx:id="enablerTableView" editable="true" GridPane.columnSpan="2">
+                                                               <columns>
+                                                                  <TableColumn fx:id="encheckTableColumn" prefWidth="35.0" />
+                                                                  <TableColumn fx:id="enappTableColumn" editable="false" prefWidth="205.0" text="App name" />
+                                                                  <TableColumn fx:id="enpackageTableColumn" editable="false" prefWidth="310.0" text="Package name" />
+                                                               </columns>
+                                                            </TableView>
+                                                            <Button fx:id="enableButton" mnemonicParsing="false" onAction="#enableButtonPressed" prefHeight="35.0" prefWidth="570.0" text="Enable!" textFill="#00c800" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                                               <font>
+                                                                  <Font size="16.0" />
                                                                </font>
                                                             </Button>
                                                          </children>
@@ -199,12 +258,12 @@
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                                    <children>
-                                                      <Button fx:id="enableButton" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableButtonPressed" text="Enable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <Button fx:id="enableCamera2Button" layoutX="64.0" layoutY="65.0" mnemonicParsing="false" onAction="#enableCamera2ButtonPressed" text="Enable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Button>
-                                                      <Button fx:id="disableButton" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableButtonPressed" text="Disable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
+                                                      <Button fx:id="disableCamera2Button" layoutX="62.0" layoutY="115.0" mnemonicParsing="false" onAction="#disableCamera2ButtonPressed" text="Disable Camera2" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
                                                          <font>
                                                             <Font size="15.0" />
                                                          </font>
