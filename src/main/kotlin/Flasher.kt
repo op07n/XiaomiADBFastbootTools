@@ -6,14 +6,14 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
-class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Command(tic) {
+class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Command() {
 
     init {
         pb.redirectErrorStream(true)
     }
 
     fun exec(image: File?, arg: String) {
-        tic?.text = ""
+        tic.text = ""
         val sb = StringBuffer("")
         val arguments = arg.split(' ').toTypedArray()
         arguments[0] = prefix + arguments[0]
@@ -32,7 +32,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                 sb.append(scan.next())
                 val line = sb.toString()
                 Platform.runLater {
-                    tic?.text = line
+                    tic.text = line
                 }
             }
             scan.close()
@@ -43,7 +43,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
     }
 
     fun exec(image: File?, vararg args: String) {
-        tic?.text = ""
+        tic.text = ""
         val sb = StringBuffer("")
         progressind.isVisible = true
         thread(true, true) {
@@ -63,7 +63,7 @@ class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Comma
                     sb.append(scan.next())
                     val line = sb.toString()
                     Platform.runLater {
-                        tic?.text = line
+                        tic.text = line
                     }
                 }
                 scan.close()

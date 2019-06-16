@@ -38,20 +38,17 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
         if (where == "..") {
             if (path.split('/').size < 3)
                 return
-            path = path.substring(0, path.lastIndex).substringBeforeLast('/') + "/"
+            path = path.dropLast(1).substringBeforeLast('/') + "/"
         } else path += "$where/"
     }
 
     fun getFiles(): ObservableList<AndroidFile> {
-        val lines = exec("adb shell ls -l $path", 5)
         val files = FXCollections.observableArrayList<AndroidFile>()
-        lines.split('\n').forEach {
-            if (':' in it && "ls:" !in it) {
-                val file = makeFile(it)
-                file?.let {
+        exec("adb shell ls -l $path", lim = 5).lines().forEach {
+            if ("ls:" !in it && ':' in it)
+                makeFile(it)?.let { file ->
                     files.add(file)
                 }
-            }
         }
         return files
     }
@@ -66,14 +63,14 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
             ex.printStackTrace()
             ExceptionAlert(ex)
         }
-        val scan = Scanner(proc.inputStream).useDelimiter("")
+        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
         while (scan.hasNextLine()) {
-            val line = scan.nextLine()
+            output = scan.nextLine()
             Platform.runLater {
-                if (line.contains('%'))
-                    progress.progress = line.substring(line.indexOf('[') + 1, line.indexOf('%')).trim().toInt() / 100.0
-                else if (line.contains(command))
-                    status.text = "ERROR: ${line.substringAfterLast(':').trim()}"
+                if ('%' in output)
+                    progress.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
+                else if (command in output)
+                    status.text = "ERROR: ${output.substringAfterLast(':').trim()}"
             }
         }
         scan.close()
@@ -83,13 +80,11 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     fun pull(selected: List<AndroidFile>, to: File, func: () -> Unit) {
         thread(true, true) {
             if (selected.isEmpty()) {
-                val arguments = arrayOf("${prefix}adb", "pull", path, to.absolutePath)
-                pb.command(*arguments)
+                pb.command("${prefix}adb", "pull", path, to.absolutePath)
                 init()
             } else {
                 selected.forEach {
-                    val arguments = arrayOf("${prefix}adb", "pull", path + it.name, to.absolutePath)
-                    pb.command(*arguments)
+                    pb.command("${prefix}adb", "pull", path + it.name, to.absolutePath)
                     init()
                 }
             }
@@ -105,8 +100,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     fun push(selected: List<File>, func: () -> Unit) {
         thread(true, true) {
             selected.forEach {
-                val arguments = arrayOf("${prefix}adb", "push", it.absolutePath, path)
-                pb.command(*arguments)
+                pb.command("${prefix}adb", "push", it.absolutePath, path)
                 init()
             }
             Platform.runLater {
@@ -121,10 +115,9 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     fun delete(selected: List<AndroidFile>, func: () -> Unit) {
         thread(true, true) {
             selected.forEach {
-                val arguments = if (it.dir)
-                    arrayOf("${prefix}adb", "shell", "rm", "-rf", format(path + it.name))
-                else arrayOf("${prefix}adb", "shell", "rm", "-f", format(path + it.name))
-                pb.command(*arguments)
+                if (it.dir)
+                    pb.command("${prefix}adb", "shell", "rm", "-rf", format(path + it.name))
+                else pb.command("${prefix}adb", "shell", "rm", "-f", format(path + it.name))
                 init("rm")
             }
             Platform.runLater {
@@ -138,8 +131,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     fun mkdir(name: String, func: () -> Unit) {
         thread(true, true) {
-            val arguments = arrayOf("${prefix}adb", "shell", "mkdir", format(path + name))
-            pb.command(*arguments)
+            pb.command("${prefix}adb", "shell", "mkdir", format(path + name))
             init("mkdir")
             Platform.runLater {
                 if (status.text.isEmpty())
@@ -152,8 +144,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
         thread(true, true) {
-            val arguments = arrayOf("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
-            pb.command(*arguments)
+            pb.command("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             init("mv")
             Platform.runLater {
                 if (status.text.isEmpty())

@@ -26,7 +26,6 @@ class FileExplorerController : Initializable {
     private lateinit var progressBar: ProgressBar
 
     private lateinit var fileExplorer: FileExplorer
-    lateinit var device: Device
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         backButton.graphic = ImageView("back.png")
@@ -36,7 +35,7 @@ class FileExplorerController : Initializable {
         pathTextField.setOnAction {
             pathTextField.text = pathTextField.text.trim()
             if (!pathTextField.text.endsWith('/'))
-                pathTextField.text += "/"
+                pathTextField.text += '/'
             fileExplorer.path = pathTextField.text
             listView.items = fileExplorer.getFiles()
             listView.refresh()
@@ -64,12 +63,11 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun pushButtonPressed(event: ActionEvent) {
-        if (device.readADB()) {
+        if (Device.readADB()) {
             val fc = FileChooser()
             fc.title = "Select files to copy"
-            val files = fc.showOpenMultipleDialog((event.source as Node).scene.window)
-            files?.let {
-                fileExplorer.push(files) {
+            fc.showOpenMultipleDialog((event.source as Node).scene.window)?.let {
+                fileExplorer.push(it) {
                     loadList()
                 }
             }
@@ -78,12 +76,11 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun pullButtonPressed(event: ActionEvent) {
-        if (device.readADB()) {
+        if (Device.readADB()) {
             val dc = DirectoryChooser()
             dc.title = "Select the destination"
-            val dir = dc.showDialog((event.source as Node).scene.window)
-            dir?.let {
-                fileExplorer.pull(listView.selectionModel.selectedItems, dir) {
+            dc.showDialog((event.source as Node).scene.window)?.let {
+                fileExplorer.pull(listView.selectionModel.selectedItems, it) {
                     loadList()
                 }
             }
@@ -92,7 +89,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun newFolderButtonPressed(event: ActionEvent) {
-        if (device.readADB()) {
+        if (Device.readADB()) {
             val dialog = TextInputDialog()
             dialog.initStyle(StageStyle.UTILITY)
             dialog.isResizable = false
@@ -110,7 +107,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun deleteButtonPressed(event: ActionEvent) {
-        if (device.readADB()) {
+        if (Device.readADB()) {
             if (listView.selectionModel.selectedItems.isEmpty())
                 return
             val alert = Alert(Alert.AlertType.CONFIRMATION)
@@ -134,7 +131,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun renameButtonPressed(event: ActionEvent) {
-        if (device.readADB()) {
+        if (Device.readADB()) {
             if (listView.selectionModel.selectedItems.size != 1)
                 return
             val item = listView.selectionModel.selectedItems[0]
@@ -157,7 +154,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun listViewMouseClicked(event: MouseEvent) {
-        if (event.clickCount == 2) {
+        if (event.clickCount > 1) {
             val item = listView.selectionModel.selectedItem
             if (item.dir)
                 navigate(item.name)

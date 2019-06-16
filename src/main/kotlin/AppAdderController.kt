@@ -13,8 +13,6 @@ class AppAdderController : Initializable {
     @FXML
     private lateinit var appTextArea: TextArea
 
-    lateinit var appManager: AppManager
-
     override fun initialize(location: URL?, resources: ResourceBundle?) {
     }
 
@@ -22,7 +20,7 @@ class AppAdderController : Initializable {
     private fun loadButtonPressed(event: ActionEvent) {
         val fc = FileChooser()
         fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-        fc.title = "Select an image"
+        fc.title = "Select a text file"
         val file = fc.showOpenDialog((event.source as Node).scene.window)
         appTextArea.text = file?.readText()
     }
@@ -30,11 +28,11 @@ class AppAdderController : Initializable {
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
         appTextArea.text?.let {
-            if (appTextArea.text.trim().isNotEmpty()) {
-                appTextArea.text.trim().lines().forEach {
-                    appManager.addApp(it.trim())
+            if (it.isNotBlank()) {
+                it.trim().lines().forEach { line ->
+                    AppManager.addApp(line.trim())
                 }
-                appManager.createTables()
+                AppManager.createTables()
             }
         }
         ((event.source as Node).scene.window as Stage).close()

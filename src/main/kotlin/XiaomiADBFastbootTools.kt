@@ -23,49 +23,10 @@ import java.net.URL
 
 class XiaomiADBFastbootTools : Application() {
 
-    private val command = Command()
-    private val tmp = File(System.getProperty("user.home"), "xaft_tmp")
-
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             launch(XiaomiADBFastbootTools::class.java)
-        }
-    }
-
-    private fun createFile(file: String, exec: Boolean) {
-        val bytes = this.javaClass.classLoader.getResourceAsStream(file).readBytes()
-        val newfile = if ('/' in file)
-            File(tmp, file.substringAfterLast('/'))
-        else File(tmp, file)
-        try {
-            newfile.writeBytes(bytes)
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            ExceptionAlert(ex)
-        }
-        newfile.setExecutable(exec, false)
-    }
-
-    private fun setupFiles() {
-        val os = System.getProperty("os.name").toLowerCase()
-        tmp.mkdir()
-        File(tmp, "dummy.img").writeBytes(ByteArray(8192))
-        when {
-            "win" in os -> {
-                createFile("windows/adb.exe", true)
-                createFile("windows/fastboot.exe", true)
-                createFile("windows/AdbWinApi.dll", false)
-                createFile("windows/AdbWinUsbApi.dll", false)
-            }
-            "mac" in os -> {
-                createFile("darwin/adb", true)
-                createFile("darwin/fastboot", true)
-            }
-            else -> {
-                createFile("linux/adb", true)
-                createFile("linux/fastboot", true)
-            }
         }
     }
 
@@ -112,14 +73,22 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        if (tmp.exists() && !tmp.deleteRecursively()) {
-            val alert = Alert(Alert.AlertType.ERROR)
-            alert.title = "Fatal Error"
-            alert.headerText = "ERROR: Please kill adb in Task Manager and try again!"
-            alert.showAndWait()
-            Platform.exit()
+        try {
+            ProcessBuilder("adb", "--version").start()
+            ProcessBuilder("fastboot", "--version").start()
+        } catch (e: Exception) {
+            if ((File("adb").exists() || File("adb.exe").exists()) && (File("fastboot").exists() || File("fastboot.exe").exists())) {
+                Command.prefix = if ("win" in System.getProperty("os.name").toLowerCase())
+                    System.getProperty("user.dir") + '/'
+                else "./"
+            } else {
+                val alert = Alert(Alert.AlertType.ERROR)
+                alert.title = "Fatal Error"
+                alert.headerText = "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR where they are!"
+                alert.showAndWait()
+                Platform.exit()
+            }
         }
-        setupFiles()
         val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("Main.fxml"))
         val scene = Scene(root)
         stage.scene = scene
@@ -127,20 +96,11 @@ class XiaomiADBFastbootTools : Application() {
         stage.icons.add(Image("icon.png"))
         stage.show()
         checkVersion()
-        if (!File(tmp, "adb").exists() && !File(tmp, "adb.exe").exists()) {
-            val alert = Alert(Alert.AlertType.ERROR)
-            alert.title = "Fatal Error"
-            alert.headerText = "ERROR: Couldn't initialize ADB!"
-            alert.showAndWait()
-            Platform.exit()
-        }
     }
 
     override fun stop() {
         MainController.thread.interrupt()
-        command.exec("adb kill-server")
-        while (tmp.exists() && !tmp.deleteRecursively())
-            Thread.sleep(500)
+        Command.exec("adb kill-server")
     }
 
 }
