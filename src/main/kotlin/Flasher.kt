@@ -9,7 +9,6 @@ import kotlin.concurrent.thread
 open class Flasher: Command() {
 
     companion object {
-        lateinit var tic: TextInputControl
         lateinit var progressInd: ProgressIndicator
 
         init {
@@ -18,7 +17,7 @@ open class Flasher: Command() {
 
         fun exec(image: File?, vararg args: String) {
             tic.text = ""
-            progressind.isVisible = true
+            progressInd.isVisible = true
             thread(true, true) {
                 args.forEach {
                     pb.command((prefix + it).split(' ') + image?.absolutePath)
@@ -37,7 +36,7 @@ open class Flasher: Command() {
                     proc.waitFor()
                 }
                 Platform.runLater {
-                    progressind.isVisible = false
+                    progressInd.isVisible = false
                 }
             }
         }
