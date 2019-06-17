@@ -6,71 +6,39 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
-class Flasher(tic: TextInputControl, var progressind: ProgressIndicator) : Command() {
+open class Flasher: Command() {
 
-    init {
-        pb.redirectErrorStream(true)
-    }
+    companion object {
+        lateinit var tic: TextInputControl
+        lateinit var progressInd: ProgressIndicator
 
-    fun exec(image: File?, arg: String) {
-        tic.text = ""
-        val sb = StringBuffer("")
-        val arguments = arg.split(' ').toTypedArray()
-        arguments[0] = prefix + arguments[0]
-        pb.command(*arguments)
-        pb.command().add(image?.absolutePath)
-        try {
-            proc = pb.start()
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            ExceptionAlert(ex)
+        init {
+            pb.redirectErrorStream(true)
         }
-        val scan = Scanner(proc.inputStream).useDelimiter("")
-        progressind.isVisible = true
-        thread(true, true) {
-            while (scan.hasNext()) {
-                sb.append(scan.next())
-                val line = sb.toString()
-                Platform.runLater {
-                    tic.text = line
-                }
-            }
-            scan.close()
-            Platform.runLater {
-                progressind.isVisible = false
-            }
-        }
-    }
 
-    fun exec(image: File?, vararg args: String) {
-        tic.text = ""
-        val sb = StringBuffer("")
-        progressind.isVisible = true
-        thread(true, true) {
-            args.forEach {
-                val arguments = it.split(' ').toTypedArray()
-                arguments[0] = prefix + arguments[0]
-                pb.command(*arguments)
-                pb.command().add(image?.absolutePath)
-                try {
-                    proc = pb.start()
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
-                    ExceptionAlert(ex)
-                }
-                val scan = Scanner(proc.inputStream).useDelimiter("")
-                while (scan.hasNext()) {
-                    sb.append(scan.next())
-                    val line = sb.toString()
-                    Platform.runLater {
-                        tic.text = line
+        fun exec(image: File?, vararg args: String) {
+            tic.text = ""
+            progressind.isVisible = true
+            thread(true, true) {
+                args.forEach {
+                    pb.command((prefix + it).split(' ') + image?.absolutePath)
+                    try {
+                        proc = pb.start()
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
+                        ExceptionAlert(ex)
                     }
+                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                    while (scan.hasNext())
+                        Platform.runLater {
+                            tic.appendText(scan.next())
+                        }
+                    scan.close()
+                    proc.waitFor()
                 }
-                scan.close()
-                proc.waitFor()
-            }
-            Platform.runLater {
-                progressind.isVisible = false
+                Platform.runLater {
+                    progressind.isVisible = false
+                }
             }
         }
     }

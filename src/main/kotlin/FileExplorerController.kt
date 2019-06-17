@@ -139,9 +139,9 @@ class FileExplorerController : Initializable {
             dialog.initStyle(StageStyle.UTILITY)
             dialog.isResizable = false
             dialog.title = "Rename"
-            if (item.dir)
-                dialog.contentText = "Folder name:"
-            else dialog.contentText = "File name:"
+            dialog.contentText = if (item.dir)
+                "Folder name:"
+            else "File name:"
             dialog.headerText = null
             dialog.graphic = null
             val result = dialog.showAndWait()

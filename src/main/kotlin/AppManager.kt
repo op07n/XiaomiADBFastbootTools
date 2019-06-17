@@ -21,7 +21,7 @@ class AppManager: Command() {
         lateinit var disablerTableView: TableView<App>
         lateinit var enablerTableView: TableView<App>
         lateinit var progress: ProgressBar
-        lateinit var progressind: ProgressIndicator
+        lateinit var progressInd: ProgressIndicator
         val potentialApps = arrayListOf(
             "Analytics;com.miui.analytics",
             "App Vault;com.miui.personalassistant,com.mi.android.globalpersonalassistant",
@@ -114,16 +114,20 @@ class AppManager: Command() {
             "YouTube;com.google.android.youtube"
         )
 
+        init {
+            pb.redirectErrorStream(false)
+        }
+
         fun createTables() {
             uninstallerTableView.items.clear()
             reinstallerTableView.items.clear()
             disablerTableView.items.clear()
             enablerTableView.items.clear()
-            val uninst = java.util.ArrayList<String>()
-            val reinst = java.util.ArrayList<String>()
-            val disable = java.util.ArrayList<String>()
-            val enable = java.util.ArrayList<String>()
-            val apps = java.util.HashMap<String, String>()
+            val uninst = ArrayList<String>()
+            val reinst = ArrayList<String>()
+            val disable = ArrayList<String>()
+            val enable = ArrayList<String>()
+            val apps = HashMap<String, String>()
             exec("adb shell pm list packages -u --user $user").lines().forEach {
                 apps[it.substringAfter(':')] = "uninstalled"
             }
@@ -181,7 +185,7 @@ class AppManager: Command() {
 
         fun uninstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
             progress.progress = 0.0
-            progressind.isVisible = true
+            progressInd.isVisible = true
             tic.text = ""
             thread(true, true) {
                 selected.forEach {
@@ -209,7 +213,7 @@ class AppManager: Command() {
                 Platform.runLater {
                     tic.appendText("Done!")
                     progress.progress = 0.0
-                    progressind.isVisible = false
+                    progressInd.isVisible = false
                     createTables()
                     func()
                 }
@@ -219,7 +223,7 @@ class AppManager: Command() {
         fun reinstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
             tic.text = ""
             progress.progress = 0.0
-            progressind.isVisible = true
+            progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
@@ -249,7 +253,7 @@ class AppManager: Command() {
                 Platform.runLater {
                     tic.appendText("Done!")
                     progress.progress = 0.0
-                    progressind.isVisible = false
+                    progressInd.isVisible = false
                     createTables()
                     func()
                 }
@@ -259,7 +263,7 @@ class AppManager: Command() {
         fun disable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
             tic.text = ""
             progress.progress = 0.0
-            progressind.isVisible = true
+            progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
@@ -289,7 +293,7 @@ class AppManager: Command() {
                 Platform.runLater {
                     tic.appendText("Done!")
                     progress.progress = 0.0
-                    progressind.isVisible = false
+                    progressInd.isVisible = false
                     createTables()
                     func()
                 }
@@ -299,7 +303,7 @@ class AppManager: Command() {
         fun enable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
             tic.text = ""
             progress.progress = 0.0
-            progressind.isVisible = true
+            progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
@@ -329,15 +333,11 @@ class AppManager: Command() {
                 Platform.runLater {
                     tic.appendText("Done!")
                     progress.progress = 0.0
-                    progressind.isVisible = false
+                    progressInd.isVisible = false
                     createTables()
                     func()
                 }
             }
         }
-    }
-
-    init {
-        pb.redirectErrorStream(false)
     }
 }

@@ -21,10 +21,12 @@ class FileListCell : ListCell<AndroidFile>() {
     @FXML
     private lateinit var time: Label
 
+    private val folderimg = Image("folder.png")
+    private val fileimg = Image("file.png")
+
     init {
         val fxmlLoader = FXMLLoader(javaClass.classLoader.getResource("File.fxml"))
         fxmlLoader.setController(this)
-
         try {
             fxmlLoader.load<Parent>()
         } catch (e: IOException) {
@@ -35,18 +37,16 @@ class FileListCell : ListCell<AndroidFile>() {
 
     override fun updateItem(item: AndroidFile?, empty: Boolean) {
         super.updateItem(item, empty)
-
         if (empty || item == null) {
             text = null
             graphic = null
         } else {
-            if (item.dir)
-                dir.image = Image("folder.png")
-            else dir.image = Image("file.png")
+            dir.image = if (item.dir)
+                folderimg
+            else fileimg
             name.text = item.name
             size.text = item.getSize()
             time.text = item.time
-
             text = null
             graphic = gridPane
         }

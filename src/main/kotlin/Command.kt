@@ -12,6 +12,10 @@ open class Command {
         lateinit var proc: Process
         lateinit var output: String
 
+        init {
+            pb.directory(File(System.getProperty("user.dir")))
+        }
+
         fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
             pb.redirectErrorStream(err)
             output = ""
@@ -56,9 +60,5 @@ open class Command {
             }
             return output
         }
-    }
-
-    init {
-        pb.directory(File(System.getProperty("user.dir")))
     }
 }

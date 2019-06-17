@@ -31,7 +31,7 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     private fun versionToInt(ver: String): Int {
-        val bits = ("$ver.0").split('.')
+        val bits = "$ver.0".split('.')
         return bits[0].toInt() * 100 + bits[1].toInt() * 10 + bits[2].toInt()
     }
 
@@ -84,7 +84,7 @@ class XiaomiADBFastbootTools : Application() {
             } else {
                 val alert = Alert(Alert.AlertType.ERROR)
                 alert.title = "Fatal Error"
-                alert.headerText = "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR where they are!"
+                alert.headerText = "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
                 alert.showAndWait()
                 Platform.exit()
             }

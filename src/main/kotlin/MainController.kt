@@ -257,15 +257,15 @@ class MainController : Initializable {
             AppManager.createTables()
             codenameTextField.text = Device.codename
             if (Device.mode == Mode.ADB) {
-                if (Device.dpi != -1)
-                    dpiTextField.text = Device.dpi.toString()
-                else dpiTextField.text = "ERROR"
-                if (Device.width != -1)
-                    widthTextField.text = Device.width.toString()
-                else widthTextField.text = "ERROR"
-                if (Device.height != -1)
-                    heightTextField.text = Device.height.toString()
-                else heightTextField.text = "ERROR"
+                dpiTextField.text = if (Device.dpi != -1)
+                    Device.dpi.toString()
+                else "ERROR"
+                widthTextField.text = if (Device.width != -1)
+                    Device.width.toString()
+                else "ERROR"
+                heightTextField.text = if (Device.height != -1)
+                    Device.height.toString()
+                else "ERROR"
             }
             outputTextArea.text = "Device found in ADB mode!\n\n"
             if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
@@ -361,13 +361,15 @@ class MainController : Initializable {
         enablerTableView.columns.setAll(encheckTableColumn, enappTableColumn, enpackageTableColumn)
 
         Command.tic = outputTextArea
+        Flasher.tic = outputTextArea
+        Flasher.progressInd = progressIndicator
         flasher = Flasher(outputTextArea, progressIndicator)
         AppManager.uninstallerTableView = uninstallerTableView
         AppManager.reinstallerTableView = reinstallerTableView
         AppManager.disablerTableView = disablerTableView
         AppManager.enablerTableView = enablerTableView
         AppManager.progress = progressBar
-        AppManager.progressind = progressIndicator
+        AppManager.progressInd = progressIndicator
     }
 
     private fun checkCamera2(): Boolean = Command.exec("adb shell getprop persist.camera.HAL3.enabled").contains("1")
@@ -382,9 +384,9 @@ class MainController : Initializable {
                 return
             }
             Command.exec("adb shell setprop persist.camera.HAL3.enabled 0")
-            if (!checkCamera2())
-                outputTextArea.text = "Camera2 disabled!"
-            else outputTextArea.text = "ERROR: Couldn't disable Camera2!"
+            outputTextArea.text = if (!checkCamera2())
+                "Camera2 disabled!"
+            else "ERROR: Couldn't disable Camera2!"
         }
     }
 
@@ -396,9 +398,9 @@ class MainController : Initializable {
                 return
             }
             Command.exec("adb shell setprop persist.camera.HAL3.enabled 1")
-            if (checkCamera2())
-                outputTextArea.text = "Camera2 enabled!"
-            else outputTextArea.text = "ERROR: Couldn't enable Camera2!"
+            outputTextArea.text = if (checkCamera2())
+                "Camera2 enabled!"
+            else "ERROR: Couldn't enable Camera2!"
         }
     }
 
@@ -410,9 +412,9 @@ class MainController : Initializable {
                 return
             }
             Command.exec("adb shell setprop persist.camera.eis.enable 0")
-            if (!checkEIS())
-                outputTextArea.text = "EIS disabled!"
-            else outputTextArea.text = "ERROR: Couldn't disable EIS!"
+            outputTextArea.text = if (!checkEIS())
+                "EIS disabled!"
+            else "ERROR: Couldn't disable EIS!"
         }
     }
 
@@ -424,9 +426,9 @@ class MainController : Initializable {
                 return
             }
             Command.exec("adb shell setprop persist.camera.eis.enable 1")
-            if (checkEIS())
-                outputTextArea.text = "EIS enabled!"
-            else outputTextArea.text = "ERROR: Couldn't enable EIS!"
+            outputTextArea.text = if (checkEIS())
+                "EIS enabled!"
+            else "ERROR: Couldn't enable EIS!"
         }
     }
 
