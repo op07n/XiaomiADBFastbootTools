@@ -1,13 +1,11 @@
 import javafx.application.Platform
 import javafx.scene.control.ProgressBar
-import javafx.scene.control.ProgressIndicator
-import javafx.scene.control.TextInputControl
 import java.io.File
 import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
-class ROMFlasher: Flasher() {
+class ROMFlasher : Flasher() {
 
     companion object {
         lateinit var progress: ProgressBar
@@ -36,7 +34,7 @@ class ROMFlasher: Flasher() {
             output = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread (true, true) {
+            thread(true, true) {
                 val script: File
                 if ("win" in System.getProperty("os.name").toLowerCase()) {
                     script = createScript("$arg.bat")

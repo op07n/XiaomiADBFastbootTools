@@ -10,6 +10,8 @@ import java.util.*
 
 class AppAdderController : Initializable {
 
+    //TODO
+
     @FXML
     private lateinit var appTextArea: TextArea
 

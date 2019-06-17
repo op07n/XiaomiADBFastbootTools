@@ -98,7 +98,7 @@ class FileExplorerController : Initializable {
             dialog.headerText = null
             dialog.graphic = null
             val result = dialog.showAndWait()
-            if (result.isPresent && result.get().trim().isNotEmpty())
+            if (result.isPresent && result.get().isNotBlank())
                 fileExplorer.mkdir(result.get().trim()) {
                     loadList()
                 }
@@ -145,7 +145,7 @@ class FileExplorerController : Initializable {
             dialog.headerText = null
             dialog.graphic = null
             val result = dialog.showAndWait()
-            if (result.isPresent && result.get().trim().isNotEmpty() && result.get().trim() != item.name)
+            if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name)
                 fileExplorer.rename(item, result.get().trim()) {
                     loadList()
                 }

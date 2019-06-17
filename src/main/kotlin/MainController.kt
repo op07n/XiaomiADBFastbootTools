@@ -31,6 +31,8 @@ import kotlin.concurrent.thread
 
 class MainController : Initializable {
 
+    //TODO: Check ERROR mode device
+
     @FXML
     private lateinit var deviceMenu: Menu
     @FXML
@@ -286,7 +288,8 @@ class MainController : Initializable {
             } else {
                 val alert = Alert(AlertType.ERROR)
                 alert.title = "Fatal Error"
-                alert.headerText = "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
+                alert.headerText =
+                    "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
                 alert.showAndWait()
                 Platform.exit()
             }
@@ -551,7 +554,7 @@ class MainController : Initializable {
         if (checkADB()) {
             val attempt =
                 Command.exec_displayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
-            outputTextArea.text =  when {
+            outputTextArea.text = when {
                 "permission" in attempt ->
                     "ERROR: Please allow USB debugging (Security settings)!"
                 "bad" in attempt ->
@@ -702,7 +705,10 @@ class MainController : Initializable {
                                     it,
                                     "flash_all_except_data_storage.sh"
                                 ).exists() -> ROMFlasher.exec("flash_all_except_data_storage")
-                                File(it, "flash_all_except_data.sh").exists() -> ROMFlasher.exec("flash_all_except_data")
+                                File(
+                                    it,
+                                    "flash_all_except_data.sh"
+                                ).exists() -> ROMFlasher.exec("flash_all_except_data")
                                 else -> ROMFlasher.exec("flash_all_except_storage")
                             }
                         }

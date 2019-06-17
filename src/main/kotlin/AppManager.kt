@@ -1,10 +1,8 @@
 import javafx.application.Platform
-import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
-import javafx.scene.control.TextInputControl
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -12,7 +10,9 @@ import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
-class AppManager: Command() {
+class AppManager : Command() {
+
+    //TODO
 
     companion object {
         var user = 0

@@ -1,12 +1,11 @@
 import javafx.application.Platform
 import javafx.scene.control.ProgressIndicator
-import javafx.scene.control.TextInputControl
 import java.io.File
 import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
 
-open class Flasher: Command() {
+open class Flasher : Command() {
 
     companion object {
         lateinit var progressInd: ProgressIndicator

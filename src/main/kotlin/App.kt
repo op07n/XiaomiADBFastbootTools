@@ -5,6 +5,8 @@ import javafx.beans.property.StringProperty
 
 
 class App(name: String, packages: List<String>, checked: Boolean = false) {
+
+    //TODO
     private val appname = SimpleStringProperty()
     private val packagename = SimpleStringProperty()
     private val selected = SimpleBooleanProperty()

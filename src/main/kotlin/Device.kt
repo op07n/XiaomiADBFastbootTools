@@ -9,7 +9,7 @@ class Device {
         var dpi = -1
         var width = -1
         var height = -1
-        var props = HashMap<String,String>()
+        var props = HashMap<String, String>()
 
         var mode = Mode.NONE
         var reinstaller = true
@@ -17,13 +17,15 @@ class Device {
 
         fun readADB(): Boolean {
             val propstring = Command.exec("adb shell getprop")
-            if ("no devices" in props) {
-                mode = Mode.NONE
-                return false
-            }
-            if ("unauthorized" in props) {
-                mode = Mode.AUTH
-                return false
+            when {
+                "no devices" in props -> {
+                    mode = Mode.NONE
+                    return false
+                }
+                "unauthorized" in props -> {
+                    mode = Mode.AUTH
+                    return false
+                }
             }
             mode = if ("recovery" in Command.exec("adb devices"))
                 Mode.RECOVERY
@@ -39,8 +41,8 @@ class Device {
                 mode = Mode.ERROR
                 return false
             }
-            serial = props["ro.serialno"]!!
-            codename = props["ro.build.product"]!!
+            serial = props["ro.serialno"] ?: ""
+            codename = props["ro.build.product"] ?: ""
             bootloader = props["ro.boot.flash.locked"]?.contains("0") ?: false
             camera2 = props["persist.sys.camera.camera2"]?.contains("true") ?: false
             if (mode == Mode.ADB) {
@@ -66,19 +68,20 @@ class Device {
 
         fun readFastboot(): Boolean {
             val status = Command.exec("fastboot devices", err = false)
-            if (status.isEmpty()) {
-                mode = Mode.NONE
-                return false
+            when {
+                status.isEmpty() -> {
+                    mode = Mode.NONE
+                    return false
+                }
+                mode == Mode.FASTBOOT && serial in status -> return true
             }
-            if (mode == Mode.FASTBOOT && serial in status)
-                return true
             props.clear()
             Command.exec("fastboot getvar all").lines().forEach {
                 val parts = it.split(' ', limit = 3)
                 props[parts[1].trimEnd(':')] = parts[2]
             }
-            serial = props["serial"]!!
-            codename = props["product"]!!
+            serial = props["serial"] ?: ""
+            codename = props["product"] ?: ""
             bootloader = props["unlocked"]?.contains("yes") ?: false
             anti = try {
                 props["anti"]!!.toInt()
