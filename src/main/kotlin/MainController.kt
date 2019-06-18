@@ -275,17 +275,21 @@ class MainController : Initializable {
     }
 
     private fun checkADBFastboot() {
-        try {
-            ProcessBuilder("adb", "--version").start()
-            ProcessBuilder("fastboot", "--version").start()
+        //TODO Linux check
+        if (File("adb.exe").exists() && File("fastboot.exe").exists() && File("AdbWinApi.dll").exists() && File("AdbWinUsbApi.dll").exists()) {
+            Command.prefix = System.getProperty("user.dir") + '/'
             Command.exec("adb start-server")
-        } catch (e: Exception) {
-            if ((File("adb").exists() || File("adb.exe").exists()) && (File("fastboot").exists() || File("fastboot.exe").exists())) {
-                Command.prefix = if ("win" in System.getProperty("os.name").toLowerCase())
-                    System.getProperty("user.dir") + '/'
-                else "./"
+            return
+        } else if (File("adb").exists() && File("fastboot").exists()) {
+            Command.prefix = "./"
+            Command.exec("adb start-server")
+            return
+        } else {
+            try {
+                ProcessBuilder("adb", "--version").start()
+                ProcessBuilder("fastboot", "--version").start()
                 Command.exec("adb start-server")
-            } else {
+            } catch (e: Exception) {
                 val alert = Alert(AlertType.ERROR)
                 alert.title = "Fatal Error"
                 alert.headerText =
