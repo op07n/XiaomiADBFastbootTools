@@ -27,11 +27,12 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
             }
         if (bits.size < 8)
             return null
-        var name = ""
-        var cnt = 7
-        while (cnt != bits.size)
-            name += "${bits[cnt++]} "
-        return AndroidFile(bits[0][0] != '-', name.trim(), bits[4].toInt(), "${bits[5]} ${bits[6]}")
+        return AndroidFile(
+            bits[0][0] != '-',
+            bits.drop(7).joinToString(" ").trim(),
+            bits[4].toInt(),
+            "${bits[5]} ${bits[6]}"
+        )
     }
 
     fun navigate(where: String) {

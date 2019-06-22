@@ -6,18 +6,13 @@ import javafx.beans.property.StringProperty
 
 class App(name: String, packages: List<String>, checked: Boolean = false) {
 
-    //TODO
     private val appname = SimpleStringProperty()
     private val packagename = SimpleStringProperty()
     private val selected = SimpleBooleanProperty()
 
     init {
         appname.set(name)
-        var pkgs = ""
-        packages.forEach {
-            pkgs += "$it\n"
-        }
-        packagename.set(pkgs.trim())
+        packagename.set(packages.joinToString("\n").trim())
         selected.set(checked)
     }
 

@@ -10,8 +10,6 @@ import java.util.*
 
 class AppAdderController : Initializable {
 
-    //TODO
-
     @FXML
     private lateinit var appTextArea: TextArea
 
@@ -23,19 +21,16 @@ class AppAdderController : Initializable {
         val fc = FileChooser()
         fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
         fc.title = "Select a text file"
-        val file = fc.showOpenDialog((event.source as Node).scene.window)
-        appTextArea.text = file?.readText()
+        appTextArea.text = fc.showOpenDialog((event.source as Node).scene.window)?.readText()
     }
 
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
-        appTextArea.text?.let {
-            if (it.isNotBlank()) {
-                it.trim().lines().forEach { line ->
-                    AppManager.addApp(line.trim())
-                }
-                AppManager.createTables()
+        if (!appTextArea.text.isNullOrBlank()) {
+            appTextArea.text.trim().lines().forEach {
+                AppManager.addApp(it.trim())
             }
+            AppManager.createTables()
         }
         ((event.source as Node).scene.window as Stage).close()
     }

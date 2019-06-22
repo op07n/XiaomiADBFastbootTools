@@ -9,7 +9,7 @@ class ROMFlasher : Flasher() {
 
     companion object {
         lateinit var progress: ProgressBar
-        lateinit var directory: File
+        var directory: File? = null
 
         init {
             pb.directory(directory)

@@ -19,9 +19,8 @@ open class Flasher : Command() {
             progressInd.isVisible = true
             thread(true, true) {
                 args.forEach {
-                    pb.command((prefix + it).split(' ') + image?.absolutePath)
                     try {
-                        proc = pb.start()
+                        proc = pb.command((prefix + it).split(' ') + image?.absolutePath).start()
                     } catch (ex: IOException) {
                         ex.printStackTrace()
                         ExceptionAlert(ex)

@@ -12,8 +12,6 @@ import kotlin.concurrent.thread
 
 class AppManager : Command() {
 
-    //TODO
-
     companion object {
         var user = 0
         lateinit var uninstallerTableView: TableView<App>
@@ -190,15 +188,14 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
-                        pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' '))
                         try {
-                            proc = pb.start()
+                            proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {
                             ex.printStackTrace()
                             ExceptionAlert(ex)
                         }
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         output = ""
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNext())
                             output += scan.next()
                         scan.close()
@@ -227,15 +224,16 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
-                        pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
                         try {
-                            proc = pb.start()
+                            proc =
+                                pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
+                                    .start()
                         } catch (ex: IOException) {
                             ex.printStackTrace()
                             ExceptionAlert(ex)
                         }
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         output = ""
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNext())
                             output += scan.next()
                         scan.close()
@@ -267,15 +265,14 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
-                        pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' '))
                         try {
-                            proc = pb.start()
+                            proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {
                             ex.printStackTrace()
                             ExceptionAlert(ex)
                         }
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         output = ""
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNext())
                             output += scan.next()
                         scan.close()
@@ -307,15 +304,14 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().lines().forEach { pkg ->
-                        pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' '))
                         try {
-                            proc = pb.start()
+                            proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {
                             ex.printStackTrace()
                             ExceptionAlert(ex)
                         }
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         output = ""
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNext())
                             output += scan.next()
                         scan.close()

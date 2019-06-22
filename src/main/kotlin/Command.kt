@@ -5,26 +5,35 @@ import java.util.*
 
 open class Command {
 
-    //TODO
-
     companion object {
         var pb: ProcessBuilder = ProcessBuilder()
         var prefix = ""
+        var output = ""
         lateinit var tic: TextInputControl
         lateinit var proc: Process
-        lateinit var output: String
 
         init {
             pb.directory(File(System.getProperty("user.dir")))
+        }
+
+        fun setup(pref: String): Boolean {
+            prefix = pref
+            return try {
+                pb.command("${prefix}adb", "--version").start()
+                pb.command("${prefix}fastboot", "--version").start()
+                pb.command("${prefix}adb", "start-server").start()
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
 
         fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
             pb.redirectErrorStream(err)
             output = ""
             args.forEach {
-                pb.command((prefix + it).split(' ', limit = lim))
                 try {
-                    proc = pb.start()
+                    proc = pb.command((prefix + it).split(' ', limit = lim)).start()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                     ExceptionAlert(ex)
@@ -43,9 +52,8 @@ open class Command {
             output = ""
             tic.text = ""
             args.forEach {
-                pb.command((prefix + it).split(' ', limit = lim))
                 try {
-                    proc = pb.start()
+                    proc = pb.command((prefix + it).split(' ', limit = lim)).start()
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                     ExceptionAlert(ex)

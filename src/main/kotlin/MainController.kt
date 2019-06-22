@@ -31,8 +31,6 @@ import kotlin.concurrent.thread
 
 class MainController : Initializable {
 
-    //TODO: Check ERROR mode device
-
     @FXML
     private lateinit var deviceMenu: Menu
     @FXML
@@ -131,7 +129,9 @@ class MainController : Initializable {
     private val version = "6.5"
 
     private var image: File? = null
-    private var rom: File? = null
+
+    private val win = "win" in System.getProperty("os.name").toLowerCase()
+    private val linux = "linux" in System.getProperty("os.name").toLowerCase()
 
     companion object {
         lateinit var thread: Thread
@@ -263,7 +263,7 @@ class MainController : Initializable {
             vb.alignment = Pos.CENTER
             val download = Hyperlink("Download")
             download.onAction = EventHandler {
-                if ("linux" in System.getProperty("os.name").toLowerCase())
+                if (linux)
                     Runtime.getRuntime().exec("xdg-open $link")
                 else Desktop.getDesktop().browse(URI(link))
             }
@@ -275,29 +275,21 @@ class MainController : Initializable {
     }
 
     private fun checkADBFastboot() {
-        //TODO Linux check
-        if (File("adb.exe").exists() && File("fastboot.exe").exists() && File("AdbWinApi.dll").exists() && File("AdbWinUsbApi.dll").exists()) {
-            Command.prefix = System.getProperty("user.dir") + '/'
-            Command.exec("adb start-server")
-            return
-        } else if (File("adb").exists() && File("fastboot").exists()) {
-            Command.prefix = "./"
-            Command.exec("adb start-server")
-            return
+        if (win) {
+            if (Command.setup(System.getProperty("user.dir") + "/bin/")) return
+            if (Command.setup(System.getProperty("user.dir") + '/')) return
+            if (Command.setup("")) return
         } else {
-            try {
-                ProcessBuilder("adb", "--version").start()
-                ProcessBuilder("fastboot", "--version").start()
-                Command.exec("adb start-server")
-            } catch (e: Exception) {
-                val alert = Alert(AlertType.ERROR)
-                alert.title = "Fatal Error"
-                alert.headerText =
-                    "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
-                alert.showAndWait()
-                Platform.exit()
-            }
+            if (Command.setup("./bin/")) return
+            if (Command.setup("./")) return
+            if (Command.setup("")) return
         }
+        val alert = Alert(AlertType.ERROR)
+        alert.title = "Fatal Error"
+        alert.headerText =
+            "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
+        alert.showAndWait()
+        Platform.exit()
     }
 
     private fun checkADB(): Boolean {
@@ -349,6 +341,10 @@ class MainController : Initializable {
             }
             Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
                 outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
+                setUI()
+            }
+            Device.mode == Mode.ERROR && "ERROR" !in outputTextArea.text -> {
+                outputTextArea.text = "ERROR! ADB cannot read the device!"
                 setUI()
             }
         }
@@ -597,8 +593,6 @@ class MainController : Initializable {
         }
     }
 
-    //TODO
-
     @FXML
     private fun savePropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
@@ -660,7 +654,7 @@ class MainController : Initializable {
     private fun flashimageButtonPressed(event: ActionEvent) {
         image?.let {
             partitionComboBox.value?.let { pcb ->
-                if (it.absolutePath.isNotEmpty() && pcb.isBlank() && checkFastboot()) {
+                if (it.absolutePath.isNotBlank() && pcb.isNotBlank() && checkFastboot()) {
                     confirm {
                         if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
                             Flasher.exec(it, "fastboot flash ${pcb.trim()}", "fastboot boot")
@@ -677,8 +671,8 @@ class MainController : Initializable {
         dc.title = "Select the root directory of a Fastboot ROM"
         outputTextArea.text = ""
         romLabel.text = "-"
-        rom = dc.showDialog((event.source as Node).scene.window)
-        rom?.let {
+        ROMFlasher.directory = dc.showDialog((event.source as Node).scene.window)
+        ROMFlasher.directory?.let {
             if (File(it, "images").exists()) {
                 romLabel.text = it.name
                 outputTextArea.text = "Fastboot ROM found!"
@@ -689,14 +683,14 @@ class MainController : Initializable {
                 File(it, "flash_all_except_data_storage.sh").setExecutable(true, false)
             } else {
                 outputTextArea.text = "ERROR: Fastboot ROM not found!"
-                rom = null
+                ROMFlasher.directory = null
             }
         }
     }
 
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
-        rom?.let {
+        ROMFlasher.directory?.let {
             scriptComboBox.value?.let { scb ->
                 if (checkFastboot())
                     confirm {
@@ -724,7 +718,7 @@ class MainController : Initializable {
     @FXML
     private fun bootButtonPressed(event: ActionEvent) {
         image?.let {
-            if (it.absolutePath.isNotEmpty() && checkFastboot())
+            if (it.absolutePath.isNotBlank() && checkFastboot())
                 Flasher.exec(it, "fastboot boot")
         }
     }
@@ -756,9 +750,7 @@ class MainController : Initializable {
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             confirm("Your partitions must be intact in order to successfully lock the bootloader.\nAre you sure you want to proceed?") {
-                Command.exec_displayed(
-                    "fastboot oem lock"
-                )
+                Command.exec_displayed("fastboot oem lock")
             }
     }
 
@@ -848,7 +840,7 @@ class MainController : Initializable {
                     if ("bigota" in link) {
                         versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                         outputTextArea.appendText("\n\nStarting download in browser...")
-                        if ("linux" in System.getProperty("os.name").toLowerCase())
+                        if (linux)
                             Runtime.getRuntime().exec("xdg-open $link")
                         else Desktop.getDesktop().browse(URI(link))
                     } else {
@@ -1021,7 +1013,6 @@ class MainController : Initializable {
         if (checkADB()) {
             val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml")).load<Parent>())
             val stage = Stage()
-            stage.scene = scene
             stage.initModality(Modality.APPLICATION_MODAL)
             stage.scene = scene
             stage.isResizable = false
@@ -1031,7 +1022,6 @@ class MainController : Initializable {
 
     @FXML
     private fun aboutMenuItemPressed(event: ActionEvent) {
-        val linux = "linux" in System.getProperty("os.name").toLowerCase()
         val alert = Alert(AlertType.INFORMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.title = "About"
