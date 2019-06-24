@@ -760,46 +760,66 @@ class MainController : Initializable {
             Command.exec_displayed("fastboot oem unlock")
     }
 
+    private fun getLink(version: String, codename: String): String? {
+        fun getLocation(codename: String, ending: String, branch: Char, region: String): String? {
+            val huc =
+                URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=$branch&r=$region&n=").openConnection() as HttpURLConnection
+            huc.requestMethod = "GET"
+            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+            huc.instanceFollowRedirects = false
+            try {
+                huc.connect()
+                huc.disconnect()
+            } catch (e: IOException) {
+                return null
+            }
+            return huc.getHeaderField("Location")
+        }
+        when (version) {
+            "Global Stable" ->
+                return getLocation(codename, "_global", 'F', "global")
+            "Global Developer" ->
+                return getLocation(codename, "_global", 'X', "global")
+            "China Stable" ->
+                return getLocation(codename, "", 'F', "cn")
+            "China Developer" ->
+                return getLocation(codename, "", 'X', "cn")
+            "EEA Stable" ->
+                return getLocation(codename, "_eea_global", 'F', "eea")
+            "Russia Stable" -> {
+                var link: String? = null
+                for (region in arrayOf("ru", "global")) {
+                    link = getLocation(codename, "_ru_global", 'F', region)
+                    if (link != null && "bigota" in link)
+                        return link
+                }
+                return link
+            }
+            else -> {
+                var link: String? = null
+                for (region in arrayOf("in", "global"))
+                    for (ending in arrayOf("_in_global", "_india_global", "_global")) {
+                        link = getLocation(codename, "_ru_global", 'F', region)
+                        if (link != null && "bigota" in link)
+                            return link
+                    }
+                return link
+            }
+        }
+    }
+
     @FXML
     private fun getlinkButtonPressed(event: ActionEvent) {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
-                val codename = codenameTextField.text.trim()
-                val huc = when (it) {
-                    "Global Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-                    "Global Developer" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-                    "China Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-                    "China Developer" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
-                    "EEA Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
-                    "Russia Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
-                    "India Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
-                    else -> URL("http://google.com")
-                }.openConnection() as HttpURLConnection
-                huc.requestMethod = "GET"
-                huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-                huc.instanceFollowRedirects = false
-                try {
-                    huc.connect()
-                    huc.disconnect()
-                } catch (e: IOException) {
-                    return
-                }
-                huc.getHeaderField("Location")?.let { link ->
-                    if ("bigota" in link) {
-                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                        outputTextArea.appendText("\n\n$link\n\nLink copied to clipboard!")
-                        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
-                    } else {
-                        versionLabel.text = "-"
-                        outputTextArea.appendText("\n\nLink not found!")
-                    }
+                val link = getLink(it, codenameTextField.text.trim())
+                if (link != null && "bigota" in link) {
+                    versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                    outputTextArea.appendText("\n\n$link\n\nLink copied to clipboard!")
+                    Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
+                } else {
+                    versionLabel.text = "-"
+                    outputTextArea.appendText("\n\nLink not found!")
                 }
             }
         }
@@ -809,44 +829,16 @@ class MainController : Initializable {
     private fun downloadromButtonPressed(event: ActionEvent) {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
-                val codename = codenameTextField.text.trim()
-                val huc = when (it) {
-                    "Global Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=F&r=global&n=")
-                    "Global Developer" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_global&b=X&r=global&n=")
-                    "China Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=F&r=cn&n=")
-                    "China Developer" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}&b=X&r=cn&n=")
-                    "EEA Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_eea_global&b=F&r=eea&n=")
-                    "Russia Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_ru_global&b=F&r=global&n=")
-                    "India Stable" ->
-                        URL("http://update.miui.com/updates/v1/fullromdownload.php?d=${codename}_india_global&b=F&r=global&n=")
-                    else -> URL("http://google.com")
-                }.openConnection() as HttpURLConnection
-                huc.requestMethod = "GET"
-                huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-                huc.instanceFollowRedirects = false
-                try {
-                    huc.connect()
-                    huc.disconnect()
-                } catch (e: IOException) {
-                    return
-                }
-                huc.getHeaderField("Location")?.let { link ->
-                    if ("bigota" in link) {
-                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                        outputTextArea.appendText("\n\nStarting download in browser...")
-                        if (linux)
-                            Runtime.getRuntime().exec("xdg-open $link")
-                        else Desktop.getDesktop().browse(URI(link))
-                    } else {
-                        versionLabel.text = "-"
-                        outputTextArea.appendText("\n\nLink not found!")
-                    }
+                val link = getLink(it, codenameTextField.text.trim())
+                if (link != null && "bigota" in link) {
+                    versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                    outputTextArea.appendText("\n\nStarting download in browser...")
+                    if (linux)
+                        Runtime.getRuntime().exec("xdg-open $link")
+                    else Desktop.getDesktop().browse(URI(link))
+                } else {
+                    versionLabel.text = "-"
+                    outputTextArea.appendText("\n\nLink not found!")
                 }
             }
         }

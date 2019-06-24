@@ -20,19 +20,34 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     private fun makeFile(out: String): AndroidFile? {
         val bits = ArrayList<String>()
         for (bit in out.split(' '))
-            if (bit.isNotEmpty()) {
+            if (bit.isNotBlank()) {
                 if (bit == "->")
                     break
                 bits.add(bit)
             }
-        if (bits.size < 8)
-            return null
-        return AndroidFile(
-            bits[0][0] != '-',
-            bits.drop(7).joinToString(" ").trim(),
-            bits[4].toInt(),
-            "${bits[5]} ${bits[6]}"
-        )
+        return when {
+            bits.size < 6 -> null
+            bits[5].length == 10 && bits[6].length == 5 -> AndroidFile(
+                bits[0][0] != '-',
+                bits.drop(7).joinToString(" ").trim(),
+                bits[4].toInt(),
+                "${bits[5]} ${bits[6]}"
+            )
+            bits[4].length == 10 && bits[5].length == 5 -> AndroidFile(
+                bits[0][0] != '-',
+                bits.drop(6).joinToString(" ").trim(),
+                bits[3].toInt(),
+                "${bits[4]} ${bits[5]}"
+            )
+            bits[3].length == 10 && bits[4].length == 5 -> AndroidFile(
+                bits[0][0] != '-',
+                bits.drop(5).joinToString(" ").trim(),
+                0,
+                "${bits[3]} ${bits[4]}"
+            )
+            else -> null
+        }
+
     }
 
     fun navigate(where: String) {
