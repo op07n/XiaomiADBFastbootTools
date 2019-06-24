@@ -38,9 +38,9 @@ open class Command {
                     ex.printStackTrace()
                     ExceptionAlert(ex)
                 }
-                val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                while (scan.hasNext())
-                    output += scan.next()
+                val scan = Scanner(proc.inputStream, "UTF-8")
+                while (scan.hasNextLine())
+                    output += scan.nextLine()
                 scan.close()
                 proc.waitFor()
             }
@@ -58,10 +58,10 @@ open class Command {
                     ex.printStackTrace()
                     ExceptionAlert(ex)
                 }
-                val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                val scan = Scanner(proc.inputStream, "UTF-8")
                 var next: String
-                while (scan.hasNext()) {
-                    next = scan.next()
+                while (scan.hasNextLine()) {
+                    next = scan.nextLine()
                     output += next
                     tic.appendText(next)
                 }

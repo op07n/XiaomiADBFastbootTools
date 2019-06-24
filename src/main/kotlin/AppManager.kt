@@ -195,9 +195,9 @@ class AppManager : Command() {
                             ExceptionAlert(ex)
                         }
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                        while (scan.hasNext())
-                            output += scan.next()
+                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        while (scan.hasNextLine())
+                            output += scan.nextLine()
                         scan.close()
                         Platform.runLater {
                             tic.appendText("App: ${it.appnameProperty().get()}\n")
@@ -233,9 +233,9 @@ class AppManager : Command() {
                             ExceptionAlert(ex)
                         }
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                        while (scan.hasNext())
-                            output += scan.next()
+                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        while (scan.hasNextLine())
+                            output += scan.nextLine()
                         scan.close()
                         output = if ("installed for user" in output)
                             "Success\n"
@@ -272,9 +272,9 @@ class AppManager : Command() {
                             ExceptionAlert(ex)
                         }
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                        while (scan.hasNext())
-                            output += scan.next()
+                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        while (scan.hasNextLine())
+                            output += scan.nextLine()
                         scan.close()
                         output = if ("disabled-user" in output)
                             "Success\n"
@@ -311,9 +311,9 @@ class AppManager : Command() {
                             ExceptionAlert(ex)
                         }
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                        while (scan.hasNext())
-                            output += scan.next()
+                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        while (scan.hasNextLine())
+                            output += scan.nextLine()
                         scan.close()
                         output = if ("enabled" in output)
                             "Success\n"

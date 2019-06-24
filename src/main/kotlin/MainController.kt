@@ -331,23 +331,20 @@ class MainController : Initializable {
                 outputTextArea.text = "Device found in ADB mode!\n\n"
                 if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
                     outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.")
-                setUI()
             }
             Device.readFastboot() -> {
                 progressIndicator.isVisible = false
                 codenameTextField.text = Device.codename
                 outputTextArea.text = "Device found in Fastboot mode!"
-                setUI()
             }
             Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
                 outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
-                setUI()
             }
             (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "ERROR" !in outputTextArea.text -> {
                 outputTextArea.text = "ERROR! The device cannot be loaded!"
-                setUI()
             }
         }
+        setUI()
     }
 
     private fun checkDevice() {
@@ -382,11 +379,6 @@ class MainController : Initializable {
     override fun initialize(url: URL, rb: ResourceBundle?) {
         outputTextArea.text = "Looking for devices..."
         progressIndicator.isVisible = true
-        thread(true) {
-            checkADBFastboot()
-            checkVersion()
-            checkDevice()
-        }
         partitionComboBox.items.addAll(
             "boot", "cust", "modem", "persist", "recovery", "system"
         )
@@ -437,6 +429,12 @@ class MainController : Initializable {
         AppManager.enablerTableView = enablerTableView
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
+
+        thread(true) {
+            checkADBFastboot()
+            checkVersion()
+            checkDevice()
+        }
     }
 
     private fun checkCamera2(): Boolean = "1" in Command.exec("adb shell getprop persist.camera.HAL3.enabled")
@@ -1019,7 +1017,8 @@ class MainController : Initializable {
         alert.title = "About"
         alert.graphic = ImageView("icon.png")
         alert.headerText =
-            "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU"
+            "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU\n\n" +
+                    "ADB/Fastboot\n${Command.exec("adb --version").lines()[1]}"
         val vb = VBox()
         vb.alignment = Pos.CENTER
         val discord = Hyperlink("Xiaomi Community on Discord")

@@ -18,12 +18,12 @@ class Device {
         fun readADB(): Boolean {
             val propstring = Command.exec("adb shell getprop")
             when {
-                "no devices" in props -> {
+                "no devices" in propstring -> {
                     if (mode != Mode.FASTBOOT && mode != Mode.FB_ERROR)
                         mode = Mode.NONE
                     return false
                 }
-                "unauthorized" in props -> {
+                "unauthorized" in propstring -> {
                     mode = Mode.AUTH
                     return false
                 }
