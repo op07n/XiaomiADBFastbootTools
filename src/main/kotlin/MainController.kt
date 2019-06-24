@@ -343,8 +343,8 @@ class MainController : Initializable {
                 outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
                 setUI()
             }
-            Device.mode == Mode.ERROR && "ERROR" !in outputTextArea.text -> {
-                outputTextArea.text = "ERROR! ADB cannot read the device!"
+            (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "ERROR" !in outputTextArea.text -> {
+                outputTextArea.text = "ERROR! The device cannot be loaded!"
                 setUI()
             }
         }
@@ -928,7 +928,7 @@ class MainController : Initializable {
                 uninstallerTableView.items.forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
-                        n += it.packagenameProperty().get().lines().size
+                        n += it.packagenameProperty().get().trim().lines().size
                     }
                 }
                 AppManager.uninstall(selected, n) {
@@ -946,7 +946,7 @@ class MainController : Initializable {
             reinstallerTableView.items.forEach {
                 if (it.selectedProperty().get()) {
                     selected.add(it)
-                    n += it.packagenameProperty().get().lines().size
+                    n += it.packagenameProperty().get().trim().lines().size
                 }
             }
             AppManager.reinstall(selected, n) {
@@ -965,7 +965,7 @@ class MainController : Initializable {
                 disablerTableView.items.forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
-                        n += it.packagenameProperty().get().lines().size
+                        n += it.packagenameProperty().get().trim().lines().size
                     }
                 }
                 AppManager.disable(selected, n) {
@@ -983,7 +983,7 @@ class MainController : Initializable {
             enablerTableView.items.forEach {
                 if (it.selectedProperty().get()) {
                     selected.add(it)
-                    n += it.packagenameProperty().get().lines().size
+                    n += it.packagenameProperty().get().trim().lines().size
                 }
             }
             AppManager.enable(selected, n) {

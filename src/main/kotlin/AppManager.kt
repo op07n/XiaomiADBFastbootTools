@@ -126,13 +126,13 @@ class AppManager : Command() {
             val disable = ArrayList<String>()
             val enable = ArrayList<String>()
             val apps = HashMap<String, String>()
-            exec("adb shell pm list packages -u --user $user").lines().forEach {
+            exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
                 apps[it.substringAfter(':')] = "uninstalled"
             }
-            exec("adb shell pm list packages -d --user $user").lines().forEach {
+            exec("adb shell pm list packages -d --user $user").trim().lines().forEach {
                 apps[it.substringAfter(':')] = "disabled"
             }
-            exec("adb shell pm list packages -e --user $user").lines().forEach {
+            exec("adb shell pm list packages -e --user $user").trim().lines().forEach {
                 apps[it.substringAfter(':')] = "enabled"
             }
             potentialApps.forEach {
@@ -187,7 +187,7 @@ class AppManager : Command() {
             tic.text = ""
             thread(true, true) {
                 selected.forEach {
-                    it.packagenameProperty().get().lines().forEach { pkg ->
+                    it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         try {
                             proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {
@@ -223,7 +223,7 @@ class AppManager : Command() {
             progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
-                    it.packagenameProperty().get().lines().forEach { pkg ->
+                    it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         try {
                             proc =
                                 pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
@@ -264,7 +264,7 @@ class AppManager : Command() {
             progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
-                    it.packagenameProperty().get().lines().forEach { pkg ->
+                    it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         try {
                             proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {
@@ -303,7 +303,7 @@ class AppManager : Command() {
             progressInd.isVisible = true
             thread(true, true) {
                 selected.forEach {
-                    it.packagenameProperty().get().lines().forEach { pkg ->
+                    it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         try {
                             proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
                         } catch (ex: IOException) {

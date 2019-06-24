@@ -19,7 +19,8 @@ class Device {
             val propstring = Command.exec("adb shell getprop")
             when {
                 "no devices" in props -> {
-                    mode = Mode.NONE
+                    if (mode != Mode.FASTBOOT && mode != Mode.FB_ERROR)
+                        mode = Mode.NONE
                     return false
                 }
                 "unauthorized" in props -> {
@@ -33,12 +34,12 @@ class Device {
             if (mode == Mode.ADB && serial in propstring && dpi != -1 && width != -1 && height != -1)
                 return true
             props.clear()
-            propstring.lines().forEach {
+            propstring.trim().lines().forEach {
                 val parts = it.split("]: [")
                 props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
             }
-            if (props["ro.serialno"].isNullOrEmpty() || props["ro.product.build"].isNullOrEmpty()) {
-                mode = Mode.ERROR
+            if (props["ro.serialno"].isNullOrEmpty() || props["ro.build.product"].isNullOrEmpty()) {
+                mode = Mode.ADB_ERROR
                 return false
             }
             serial = props["ro.serialno"] ?: ""
@@ -70,15 +71,20 @@ class Device {
             val status = Command.exec("fastboot devices", err = false)
             when {
                 status.isEmpty() -> {
-                    mode = Mode.NONE
+                    if (mode == Mode.FASTBOOT || mode == Mode.FB_ERROR)
+                        mode = Mode.NONE
                     return false
                 }
                 mode == Mode.FASTBOOT && serial in status -> return true
             }
             props.clear()
-            Command.exec("fastboot getvar all").lines().forEach {
+            Command.exec("fastboot getvar all").trim().lines().forEach {
                 val parts = it.split(' ', limit = 3)
                 props[parts[1].trimEnd(':')] = parts[2]
+            }
+            if (props["serial"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
+                mode = Mode.FB_ERROR
+                return false
             }
             serial = props["serial"] ?: ""
             codename = props["product"] ?: ""
