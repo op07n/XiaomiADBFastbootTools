@@ -79,9 +79,8 @@ class Device {
             }
             props.clear()
             Command.exec("fastboot getvar all").trim().lines().forEach {
-                if (it[0] == '(') {
+                if (it[0] == '(')
                     props[it.substringAfter(' ').substringBeforeLast(':')] = it.substringAfterLast(':').trim()
-                }
             }
             if (props["serialno"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
                 mode = Mode.FB_ERROR

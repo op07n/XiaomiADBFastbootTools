@@ -10,12 +10,10 @@ open class Command {
         var output = ""
         lateinit var tic: TextInputControl
         lateinit var proc: Process
-
-        init {
-            pb.directory(File(System.getProperty("user.dir")))
-        }
+        private val userdir = File(System.getProperty("user.dir"))
 
         fun setup(pref: String): Boolean {
+            pb.directory(userdir)
             prefix = pref
             return try {
                 pb.command("${prefix}adb", "--version").start()
@@ -28,6 +26,7 @@ open class Command {
         }
 
         fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
+            pb.directory(userdir)
             pb.redirectErrorStream(err)
             output = ""
             args.forEach {
@@ -42,6 +41,7 @@ open class Command {
         }
 
         fun exec_displayed(vararg args: String, lim: Int = 0, err: Boolean = true): String {
+            pb.directory(userdir)
             pb.redirectErrorStream(err)
             output = ""
             tic.text = ""
