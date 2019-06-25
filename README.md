@@ -1,4 +1,4 @@
-# Xiaomi ADB/Fastboot Tools
+# Xiaomi ADB/Fastboot Tools :blush:
 
 ![](https://img.shields.io/github/downloads/Saki-EU/XiaomiADBFastbootTools/total.svg)
 ![](https://img.shields.io/github/license/Saki-EU/XiaomiADBFastbootTools.svg)
@@ -20,7 +20,19 @@
 
 ![](screenshot.png)
 
-## Download the executable JAR from [here](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest).
+## Downloads
+
+```
+COMING SOON!
+There are two kinds of downloads:
+
+* Executable JAR
+* OS-specific ZIP (JAR + ADB + Fastboot)
+
+If you have ADB and Fastboot installed system-wide, download the JAR. In case you don't, download the OS-specific ZIP that includes them.
+```
+
+### [Downloads](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest)
 
 **Warning: Use the program at your own risk!**
 
@@ -35,7 +47,8 @@
 
 2. Enable USB debugging in Android.
 
-    * MIUI: Go to Settings > Additional settings > Developer options and enable USB debugging as well as USB debugging (Security settings).
+    * MIUI: Go to Settings > Additional settings > Developer options and enable USB debugging.
+        * In order to use the Screen density and Screen resolution modules, enable USB debugging (Security settings) as well.
     * Android One: Go to Settings > System > Developer options and enable USB debugging.
 
 3. Connect your device to the computer and launch the application. The device is going to ask for authorisation, which you'll have to allow.
@@ -56,7 +69,9 @@
 
 **The application doesn't work. Is there anything I should have installed?**
 
-Yes, it was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run, version 1.8.171 or later. You can install the latest JRE from [here](https://java.com/en/download/).
+Yes, the Xiaomi ADB/Fastboot Tools was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run, version 1.8.171 or later. You can install the latest Oracle JRE from [here](https://java.com/en/download/).
+
+The application also relies on ADB and Fastboot. In case you don't have them installed system-wide, simply download the bundled version.
 
 **The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
