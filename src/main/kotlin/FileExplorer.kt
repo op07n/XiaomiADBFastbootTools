@@ -12,10 +12,6 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     var path = "/"
 
-    init {
-        pb.redirectErrorStream(false)
-    }
-
     private fun makeFile(out: String): AndroidFile? {
         val bits = ArrayList<String>()
         for (bit in out.split(' '))
@@ -71,6 +67,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     private fun format(pathname: String): String = "'$pathname'"
 
     private fun init(command: String = "adb") {
+        pb.redirectErrorStream(false)
         status.text = ""
         proc = pb.start()
         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
@@ -153,7 +150,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
-        thread(true, true) {
+        thread(true) {
             pb.command("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             init("mv")
             Platform.runLater {

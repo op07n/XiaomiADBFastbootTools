@@ -9,21 +9,21 @@ open class Flasher : Command() {
     companion object {
         lateinit var progressInd: ProgressIndicator
 
-        init {
-            pb.redirectErrorStream(true)
-        }
-
         fun exec(image: File?, vararg args: String) {
-            tic.text = ""
+            pb.redirectErrorStream(true)
+            output = ""
             progressInd.isVisible = true
-            thread(true, true) {
+            thread(true) {
                 args.forEach {
                     proc = pb.command((prefix + it).split(' ') + image?.absolutePath).start()
                     val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    while (scan.hasNext())
+                    while (scan.hasNext()) {
+                        output += scan.next()
                         Platform.runLater {
-                            tic.appendText(scan.next())
+                            tic.text = output
+                            tic.appendText("")
                         }
+                    }
                     scan.close()
                     proc.waitFor()
                 }

@@ -214,10 +214,8 @@ class MainController : Initializable {
                 if (Device.bootloader)
                     infoTextArea.appendText("unlocked\n")
                 else infoTextArea.appendText("locked\n")
-                infoTextArea.appendText("Camera2:\t\t\t")
                 if (Device.camera2)
-                    infoTextArea.appendText("enabled")
-                else infoTextArea.appendText("unknown")
+                    infoTextArea.appendText("Camera2:\t\t\tenabled")
             }
             Mode.FASTBOOT -> {
                 infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
@@ -226,7 +224,7 @@ class MainController : Initializable {
                 if (Device.bootloader)
                     infoTextArea.appendText("unlocked")
                 else infoTextArea.appendText("locked")
-                if (Device.anti != 0)
+                if (Device.anti != -1)
                     infoTextArea.appendText("\nAnti version:\t\t${Device.anti}")
             }
             else -> infoTextArea.text = ""

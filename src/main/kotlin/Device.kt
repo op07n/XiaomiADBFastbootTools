@@ -79,14 +79,15 @@ class Device {
             }
             props.clear()
             Command.exec("fastboot getvar all").trim().lines().forEach {
-                val parts = it.split(' ', limit = 3)
-                props[parts[1].trimEnd(':')] = parts[2]
+                if (it[0] == '(') {
+                    props[it.substringAfter(' ').substringBeforeLast(':')] = it.substringAfterLast(':').trim()
+                }
             }
-            if (props["serial"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
+            if (props["serialno"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
                 mode = Mode.FB_ERROR
                 return false
             }
-            serial = props["serial"] ?: ""
+            serial = props["serialno"] ?: ""
             codename = props["product"] ?: ""
             bootloader = props["unlocked"]?.contains("yes") ?: false
             anti = try {

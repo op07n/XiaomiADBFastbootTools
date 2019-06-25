@@ -11,11 +11,6 @@ class ROMFlasher : Flasher() {
         lateinit var progress: ProgressBar
         var directory: File? = null
 
-        init {
-            pb.directory(directory)
-            pb.redirectErrorStream(true)
-        }
-
         private fun getCmdCount(file: File): Int = file.readText().split("fastboot").size - 1
 
         private fun createScript(arg: String): File {
@@ -31,10 +26,12 @@ class ROMFlasher : Flasher() {
         }
 
         fun exec(arg: String) {
+            pb.directory(directory)
+            pb.redirectErrorStream(true)
             output = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true, true) {
+            thread(true) {
                 val script: File
                 if ("win" in System.getProperty("os.name").toLowerCase()) {
                     script = createScript("$arg.bat")
@@ -46,14 +43,13 @@ class ROMFlasher : Flasher() {
                 val n = getCmdCount(script)
                 proc = pb.start()
                 val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                var next: String
                 while (scan.hasNext()) {
-                    next = scan.next()
-                    output += next
+                    output += scan.next()
                     if ("pause" in output)
                         break
                     Platform.runLater {
-                        tic.appendText(next)
+                        tic.text = output
+                        tic.appendText("")
                         progress.progress = 1.0 * (output.toLowerCase().split("finished.").size - 1) / n
                     }
                 }

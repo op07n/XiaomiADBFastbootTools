@@ -111,10 +111,6 @@ class AppManager : Command() {
             "YouTube;com.google.android.youtube"
         )
 
-        init {
-            pb.redirectErrorStream(false)
-        }
-
         fun createTables() {
             uninstallerTableView.items.clear()
             reinstallerTableView.items.clear()
@@ -181,10 +177,11 @@ class AppManager : Command() {
         }
 
         fun uninstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+            pb.redirectErrorStream(false)
+            tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            tic.text = ""
-            thread(true, true) {
+            thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
@@ -212,10 +209,11 @@ class AppManager : Command() {
         }
 
         fun reinstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+            pb.redirectErrorStream(false)
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true, true) {
+            thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc =
@@ -248,10 +246,11 @@ class AppManager : Command() {
         }
 
         fun disable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+            pb.redirectErrorStream(false)
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true, true) {
+            thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
@@ -282,10 +281,11 @@ class AppManager : Command() {
         }
 
         fun enable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+            pb.redirectErrorStream(false)
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true, true) {
+            thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
