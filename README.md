@@ -24,7 +24,7 @@
 
 ```
 COMING SOON!
-There are two kinds of downloads:
+The Xiaomi ADB/Fastboot Tools is available in two releases:
 
 * Executable JAR
 * OS-specific ZIP (JAR + ADB + Fastboot)
@@ -32,7 +32,7 @@ There are two kinds of downloads:
 If you have ADB and Fastboot installed system-wide, download the JAR, otherwise download the OS-specific ZIP that includes them.
 ```
 
-### [Downloads](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest)
+### [Latest releases](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest)
 
 **Warning: Use the program at your own risk!**
 
