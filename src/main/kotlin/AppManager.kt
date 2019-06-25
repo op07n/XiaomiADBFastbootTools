@@ -3,7 +3,6 @@ import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
-import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -188,16 +187,11 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        try {
-                            proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
-                        } catch (ex: IOException) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
-                        }
+                        proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
-                            output += scan.nextLine()
+                            output += scan.nextLine() + '\n'
                         scan.close()
                         Platform.runLater {
                             tic.appendText("App: ${it.appnameProperty().get()}\n")
@@ -224,18 +218,13 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        try {
-                            proc =
-                                pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
-                                    .start()
-                        } catch (ex: IOException) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
-                        }
+                        proc =
+                            pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
+                                .start()
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
-                            output += scan.nextLine()
+                            output += scan.nextLine() + '\n'
                         scan.close()
                         output = if ("installed for user" in output)
                             "Success\n"
@@ -265,16 +254,11 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        try {
-                            proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
-                        } catch (ex: IOException) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
-                        }
+                        proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
-                            output += scan.nextLine()
+                            output += scan.nextLine() + '\n'
                         scan.close()
                         output = if ("disabled-user" in output)
                             "Success\n"
@@ -304,16 +288,11 @@ class AppManager : Command() {
             thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        try {
-                            proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
-                        } catch (ex: IOException) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
-                        }
+                        proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
                         output = ""
-                        val scan = Scanner(proc.inputStream, "UTF-8")
+                        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
-                            output += scan.nextLine()
+                            output += scan.nextLine() + '\n'
                         scan.close()
                         output = if ("enabled" in output)
                             "Success\n"

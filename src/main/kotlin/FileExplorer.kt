@@ -4,7 +4,6 @@ import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import java.io.File
-import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
@@ -73,12 +72,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
 
     private fun init(command: String = "adb") {
         status.text = ""
-        try {
-            proc = pb.start()
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            ExceptionAlert(ex)
-        }
+        proc = pb.start()
         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
         while (scan.hasNextLine()) {
             output = scan.nextLine()

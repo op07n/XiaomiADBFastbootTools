@@ -44,20 +44,16 @@ class ROMFlasher : Flasher() {
                     pb.command("sh", "-c", script.absolutePath)
                 }
                 val n = getCmdCount(script)
-                try {
-                    proc = pb.start()
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
-                    ExceptionAlert(ex)
-                }
+                proc = pb.start()
                 val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                var next: String
                 while (scan.hasNext()) {
-                    output += scan.next()
+                    next = scan.next()
+                    output += next
                     if ("pause" in output)
                         break
                     Platform.runLater {
-                        tic.text = output
-                        tic.appendText("")
+                        tic.appendText(next)
                         progress.progress = 1.0 * (output.toLowerCase().split("finished.").size - 1) / n
                     }
                 }

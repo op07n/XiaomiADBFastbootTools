@@ -238,6 +238,24 @@ class MainController : Initializable {
         return bits[0].toInt() * 100 + bits[1].toInt() * 10 + bits[2].toInt()
     }
 
+    private fun checkADBFastboot(): Boolean {
+        return if (win) {
+            when {
+                (Command.setup(System.getProperty("user.dir") + "/bin/")) -> true
+                (Command.setup(System.getProperty("user.dir") + '/')) -> true
+                (Command.setup("")) -> true
+                else -> false
+            }
+        } else {
+            when {
+                (Command.setup("./bin/")) -> true
+                (Command.setup("./")) -> true
+                (Command.setup("")) -> true
+                else -> false
+            }
+        }
+    }
+
     private fun checkVersion() {
         val huc =
             URL("https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection
@@ -252,44 +270,27 @@ class MainController : Initializable {
         }
         val link = huc.getHeaderField("Location")
         val latest = link.substringAfterLast('/')
-        if (versionToInt(latest) > versionToInt(version)) {
-            val alert = Alert(AlertType.INFORMATION)
-            alert.initStyle(StageStyle.UTILITY)
-            alert.title = "New version available!"
-            alert.graphic = ImageView("mitu.png")
-            alert.headerText =
-                "Version $latest is available!"
-            val vb = VBox()
-            vb.alignment = Pos.CENTER
-            val download = Hyperlink("Download")
-            download.onAction = EventHandler {
-                if (linux)
-                    Runtime.getRuntime().exec("xdg-open $link")
-                else Desktop.getDesktop().browse(URI(link))
+        if (versionToInt(latest) > versionToInt(version))
+            Platform.runLater {
+                val alert = Alert(AlertType.INFORMATION)
+                alert.initStyle(StageStyle.UTILITY)
+                alert.title = "New version available!"
+                alert.graphic = ImageView("mitu.png")
+                alert.headerText =
+                    "Version $latest is available!"
+                val vb = VBox()
+                vb.alignment = Pos.CENTER
+                val download = Hyperlink("Download")
+                download.onAction = EventHandler {
+                    if (linux)
+                        Runtime.getRuntime().exec("xdg-open $link")
+                    else Desktop.getDesktop().browse(URI(link))
+                }
+                download.font = Font(15.0)
+                vb.children.add(download)
+                alert.dialogPane.content = vb
+                alert.showAndWait()
             }
-            download.font = Font(15.0)
-            vb.children.add(download)
-            alert.dialogPane.content = vb
-            alert.showAndWait()
-        }
-    }
-
-    private fun checkADBFastboot() {
-        if (win) {
-            if (Command.setup(System.getProperty("user.dir") + "/bin/")) return
-            if (Command.setup(System.getProperty("user.dir") + '/')) return
-            if (Command.setup("")) return
-        } else {
-            if (Command.setup("./bin/")) return
-            if (Command.setup("./")) return
-            if (Command.setup("")) return
-        }
-        val alert = Alert(AlertType.ERROR)
-        alert.title = "Fatal Error"
-        alert.headerText =
-            "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
-        alert.showAndWait()
-        Platform.exit()
     }
 
     private fun checkADB(): Boolean {
@@ -363,19 +364,6 @@ class MainController : Initializable {
         thread.start()
     }
 
-    private fun confirm(msg: String = "Are you sure you want to proceed?", func: () -> Unit) {
-        val alert = Alert(AlertType.CONFIRMATION)
-        alert.initStyle(StageStyle.UTILITY)
-        alert.isResizable = false
-        alert.headerText = msg.trim()
-        val yes = ButtonType("Yes")
-        val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
-        alert.buttonTypes.setAll(yes, no)
-        val result = alert.showAndWait()
-        if (result.get() == yes)
-            func()
-    }
-
     override fun initialize(url: URL, rb: ResourceBundle?) {
         outputTextArea.text = "Looking for devices..."
         progressIndicator.isVisible = true
@@ -431,10 +419,33 @@ class MainController : Initializable {
         AppManager.progressInd = progressIndicator
 
         thread(true) {
-            checkADBFastboot()
-            checkVersion()
-            checkDevice()
+            if (checkADBFastboot()) {
+                checkVersion()
+                checkDevice()
+            } else {
+                Platform.runLater {
+                    val alert = Alert(AlertType.ERROR)
+                    alert.title = "Fatal Error"
+                    alert.headerText =
+                        "ERROR: Can't find ADB/Fastboot!\nPlease install them system-wide or put the JAR next to them!"
+                    alert.showAndWait()
+                    Platform.exit()
+                }
+            }
         }
+    }
+
+    private fun confirm(msg: String = "Are you sure you want to proceed?", func: () -> Unit) {
+        val alert = Alert(AlertType.CONFIRMATION)
+        alert.initStyle(StageStyle.UTILITY)
+        alert.isResizable = false
+        alert.headerText = msg.trim()
+        val yes = ButtonType("Yes")
+        val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
+        alert.buttonTypes.setAll(yes, no)
+        val result = alert.showAndWait()
+        if (result.get() == yes)
+            func()
     }
 
     private fun checkCamera2(): Boolean = "1" in Command.exec("adb shell getprop persist.camera.HAL3.enabled")

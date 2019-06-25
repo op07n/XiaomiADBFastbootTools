@@ -1,6 +1,5 @@
 import javafx.scene.control.TextInputControl
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 open class Command {
@@ -32,15 +31,10 @@ open class Command {
             pb.redirectErrorStream(err)
             output = ""
             args.forEach {
-                try {
-                    proc = pb.command((prefix + it).split(' ', limit = lim)).start()
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
-                    ExceptionAlert(ex)
-                }
-                val scan = Scanner(proc.inputStream, "UTF-8")
+                proc = pb.command((prefix + it).split(' ', limit = lim)).start()
+                val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                 while (scan.hasNextLine())
-                    output += scan.nextLine()
+                    output += scan.nextLine() + '\n'
                 scan.close()
                 proc.waitFor()
             }
@@ -52,16 +46,11 @@ open class Command {
             output = ""
             tic.text = ""
             args.forEach {
-                try {
-                    proc = pb.command((prefix + it).split(' ', limit = lim)).start()
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
-                    ExceptionAlert(ex)
-                }
-                val scan = Scanner(proc.inputStream, "UTF-8")
+                proc = pb.command((prefix + it).split(' ', limit = lim)).start()
+                val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                 var next: String
                 while (scan.hasNextLine()) {
-                    next = scan.nextLine()
+                    next = scan.nextLine() + '\n'
                     output += next
                     tic.appendText(next)
                 }
