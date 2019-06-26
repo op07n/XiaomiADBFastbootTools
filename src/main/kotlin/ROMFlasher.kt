@@ -26,7 +26,6 @@ class ROMFlasher : Flasher() {
         }
 
         fun exec(arg: String) {
-            pb.directory(directory)
             pb.redirectErrorStream(true)
             output = ""
             progress.progress = 0.0

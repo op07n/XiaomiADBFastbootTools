@@ -15,7 +15,9 @@ open class Flasher : Command() {
             progressInd.isVisible = true
             thread(true) {
                 args.forEach {
-                    proc = pb.command((prefix + it).split(' ') + image?.absolutePath).start()
+                    val bits = it.split(' ').toMutableList()
+                    bits[0] = prefix + bits[0]
+                    proc = pb.command(bits + image?.absolutePath).start()
                     val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                     while (scan.hasNext()) {
                         output += scan.next()

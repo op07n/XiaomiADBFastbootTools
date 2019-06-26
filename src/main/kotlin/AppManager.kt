@@ -184,7 +184,7 @@ class AppManager : Command() {
             thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        proc = pb.command("${prefix}adb shell pm uninstall --user $user $pkg".split(' ')).start()
+                        proc = pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg).start()
                         output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
@@ -217,7 +217,16 @@ class AppManager : Command() {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc =
-                            pb.command("${prefix}adb shell cmd package install-existing --user $user $pkg".split(' '))
+                            pb.command(
+                                "${prefix}adb",
+                                "shell",
+                                "cmd",
+                                "package",
+                                "install-existing",
+                                "--user",
+                                "$user",
+                                pkg
+                            )
                                 .start()
                         output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
@@ -253,7 +262,7 @@ class AppManager : Command() {
             thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        proc = pb.command("${prefix}adb shell pm disable-user --user $user $pkg".split(' ')).start()
+                        proc = pb.command("${prefix}adb", "shell", "pm", "disable-user", "--user", "$user", pkg).start()
                         output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())
@@ -288,7 +297,7 @@ class AppManager : Command() {
             thread(true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                        proc = pb.command("${prefix}adb shell pm enable --user $user $pkg".split(' ')).start()
+                        proc = pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg).start()
                         output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                         while (scan.hasNextLine())

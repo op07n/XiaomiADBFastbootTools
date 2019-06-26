@@ -30,7 +30,9 @@ open class Command {
             pb.redirectErrorStream(err)
             output = ""
             args.forEach {
-                proc = pb.command((prefix + it).split(' ', limit = lim)).start()
+                val bits = it.split(' ', limit = lim).toMutableList()
+                bits[0] = prefix + bits[0]
+                proc = pb.command(bits).start()
                 val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                 while (scan.hasNextLine())
                     output += scan.nextLine() + '\n'
@@ -46,7 +48,9 @@ open class Command {
             output = ""
             tic.text = ""
             args.forEach {
-                proc = pb.command((prefix + it).split(' ', limit = lim)).start()
+                val bits = it.split(' ', limit = lim).toMutableList()
+                bits[0] = prefix + bits[0]
+                proc = pb.command(bits).start()
                 val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                 var next: String
                 while (scan.hasNextLine()) {
