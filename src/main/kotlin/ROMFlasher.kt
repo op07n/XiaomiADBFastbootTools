@@ -27,7 +27,7 @@ class ROMFlasher : Flasher() {
 
         fun exec(arg: String) {
             pb.redirectErrorStream(true)
-            output = ""
+            var output = ""
             progress.progress = 0.0
             progressInd.isVisible = true
             thread(true) {

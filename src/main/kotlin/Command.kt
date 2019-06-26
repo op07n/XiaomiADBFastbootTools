@@ -7,7 +7,6 @@ open class Command {
     companion object {
         var pb: ProcessBuilder = ProcessBuilder()
         var prefix = ""
-        var output = ""
         lateinit var tic: TextInputControl
         lateinit var proc: Process
         private val userdir = File(System.getProperty("user.dir"))
@@ -28,7 +27,7 @@ open class Command {
         fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
             pb.directory(userdir)
             pb.redirectErrorStream(err)
-            output = ""
+            var output = ""
             args.forEach {
                 val bits = it.split(' ', limit = lim).toMutableList()
                 bits[0] = prefix + bits[0]
@@ -45,7 +44,7 @@ open class Command {
         fun exec_displayed(vararg args: String, lim: Int = 0, err: Boolean = true): String {
             pb.directory(userdir)
             pb.redirectErrorStream(err)
-            output = ""
+            var output = ""
             tic.text = ""
             args.forEach {
                 val bits = it.split(' ', limit = lim).toMutableList()

@@ -11,7 +11,7 @@ open class Flasher : Command() {
 
         fun exec(image: File?, vararg args: String) {
             pb.redirectErrorStream(true)
-            output = ""
+            var output = ""
             progressInd.isVisible = true
             thread(true) {
                 args.forEach {

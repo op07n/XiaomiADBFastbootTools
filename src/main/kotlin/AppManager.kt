@@ -185,8 +185,8 @@ class AppManager : Command() {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg).start()
-                        output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                        var output = ""
                         while (scan.hasNextLine())
                             output += scan.nextLine() + '\n'
                         scan.close()
@@ -228,8 +228,8 @@ class AppManager : Command() {
                                 pkg
                             )
                                 .start()
-                        output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                        var output = ""
                         while (scan.hasNextLine())
                             output += scan.nextLine() + '\n'
                         scan.close()
@@ -263,8 +263,8 @@ class AppManager : Command() {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "disable-user", "--user", "$user", pkg).start()
-                        output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                        var output = ""
                         while (scan.hasNextLine())
                             output += scan.nextLine() + '\n'
                         scan.close()
@@ -298,8 +298,8 @@ class AppManager : Command() {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg).start()
-                        output = ""
                         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
+                        var output = ""
                         while (scan.hasNextLine())
                             output += scan.nextLine() + '\n'
                         scan.close()

@@ -72,7 +72,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
         proc = pb.start()
         val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
         while (scan.hasNextLine()) {
-            output = scan.nextLine()
+            val output = scan.nextLine()
             Platform.runLater {
                 if ('%' in output)
                     progress.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
