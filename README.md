@@ -27,7 +27,7 @@ Available downloads:
 * Executable JAR
 * OS-specific ZIP (Executable JAR with ADB and Fastboot included)
 
-If you have ADB and Fastboot installed system-wide, download the JAR, otherwise download the OS-specific ZIP.
+If you have ADB and Fastboot in your `PATH`, download the JAR, otherwise download the OS-specific ZIP.
 
 ### [Latest release](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest)
 
