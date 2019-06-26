@@ -794,23 +794,21 @@ class MainController : Initializable {
             "EEA Stable" ->
                 return getLocation(codename, "_eea_global", 'F', "eea")
             "Russia Stable" -> {
-                var link: String? = null
                 for (region in arrayOf("ru", "global")) {
-                    link = getLocation(codename, "_ru_global", 'F', region)
+                    val link = getLocation(codename, "_ru_global", 'F', region)
                     if (link != null && "bigota" in link)
                         return link
                 }
-                return link
+                return null
             }
             else -> {
-                var link: String? = null
                 for (region in arrayOf("in", "global"))
                     for (ending in arrayOf("_in_global", "_india_global", "_global")) {
-                        link = getLocation(codename, "_ru_global", 'F', region)
+                        val link = getLocation(codename, ending, 'F', region)
                         if (link != null && "bigota" in link)
                             return link
                     }
-                return link
+                return null
             }
         }
     }
