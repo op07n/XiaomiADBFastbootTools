@@ -126,7 +126,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var dpiPane: TitledPane
 
-    private val version = "6.5"
+    private val version = "6.5.1"
 
     private var image: File? = null
 

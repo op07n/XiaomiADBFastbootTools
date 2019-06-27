@@ -36,7 +36,8 @@ class Device {
             props.clear()
             propstring.trim().lines().forEach {
                 val parts = it.split("]: [")
-                props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
+                if (parts.size == 2)
+                    props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
             }
             if (props["ro.serialno"].isNullOrEmpty() || props["ro.build.product"].isNullOrEmpty()) {
                 mode = Mode.ADB_ERROR
@@ -80,7 +81,7 @@ class Device {
             props.clear()
             Command.exec("fastboot getvar all").trim().lines().forEach {
                 if (it[0] == '(')
-                    props[it.substringAfter(' ').substringBeforeLast(':')] = it.substringAfterLast(':').trim()
+                    props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
             }
             if (props["serialno"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
                 mode = Mode.FB_ERROR

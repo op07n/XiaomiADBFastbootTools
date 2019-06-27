@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.eu.saki'
-version '6.5'
+version '6.5.1'
 
 repositories {
     mavenCentral()
