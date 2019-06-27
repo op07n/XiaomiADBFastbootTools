@@ -804,6 +804,8 @@ class MainController : Initializable {
             else -> {
                 for (region in arrayOf("in", "global"))
                     for (ending in arrayOf("_in_global", "_india_global", "_global")) {
+                        if (region == "global" && ending == "_global")
+                            break
                         val link = getLocation(codename, ending, 'F', region)
                         if (link != null && "bigota" in link)
                             return link
@@ -817,14 +819,19 @@ class MainController : Initializable {
     private fun getlinkButtonPressed(event: ActionEvent) {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
-                val link = getLink(it, codenameTextField.text.trim())
-                if (link != null && "bigota" in link) {
-                    versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                    outputTextArea.appendText("\n\n$link\n\nLink copied to clipboard!")
-                    Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
-                } else {
-                    versionLabel.text = "-"
-                    outputTextArea.appendText("\n\nLink not found!")
+                outputTextArea.appendText("\n\nLooking for $it...")
+                thread(true) {
+                    val link = getLink(it, codenameTextField.text.trim())
+                    Platform.runLater {
+                        if (link != null && "bigota" in link) {
+                            versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                            outputTextArea.appendText("\n$link\nLink copied to clipboard!")
+                            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
+                        } else {
+                            versionLabel.text = "-"
+                            outputTextArea.appendText("\nLink not found!")
+                        }
+                    }
                 }
             }
         }
