@@ -13,7 +13,7 @@ open class Flasher : Command() {
             pb.redirectErrorStream(true)
             var output = ""
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 args.forEach {
                     val bits = it.split(' ').toMutableList()
                     bits[0] = prefix + bits[0]

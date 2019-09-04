@@ -30,7 +30,7 @@ class ROMFlasher : Flasher() {
             var output = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 val script: File
                 if ("win" in System.getProperty("os.name").toLowerCase()) {
                     script = createScript("$arg.bat")

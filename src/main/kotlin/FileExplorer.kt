@@ -85,7 +85,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun pull(selected: List<AndroidFile>, to: File, func: () -> Unit) {
-        thread(true) {
+        thread(true, true) {
             if (selected.isEmpty()) {
                 pb.command("${prefix}adb", "pull", path, to.absolutePath)
                 init()
@@ -105,7 +105,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun push(selected: List<File>, func: () -> Unit) {
-        thread(true) {
+        thread(true, true) {
             selected.forEach {
                 pb.command("${prefix}adb", "push", it.absolutePath, path)
                 init()
@@ -120,7 +120,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun delete(selected: List<AndroidFile>, func: () -> Unit) {
-        thread(true) {
+        thread(true, true) {
             selected.forEach {
                 if (it.dir)
                     pb.command("${prefix}adb", "shell", "rm", "-rf", format(path + it.name))
@@ -137,7 +137,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun mkdir(name: String, func: () -> Unit) {
-        thread(true) {
+        thread(true, true) {
             pb.command("${prefix}adb", "shell", "mkdir", format(path + name))
             init("mkdir")
             Platform.runLater {
@@ -150,7 +150,7 @@ class FileExplorer(var status: TextField, var progress: ProgressBar) : Command()
     }
 
     fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
-        thread(true) {
+        thread(true, true) {
             pb.command("${prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             init("mv")
             Platform.runLater {

@@ -2,9 +2,11 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.Node
+import javafx.scene.control.Alert
 import javafx.scene.control.TextArea
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import javafx.stage.StageStyle
 import java.net.URL
 import java.util.*
 
@@ -27,6 +29,11 @@ class AppAdderController : Initializable {
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
         if (!appTextArea.text.isNullOrBlank()) {
+            val alert = Alert(Alert.AlertType.WARNING)
+            alert.initStyle(StageStyle.UTILITY)
+            alert.isResizable = false
+            alert.headerText = "Uninstalling apps which aren't listed by default may brick your device."
+            alert.showAndWait()
             appTextArea.text.trim().lines().forEach {
                 AppManager.addApp(it.trim())
             }

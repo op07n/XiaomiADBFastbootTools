@@ -22,10 +22,12 @@ import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.nio.channels.Channels
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -102,6 +104,8 @@ class MainController : Initializable {
     @FXML
     private lateinit var branchComboBox: ComboBox<String>
     @FXML
+    private lateinit var downloadProgress: Label
+    @FXML
     private lateinit var versionLabel: Label
     @FXML
     private lateinit var appManagerPane: TabPane
@@ -125,17 +129,15 @@ class MainController : Initializable {
     private lateinit var oemPane: TitledPane
     @FXML
     private lateinit var dpiPane: TitledPane
+    @FXML
+    private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.5.1"
+    private val version = "6.6"
 
     private var image: File? = null
 
     private val win = "win" in System.getProperty("os.name").toLowerCase()
     private val linux = "linux" in System.getProperty("os.name").toLowerCase()
-
-    companion object {
-        lateinit var thread: Thread
-    }
 
     private fun setPanels() {
         when (Device.mode) {
@@ -305,7 +307,7 @@ class MainController : Initializable {
 
     private fun loadDevice() {
         if ("Looking" !in outputTextArea.text)
-            outputTextArea.text = "Looking for devices..."
+            outputTextArea.text = "Looking for devices...\n"
         reloadMenuItem.isDisable = true
         progressIndicator.isVisible = true
         when {
@@ -329,7 +331,7 @@ class MainController : Initializable {
                 }
                 outputTextArea.text = "Device connected in ADB mode!\n\n"
                 if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
-                    outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.")
+                    outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
             }
             Device.readFastboot() -> {
                 progressIndicator.isVisible = false
@@ -347,7 +349,7 @@ class MainController : Initializable {
     }
 
     private fun checkDevice() {
-        thread = Thread {
+        thread(true, true) {
             while (true) {
                 if (Device.mode != Mode.ADB && Device.mode != Mode.FASTBOOT && Device.mode != Mode.RECOVERY)
                     Platform.runLater { loadDevice() }
@@ -358,12 +360,10 @@ class MainController : Initializable {
                 }
             }
         }
-        thread.isDaemon = true
-        thread.start()
     }
 
     override fun initialize(url: URL, rb: ResourceBundle?) {
-        outputTextArea.text = "Looking for devices..."
+        outputTextArea.text = "Looking for devices...\n"
         progressIndicator.isVisible = true
         partitionComboBox.items.addAll(
             "boot", "cust", "modem", "persist", "recovery", "system"
@@ -416,7 +416,7 @@ class MainController : Initializable {
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
 
-        thread(true) {
+        thread(true, true) {
             if (checkADBFastboot()) {
                 checkVersion()
                 checkDevice()
@@ -433,11 +433,11 @@ class MainController : Initializable {
         }
     }
 
-    private fun confirm(msg: String = "Are you sure you want to proceed?", func: () -> Unit) {
+    private fun confirm(msg: String = "", func: () -> Unit) {
         val alert = Alert(AlertType.CONFIRMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.isResizable = false
-        alert.headerText = msg.trim()
+        alert.headerText = "${msg.trim()}\nAre you sure you want to proceed?".trim()
         val yes = ButtonType("Yes")
         val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
         alert.buttonTypes.setAll(yes, no)
@@ -739,13 +739,13 @@ class MainController : Initializable {
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm("All your data will be gone.\nAre you sure you want to proceed?") { Command.exec_displayed("fastboot erase userdata") }
+            confirm("All your data will be gone.") { Command.exec_displayed("fastboot erase userdata") }
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm("All your data will be gone.\nAre you sure you want to proceed?") {
+            confirm("All your data will be gone.") {
                 Command.exec_displayed(
                     "fastboot erase cache",
                     "fastboot erase userdata"
@@ -756,7 +756,7 @@ class MainController : Initializable {
     @FXML
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm("Your partitions must be intact in order to successfully lock the bootloader.\nAre you sure you want to proceed?") {
+            confirm("Your partitions must be intact in order to successfully lock the bootloader.") {
                 Command.exec_displayed("fastboot oem lock")
             }
     }
@@ -819,17 +819,17 @@ class MainController : Initializable {
     private fun getlinkButtonPressed(event: ActionEvent) {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
-                outputTextArea.appendText("\n\nLooking for $it...")
-                thread(true) {
+                outputTextArea.appendText("\nLooking for $it...\n")
+                thread(true, true) {
                     val link = getLink(it, codenameTextField.text.trim())
                     Platform.runLater {
                         if (link != null && "bigota" in link) {
                             versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                            outputTextArea.appendText("\n$link\nLink copied to clipboard!")
+                            outputTextArea.appendText("$link\nLink copied to clipboard!\n")
                             Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
                         } else {
                             versionLabel.text = "-"
-                            outputTextArea.appendText("\nLink not found!")
+                            outputTextArea.appendText("Link not found!\n")
                         }
                     }
                 }
@@ -841,16 +841,52 @@ class MainController : Initializable {
     private fun downloadromButtonPressed(event: ActionEvent) {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
+                outputTextArea.appendText("\nLooking for $it...\n")
                 val link = getLink(it, codenameTextField.text.trim())
                 if (link != null && "bigota" in link) {
-                    versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                    outputTextArea.appendText("\n\nStarting download in browser...")
-                    if (linux)
-                        Runtime.getRuntime().exec("xdg-open $link")
-                    else Desktop.getDesktop().browse(URI(link))
+                    val dc = DirectoryChooser()
+                    dc.title = "Select the download location of the Fastboot ROM"
+                    dc.showDialog((event.source as Node).scene.window)?.let {
+                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                        outputTextArea.appendText("Starting download...\n")
+                        downloaderPane.isDisable = true
+                        thread(true, true) {
+                            var complete = false
+                            val url = URL(link)
+                            val size = url.openConnection().contentLengthLong * 1.0
+                            val file = File(it, link.substringAfterLast('/'))
+                            thread(true, true) {
+                                var prev = 0L
+                                while (!complete) {
+                                    val length = file.length()
+                                    val diff = (length - prev) / 1000.0
+                                    val speed = if (diff < 1000.0)
+                                        "${diff.toString().take(5)} KB/s"
+                                    else "${(diff / 1000.0).toString().take(5)} MB/s"
+                                    prev = length
+                                    Platform.runLater {
+                                        downloadProgress.text =
+                                            "${(file.length() / size * 100.0).toString().take(5)} %\t\t$speed"
+                                    }
+                                    Thread.sleep(1000)
+                                }
+                            }
+                            FileOutputStream(file).channel.transferFrom(
+                                Channels.newChannel(url.openStream()),
+                                0,
+                                Long.MAX_VALUE
+                            )
+                            complete = true
+                            Platform.runLater {
+                                outputTextArea.appendText("Download complete!\n\n")
+                                downloadProgress.text = ""
+                                downloaderPane.isDisable = false
+                            }
+                        }
+                    }
                 } else {
                     versionLabel.text = "-"
-                    outputTextArea.appendText("\n\nLink not found!")
+                    outputTextArea.appendText("Link not found!\n\n")
                 }
             }
         }
@@ -933,7 +969,7 @@ class MainController : Initializable {
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
         if (isAppSelected(uninstallerTableView.items) && checkADB())
-            confirm("Uninstalling apps which aren't listed by default may brick your Device.\nAre you sure you want to proceed?") {
+            confirm {
                 setPanels()
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
@@ -969,21 +1005,20 @@ class MainController : Initializable {
 
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
-        if (isAppSelected(disablerTableView.items) && checkADB())
-            confirm("Disabling apps which aren't listed by default may brick your Device.\nAre you sure you want to proceed?") {
-                setPanels()
-                val selected = FXCollections.observableArrayList<App>()
-                var n = 0
-                disablerTableView.items.forEach {
-                    if (it.selectedProperty().get()) {
-                        selected.add(it)
-                        n += it.packagenameProperty().get().trim().lines().size
-                    }
-                }
-                AppManager.disable(selected, n) {
-                    setPanels()
+        if (isAppSelected(disablerTableView.items) && checkADB()) {
+            setPanels()
+            val selected = FXCollections.observableArrayList<App>()
+            var n = 0
+            disablerTableView.items.forEach {
+                if (it.selectedProperty().get()) {
+                    selected.add(it)
+                    n += it.packagenameProperty().get().trim().lines().size
                 }
             }
+            AppManager.disable(selected, n) {
+                setPanels()
+            }
+        }
     }
 
     @FXML

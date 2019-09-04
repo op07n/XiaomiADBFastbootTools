@@ -181,7 +181,7 @@ class AppManager : Command() {
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg).start()
@@ -213,7 +213,7 @@ class AppManager : Command() {
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc =
@@ -259,7 +259,7 @@ class AppManager : Command() {
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "disable-user", "--user", "$user", pkg).start()
@@ -294,7 +294,7 @@ class AppManager : Command() {
             tic.text = ""
             progress.progress = 0.0
             progressInd.isVisible = true
-            thread(true) {
+            thread(true, true) {
                 selected.forEach {
                     it.packagenameProperty().get().trim().lines().forEach { pkg ->
                         proc = pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg).start()
