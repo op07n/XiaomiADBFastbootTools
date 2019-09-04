@@ -66,9 +66,9 @@ If you have ADB and Fastboot in your `PATH` (installed system-wide), download th
 
 **The application doesn't work. Is there anything I should have installed?**
 
-Yes, the Xiaomi ADB/Fastboot Tools was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run, version 1.8.171 or later. You can install the latest Oracle JRE from [here](https://java.com/en/download/).
+Yes, the Xiaomi ADB/Fastboot Tools was developed in Kotlin for the Java Virtual Machine so it needs the JRE to run. You can install the latest Oracle JRE from [here](https://java.com/en/download/).
 
-If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar something.jar`.
+If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar XiaomiADBFastbootTools.jar`.
 
 **The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
