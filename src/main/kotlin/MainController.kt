@@ -132,7 +132,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.6"
+    private val version = "6.6.1"
 
     private var image: File? = null
 
@@ -241,8 +241,8 @@ class MainController : Initializable {
     private fun checkADBFastboot(): Boolean {
         return if (win) {
             when {
-                (Command.setup(System.getProperty("user.dir") + "/bin/")) -> true
-                (Command.setup(System.getProperty("user.dir") + '/')) -> true
+                (Command.setup(".\\bin\\")) -> true
+                (Command.setup(".\\")) -> true
                 (Command.setup("")) -> true
                 else -> false
             }
@@ -676,7 +676,6 @@ class MainController : Initializable {
     private fun browseromButtonPressed(event: ActionEvent) {
         val dc = DirectoryChooser()
         dc.title = "Select the root directory of a Fastboot ROM"
-        outputTextArea.text = ""
         romLabel.text = "-"
         ROMFlasher.directory = dc.showDialog((event.source as Node).scene.window)
         ROMFlasher.directory?.let {
