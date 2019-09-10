@@ -373,9 +373,7 @@ class MainController : Initializable {
         )
         branchComboBox.items.addAll(
             "Global Stable",
-            "Global Developer",
             "China Stable",
-            "China Developer",
             "EEA Stable",
             "Russia Stable",
             "India Stable"
@@ -767,9 +765,9 @@ class MainController : Initializable {
     }
 
     private fun getLink(version: String, codename: String): String? {
-        fun getLocation(codename: String, ending: String, branch: Char, region: String): String? {
+        fun getLocation(codename: String, ending: String, region: String): String? {
             val huc =
-                URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=$branch&r=$region&n=").openConnection() as HttpURLConnection
+                URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=F&r=$region&n=").openConnection() as HttpURLConnection
             huc.requestMethod = "GET"
             huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
             huc.instanceFollowRedirects = false
@@ -783,18 +781,14 @@ class MainController : Initializable {
         }
         when (version) {
             "Global Stable" ->
-                return getLocation(codename, "_global", 'F', "global")
-            "Global Developer" ->
-                return getLocation(codename, "_global", 'X', "global")
+                return getLocation(codename, "_global", "global")
             "China Stable" ->
-                return getLocation(codename, "", 'F', "cn")
-            "China Developer" ->
-                return getLocation(codename, "", 'X', "cn")
+                return getLocation(codename, "", "cn")
             "EEA Stable" ->
-                return getLocation(codename, "_eea_global", 'F', "eea")
+                return getLocation(codename, "_eea_global", "eea")
             "Russia Stable" -> {
                 for (region in arrayOf("ru", "global")) {
-                    val link = getLocation(codename, "_ru_global", 'F', region)
+                    val link = getLocation(codename, "_ru_global", region)
                     if (link != null && "bigota" in link)
                         return link
                 }
@@ -805,7 +799,7 @@ class MainController : Initializable {
                     for (ending in arrayOf("_in_global", "_india_global", "_global")) {
                         if (region == "global" && ending == "_global")
                             break
-                        val link = getLocation(codename, ending, 'F', region)
+                        val link = getLocation(codename, ending, region)
                         if (link != null && "bigota" in link)
                             return link
                     }
