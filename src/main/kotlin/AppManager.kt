@@ -3,7 +3,6 @@ import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -20,8 +19,7 @@ class AppManager : Command() {
         lateinit var enablerTableView: TableView<App>
         lateinit var progress: ProgressBar
         lateinit var progressInd: ProgressIndicator
-        var potentialApps =
-            File(AppManager::class.java.classLoader.getResource("apps.txt").file).readText().lines().toMutableList()
+        var potentialApps = this::class.java.classLoader.getResource("apps.txt").readText().lines().toMutableList()
 
         fun createTables() {
             uninstallerTableView.items.clear()
