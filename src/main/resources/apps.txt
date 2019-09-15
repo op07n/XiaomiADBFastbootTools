@@ -1,0 +1,94 @@
+Analytics;com.miui.analytics
+App Vault;com.miui.personalassistant,com.mi.android.globalpersonalassistant
+Backup;com.miui.backup
+Blocklist;com.miui.antispam
+Browser;com.android.browser
+Calculator;com.miui.calculator
+Calendar;com.android.calendar
+CatchLog;com.bsp.catchlog
+Cleaner;com.miui.cleanmaster
+Clock;com.android.deskclock
+Compass;com.miui.compass
+DiagLogger;com.huaqin.diaglogger
+Downloads;com.android.providers.downloads.ui
+Facebook;com.facebook.system,com.facebook.appmanager,com.facebook.services
+Feedback;com.miui.bugreport
+FM Radio;com.miui.fm
+Freeform;com.miui.freeform
+Game Turbo;com.xiaomi.gameboosterglobal
+Games;com.xiaomi.glgm
+Gboard;com.google.android.inputmethod.latin
+Gmail;com.google.android.gm
+Google App;com.google.android.googlequicksearchbox
+Google Assistant;com.google.android.apps.googleassistant
+Google Calculator;com.google.android.calculator
+Google Calendar;com.google.android.calendar
+Google Chrome;com.android.chrome
+Google Clock;com.google.android.deskclock
+Google Drive;com.google.android.apps.docs
+Google Duo;com.google.android.apps.tachyon
+Google Hangouts;com.google.android.talk
+Google Indic Keyboard;com.google.android.apps.inputmethod.hindi
+Google Keep;com.google.android.keep
+Google Korean Input;com.google.android.inputmethod.korean
+Google Lens;com.google.ar.lens
+Google Maps;com.google.android.apps.maps
+Google Photos;com.google.android.apps.photos
+Google Pinyin Input;com.google.android.inputmethod.pinyin
+Google Play Books;com.google.android.apps.books
+Google Play Games;com.google.android.play.games
+Google Play Movies;com.google.android.videos
+Google Play Music;com.google.android.music
+Google Zhuyin Input;com.google.android.apps.inputmethod.zhuyin
+HybridAccessory;com.miui.hybrid.accessory
+Joyose;com.xiaomi.joyose
+KLO Bugreport;com.miui.klo.bugreport
+MAB;com.xiaomi.ab
+Mail;com.android.email
+Market Feedback Agent;com.google.android.feedback
+Mi AI;com.miui.voiceassist
+Mi App Store;com.xiaomi.mipicks
+Mi Cloud;com.miui.cloudservice,com.miui.cloudservice.sysbase,com.miui.micloudsync,com.miui.cloudbackup
+Mi Credit;com.xiaomi.payment,com.micredit.in
+Mi Drop;com.xiaomi.midrop
+Mi File Manager;com.mi.android.globalFileexplorer
+Mi Pay;com.mipay.wallet.in,com.mipay.wallet.id
+Mi Recycle;com.xiaomi.mirecycle
+Mi Roaming;com.miui.virtualsim
+Mi Video;com.miui.video,com.miui.videoplayer
+Mi VR;com.mi.dlabs.vr
+Mi Wallet;com.mipay.wallet
+Mi Wallpaper;com.miui.miwallpaper
+MiConnectService;com.xiaomi.mi_connect_service
+MiPlayClient;com.xiaomi.miplay_client
+MiSound;com.miui.misound
+MiuiDaemon;com.miui.daemon
+MiWebView;com.mi.webkit.core
+Mobile Device Information Provider;com.amazon.appmanager
+MSA;com.miui.msa.global,com.miui.systemAdSolution
+Music;com.miui.player
+News;com.mi.globalTrendNews
+NextPay;com.miui.nextpay
+Notes;com.miui.notes
+Package Installer;com.miui.global.packageinstaller
+PAI;android.autoinstalls.config.Xiaomi.${Device.codename}
+PartnerBookmarks;com.android.providers.partnerbookmarks
+PartnerNetflixActivation;com.netflix.partner.activation
+POCO Launcher;com.mi.android.globallauncher
+Quick Apps;com.miui.hybrid
+Quick Ball;com.miui.touchassistant
+Recorder;com.android.soundrecorder
+Scanner;com.xiaomi.scanner
+Screen Recorder;com.miui.screenrecorder
+Search;com.android.quicksearchbox
+SMS Extra;com.miui.smsextra
+Translation Service;com.miui.translationservice,com.miui.translation.kingsoft,com.miui.translation.xmcloud,com.miui.translation.youdao
+UniPlay Service;com.milink.service
+VsimCore;com.miui.vsimcore
+Weather;com.miui.weather2,com.miui.providers.weather
+WMService;com.miui.wmsvc
+Xiaomi VIP Account;com.xiaomi.vipaccount
+Xiaomi Service Framework;com.xiaomi.xmsf
+Xiaomi SIM Activate Service;com.xiaomi.simactivate.service
+Yellow Pages;com.miui.yellowpage
+YouTube;com.google.android.youtube

@@ -132,7 +132,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.6.1"
+    private val version = "6.6.2"
 
     private var image: File? = null
 
