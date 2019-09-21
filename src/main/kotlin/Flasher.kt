@@ -1,37 +1,37 @@
 import javafx.application.Platform
 import javafx.scene.control.ProgressIndicator
+import javafx.scene.control.TextInputControl
 import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
 
-open class Flasher : Command() {
+object Flasher {
 
-    companion object {
-        lateinit var progressInd: ProgressIndicator
+    lateinit var progressIndicator: ProgressIndicator
+    lateinit var outputTextArea: TextInputControl
 
-        fun exec(image: File?, vararg args: String) {
-            pb.redirectErrorStream(true)
-            var output = ""
-            progressInd.isVisible = true
-            thread(true, true) {
-                args.forEach {
-                    val bits = it.split(' ').toMutableList()
-                    bits[0] = prefix + bits[0]
-                    proc = pb.command(bits + image?.absolutePath).start()
-                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    while (scan.hasNext()) {
-                        output += scan.next()
-                        Platform.runLater {
-                            tic.text = output
-                            tic.appendText("")
-                        }
+    fun exec(image: File?, vararg args: String) {
+        Command.pb.redirectErrorStream(true)
+        var output = ""
+        progressIndicator.isVisible = true
+        thread(true, true) {
+            args.forEach {
+                val bits = it.split(' ').toMutableList()
+                bits[0] = Command.prefix + bits[0]
+                Command.proc = Command.pb.command(bits + image?.absolutePath).start()
+                val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+                while (scan.hasNext()) {
+                    output += scan.next()
+                    Platform.runLater {
+                        outputTextArea.text = output
+                        outputTextArea.appendText("")
                     }
-                    scan.close()
-                    proc.waitFor()
                 }
-                Platform.runLater {
-                    progressInd.isVisible = false
-                }
+                scan.close()
+                Command.proc.waitFor()
+            }
+            Platform.runLater {
+                progressIndicator.isVisible = false
             }
         }
     }

@@ -1,9 +1,7 @@
-class Main {
+object Main {
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            XiaomiADBFastbootTools.main(args)
-        }
+    @JvmStatic
+    fun main(args: Array<String>) {
+        XiaomiADBFastbootTools.main(args)
     }
 }

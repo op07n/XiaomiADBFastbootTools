@@ -404,15 +404,19 @@ class MainController : Initializable {
         disablerTableView.columns.setAll(discheckTableColumn, disappTableColumn, dispackageTableColumn)
         enablerTableView.columns.setAll(encheckTableColumn, enappTableColumn, enpackageTableColumn)
 
-        Command.tic = outputTextArea
-        Flasher.progressInd = progressIndicator
-        ROMFlasher.progress = progressBar
+        Command.outputTextArea = outputTextArea
+        Flasher.progressIndicator = progressIndicator
+        Flasher.outputTextArea = outputTextArea
+        ROMFlasher.progressBar = progressBar
+        ROMFlasher.progressIndicator = progressIndicator
+        ROMFlasher.outputTextArea = outputTextArea
         AppManager.uninstallerTableView = uninstallerTableView
         AppManager.reinstallerTableView = reinstallerTableView
         AppManager.disablerTableView = disablerTableView
         AppManager.enablerTableView = enablerTableView
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
+        AppManager.outputTextArea = outputTextArea
 
         thread(true, true) {
             if (checkADBFastboot()) {

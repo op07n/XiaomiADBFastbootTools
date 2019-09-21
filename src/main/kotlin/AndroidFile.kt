@@ -1,4 +1,4 @@
-data class AndroidFile(var dir: Boolean, var name: String, var size: Int, var time: String) {
+class AndroidFile(var dir: Boolean, var name: String, var size: Int, var time: String) {
 
     private fun shorten(num: Float): String {
         val str = num.toString()

@@ -15,8 +15,7 @@ class AppAdderController : Initializable {
     @FXML
     private lateinit var appTextArea: TextArea
 
-    override fun initialize(location: URL?, resources: ResourceBundle?) {
-    }
+    override fun initialize(location: URL?, resources: ResourceBundle?) {}
 
     @FXML
     private fun loadButtonPressed(event: ActionEvent) {
