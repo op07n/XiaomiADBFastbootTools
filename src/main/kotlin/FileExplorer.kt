@@ -15,7 +15,7 @@ object FileExplorer {
     lateinit var progressBar: ProgressBar
 
     private fun makeFile(out: String): AndroidFile? {
-        val bits = ArrayList<String>()
+        val bits = mutableListOf<String>()
         for (bit in out.split(' '))
             if (bit.isNotBlank()) {
                 if (bit == "->")

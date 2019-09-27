@@ -27,10 +27,10 @@ object AppManager {
         reinstallerTableView.items.clear()
         disablerTableView.items.clear()
         enablerTableView.items.clear()
-        val uninst = ArrayList<String>()
-        val reinst = ArrayList<String>()
-        val disable = ArrayList<String>()
-        val enable = ArrayList<String>()
+        val uninst = mutableListOf<String>()
+        val reinst = mutableListOf<String>()
+        val disable = mutableListOf<String>()
+        val enable = mutableListOf<String>()
         val apps = HashMap<String, String>()
         Command.exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
             apps[it.substringAfter(':')] = "uninstalled"
