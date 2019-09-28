@@ -5,7 +5,6 @@ import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
 import javafx.scene.control.TextInputControl
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 

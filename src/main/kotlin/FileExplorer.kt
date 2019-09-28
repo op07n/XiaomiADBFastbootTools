@@ -5,7 +5,6 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 object FileExplorer {
