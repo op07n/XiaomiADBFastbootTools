@@ -61,7 +61,6 @@ Mi Wallet;com.mipay.wallet
 Mi Wallpaper;com.miui.miwallpaper
 MiConnectService;com.xiaomi.mi_connect_service
 MiPlayClient;com.xiaomi.miplay_client
-MiSound;com.miui.misound
 MiuiDaemon;com.miui.daemon
 MiWebView;com.mi.webkit.core
 Mobile Device Information Provider;com.amazon.appmanager
