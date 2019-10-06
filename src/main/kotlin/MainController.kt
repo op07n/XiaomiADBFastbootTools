@@ -435,7 +435,7 @@ class MainController : Initializable {
         }
     }
 
-    private fun confirm(msg: String = "", func: () -> Unit) {
+    private inline fun confirm(msg: String = "", func: () -> Unit) {
         val alert = Alert(AlertType.CONFIRMATION)
         alert.initStyle(StageStyle.UTILITY)
         alert.isResizable = false
