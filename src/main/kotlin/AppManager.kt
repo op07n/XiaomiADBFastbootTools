@@ -3,18 +3,16 @@ import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
-import javafx.scene.control.TextInputControl
 import java.util.*
 import kotlin.concurrent.thread
 
 
-object AppManager {
+object AppManager : Command() {
 
     lateinit var uninstallerTableView: TableView<App>
     lateinit var reinstallerTableView: TableView<App>
     lateinit var disablerTableView: TableView<App>
     lateinit var enablerTableView: TableView<App>
-    lateinit var outputTextArea: TextInputControl
     lateinit var progress: ProgressBar
     lateinit var progressInd: ProgressIndicator
     var user = 0
@@ -30,13 +28,13 @@ object AppManager {
         val disable = mutableListOf<String>()
         val enable = mutableListOf<String>()
         val apps = mutableMapOf<String, String>()
-        Command.exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
             apps[it.substringAfter(':')] = "uninstalled"
         }
-        Command.exec("adb shell pm list packages -d --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -d --user $user").trim().lines().forEach {
             apps[it.substringAfter(':')] = "disabled"
         }
-        Command.exec("adb shell pm list packages -e --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -e --user $user").trim().lines().forEach {
             apps[it.substringAfter(':')] = "enabled"
         }
         potentialApps.forEach {
@@ -86,17 +84,17 @@ object AppManager {
     }
 
     inline fun uninstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
-        Command.pb.redirectErrorStream(false)
+        pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    Command.proc =
-                        Command.pb.command("${Command.prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg)
+                    proc =
+                        pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg)
                             .start()
-                    val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                     var output = ""
                     while (scan.hasNextLine())
                         output += scan.nextLine() + '\n'
@@ -120,16 +118,16 @@ object AppManager {
     }
 
     inline fun reinstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
-        Command.pb.redirectErrorStream(false)
+        pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    Command.proc =
-                        Command.pb.command(
-                            "${Command.prefix}adb",
+                    proc =
+                        pb.command(
+                            "${prefix}adb",
                             "shell",
                             "cmd",
                             "package",
@@ -139,7 +137,7 @@ object AppManager {
                             pkg
                         )
                             .start()
-                    val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                     var output = ""
                     while (scan.hasNextLine())
                         output += scan.nextLine() + '\n'
@@ -166,15 +164,15 @@ object AppManager {
     }
 
     inline fun disable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
-        Command.pb.redirectErrorStream(false)
+        pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    Command.proc = Command.pb.command(
-                        "${Command.prefix}adb",
+                    proc = pb.command(
+                        "${prefix}adb",
                         "shell",
                         "pm",
                         "disable-user",
@@ -182,7 +180,7 @@ object AppManager {
                         "$user",
                         pkg
                     ).start()
-                    val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                     var output = ""
                     while (scan.hasNextLine())
                         output += scan.nextLine() + '\n'
@@ -209,17 +207,17 @@ object AppManager {
     }
 
     inline fun enable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
-        Command.pb.redirectErrorStream(false)
+        pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    Command.proc =
-                        Command.pb.command("${Command.prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg)
+                    proc =
+                        pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg)
                             .start()
-                    val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
                     var output = ""
                     while (scan.hasNextLine())
                         output += scan.nextLine() + '\n'
