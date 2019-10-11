@@ -65,9 +65,9 @@ object FileExplorer {
         return files
     }
 
-    private fun format(pathname: String): String = "'$pathname'"
+    fun format(pathname: String): String = "'$pathname'"
 
-    private fun init(command: String = "adb") {
+    fun init(command: String = "adb") {
         Command.pb.redirectErrorStream(false)
         statusTextField.text = ""
         Command.proc = Command.pb.start()
@@ -85,7 +85,7 @@ object FileExplorer {
         Command.proc.waitFor()
     }
 
-    fun pull(selected: List<AndroidFile>, to: File, func: () -> Unit) {
+    inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
         thread(true, true) {
             if (selected.isEmpty()) {
                 Command.pb.command("${Command.prefix}adb", "pull", path, to.absolutePath)
@@ -105,7 +105,7 @@ object FileExplorer {
         }
     }
 
-    fun push(selected: List<File>, func: () -> Unit) {
+    inline fun push(selected: List<File>, crossinline func: () -> Unit) {
         thread(true, true) {
             selected.forEach {
                 Command.pb.command("${Command.prefix}adb", "push", it.absolutePath, path)
@@ -120,7 +120,7 @@ object FileExplorer {
         }
     }
 
-    fun delete(selected: List<AndroidFile>, func: () -> Unit) {
+    inline fun delete(selected: List<AndroidFile>, crossinline func: () -> Unit) {
         thread(true, true) {
             selected.forEach {
                 if (it.dir)
@@ -137,7 +137,7 @@ object FileExplorer {
         }
     }
 
-    fun mkdir(name: String, func: () -> Unit) {
+    inline fun mkdir(name: String, crossinline func: () -> Unit) {
         thread(true, true) {
             Command.pb.command("${Command.prefix}adb", "shell", "mkdir", format(path + name))
             init("mkdir")
@@ -150,7 +150,7 @@ object FileExplorer {
         }
     }
 
-    fun rename(selected: AndroidFile, to: String, func: () -> Unit) {
+    inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
         thread(true, true) {
             Command.pb.command("${Command.prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
             init("mv")

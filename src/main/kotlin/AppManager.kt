@@ -86,7 +86,7 @@ object AppManager {
         }
     }
 
-    fun uninstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+    inline fun uninstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         Command.pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
@@ -120,7 +120,7 @@ object AppManager {
         }
     }
 
-    fun reinstall(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+    inline fun reinstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         Command.pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
@@ -166,7 +166,7 @@ object AppManager {
         }
     }
 
-    fun disable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+    inline fun disable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         Command.pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
@@ -209,7 +209,7 @@ object AppManager {
         }
     }
 
-    fun enable(selected: ObservableList<App>, n: Int, func: () -> Unit) {
+    inline fun enable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         Command.pb.redirectErrorStream(false)
         outputTextArea.text = ""
         progress.progress = 0.0
