@@ -416,7 +416,6 @@ class MainController : Initializable {
         AppManager.enablerTableView = enablerTableView
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
-        AppManager.outputTextArea = outputTextArea
 
         thread(true, true) {
             if (checkADBFastboot()) {
