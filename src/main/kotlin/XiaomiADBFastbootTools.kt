@@ -25,9 +25,9 @@ class XiaomiADBFastbootTools : Application() {
 
     override fun stop() {
         try {
-            Command.exec("adb kill-server")
+            Command().exec("adb kill-server")
         } catch (e: Exception) {
-            //
+            // OK
         }
     }
 

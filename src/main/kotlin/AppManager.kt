@@ -5,7 +5,6 @@ import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
 import javafx.scene.control.TextInputControl
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
@@ -30,7 +29,7 @@ object AppManager {
         val reinst = mutableListOf<String>()
         val disable = mutableListOf<String>()
         val enable = mutableListOf<String>()
-        val apps = HashMap<String, String>()
+        val apps = mutableMapOf<String, String>()
         Command.exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
             apps[it.substringAfter(':')] = "uninstalled"
         }

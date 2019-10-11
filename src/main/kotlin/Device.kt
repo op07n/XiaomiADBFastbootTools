@@ -8,14 +8,14 @@ object Device {
     var dpi = -1
     var width = -1
     var height = -1
-    var props = HashMap<String, String>()
-
+    var props = mutableMapOf<String, String>()
     var mode = Mode.NONE
     var reinstaller = true
     var disabler = true
+    var command = Command()
 
     fun readADB(): Boolean {
-        val propstring = Command.exec("adb shell getprop")
+        val propstring = command.exec("adb shell getprop")
         when {
             "no devices" in propstring -> {
                 if (mode != Mode.FASTBOOT && mode != Mode.FB_ERROR)
@@ -27,7 +27,7 @@ object Device {
                 return false
             }
         }
-        mode = if ("recovery" in Command.exec("adb devices"))
+        mode = if ("recovery" in command.exec("adb devices"))
             Mode.RECOVERY
         else Mode.ADB
         if (mode == Mode.ADB && serial in propstring && dpi != -1 && width != -1 && height != -1)
@@ -48,11 +48,11 @@ object Device {
         camera2 = props["persist.sys.camera.camera2"]?.contains("true") ?: false
         if (mode == Mode.ADB) {
             dpi = try {
-                Command.exec("adb shell wm density").substringAfterLast(':').trim().toInt()
+                command.exec("adb shell wm density").substringAfterLast(':').trim().toInt()
             } catch (e: Exception) {
                 -1
             }
-            val size = Command.exec("adb shell wm size")
+            val size = command.exec("adb shell wm size")
             width = try {
                 size.substringAfterLast(':').substringBefore('x').trim().toInt()
             } catch (e: Exception) {
@@ -68,7 +68,7 @@ object Device {
     }
 
     fun readFastboot(): Boolean {
-        val status = Command.exec("fastboot devices", err = false)
+        val status = command.exec("fastboot devices", err = false)
         when {
             status.isEmpty() -> {
                 if (mode == Mode.FASTBOOT || mode == Mode.FB_ERROR)
@@ -78,7 +78,7 @@ object Device {
             mode == Mode.FASTBOOT && serial in status -> return true
         }
         props.clear()
-        Command.exec("fastboot getvar all").trim().lines().forEach {
+        command.exec("fastboot getvar all").trim().lines().forEach {
             if (it[0] == '(')
                 props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
         }
@@ -89,11 +89,7 @@ object Device {
         serial = props["serialno"] ?: ""
         codename = props["product"] ?: ""
         bootloader = props["unlocked"]?.contains("yes") ?: false
-        anti = try {
-            props["anti"]!!.toInt()
-        } catch (e: Exception) {
-            -1
-        }
+        anti = props["anti"]?.toInt() ?: -1
         mode = Mode.FASTBOOT
         return true
     }

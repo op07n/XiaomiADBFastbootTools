@@ -7,7 +7,7 @@ import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
 
-object FileExplorer {
+object FileExplorer : Command() {
 
     var path = "/"
     lateinit var statusTextField: TextField
@@ -15,12 +15,13 @@ object FileExplorer {
 
     private fun makeFile(out: String): AndroidFile? {
         val bits = mutableListOf<String>()
-        for (bit in out.split(' '))
-            if (bit.isNotBlank()) {
-                if (bit == "->")
-                    break
-                bits.add(bit)
+        out.split(' ').forEach {
+            if (it.isNotBlank()) {
+                if (it == "->")
+                    return@forEach
+                bits.add(it)
             }
+        }
         return when {
             bits.size < 6 -> null
             bits[5].length == 10 && bits[6].length == 5 -> AndroidFile(
@@ -56,7 +57,7 @@ object FileExplorer {
 
     fun getFiles(): ObservableList<AndroidFile> {
         val files = FXCollections.observableArrayList<AndroidFile>()
-        Command.exec("adb shell ls -l $path", lim = 5).trim().lines().forEach {
+        exec("adb shell ls -l $path", lim = 5).trim().lines().forEach {
             if ("ls:" !in it && ':' in it)
                 makeFile(it)?.let { file ->
                     files.add(file)
@@ -65,13 +66,13 @@ object FileExplorer {
         return files
     }
 
-    fun format(pathname: String): String = "'$pathname'"
+    fun String.fmt(): String = "'$this'"
 
     fun init(command: String = "adb") {
-        Command.pb.redirectErrorStream(false)
+        pb.redirectErrorStream(false)
         statusTextField.text = ""
-        Command.proc = Command.pb.start()
-        val scan = Scanner(Command.proc.inputStream, "UTF-8").useDelimiter("")
+        proc = pb.start()
+        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
         while (scan.hasNextLine()) {
             val output = scan.nextLine()
             Platform.runLater {
@@ -82,17 +83,17 @@ object FileExplorer {
             }
         }
         scan.close()
-        Command.proc.waitFor()
+        proc.waitFor()
     }
 
     inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
         thread(true, true) {
             if (selected.isEmpty()) {
-                Command.pb.command("${Command.prefix}adb", "pull", path, to.absolutePath)
+                pb.command("${prefix}adb", "pull", path, to.absolutePath)
                 init()
             } else {
                 selected.forEach {
-                    Command.pb.command("${Command.prefix}adb", "pull", path + it.name, to.absolutePath)
+                    pb.command("${prefix}adb", "pull", path + it.name, to.absolutePath)
                     init()
                 }
             }
@@ -108,7 +109,7 @@ object FileExplorer {
     inline fun push(selected: List<File>, crossinline func: () -> Unit) {
         thread(true, true) {
             selected.forEach {
-                Command.pb.command("${Command.prefix}adb", "push", it.absolutePath, path)
+                pb.command("${prefix}adb", "push", it.absolutePath, path)
                 init()
             }
             Platform.runLater {
@@ -124,8 +125,8 @@ object FileExplorer {
         thread(true, true) {
             selected.forEach {
                 if (it.dir)
-                    Command.pb.command("${Command.prefix}adb", "shell", "rm", "-rf", format(path + it.name))
-                else Command.pb.command("${Command.prefix}adb", "shell", "rm", "-f", format(path + it.name))
+                    pb.command("${prefix}adb", "shell", "rm", "-rf", (path + it.name).fmt())
+                else pb.command("${prefix}adb", "shell", "rm", "-f", (path + it.name).fmt())
                 init("rm")
             }
             Platform.runLater {
@@ -139,7 +140,7 @@ object FileExplorer {
 
     inline fun mkdir(name: String, crossinline func: () -> Unit) {
         thread(true, true) {
-            Command.pb.command("${Command.prefix}adb", "shell", "mkdir", format(path + name))
+            pb.command("${prefix}adb", "shell", "mkdir", (path + name).fmt())
             init("mkdir")
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
@@ -152,7 +153,7 @@ object FileExplorer {
 
     inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
         thread(true, true) {
-            Command.pb.command("${Command.prefix}adb", "shell", "mv", format(path + selected.name), format(path + to))
+            pb.command("${prefix}adb", "shell", "mv", (path + selected.name).fmt(), (path + to).fmt())
             init("mv")
             Platform.runLater {
                 if (statusTextField.text.isEmpty())

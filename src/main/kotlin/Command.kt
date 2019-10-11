@@ -2,13 +2,16 @@ import javafx.scene.control.TextInputControl
 import java.io.File
 import java.util.*
 
-object Command {
+open class Command {
 
     var pb: ProcessBuilder = ProcessBuilder()
     var prefix = ""
     lateinit var proc: Process
-    lateinit var outputTextArea: TextInputControl
     private val userdir = File(System.getProperty("user.dir"))
+
+    companion object {
+        lateinit var outputTextArea: TextInputControl
+    }
 
     fun setup(pref: String): Boolean {
         pb.directory(userdir)
