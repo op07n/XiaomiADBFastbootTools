@@ -132,7 +132,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.6.2"
+    private val version = "6.7"
 
     private val command = Command()
     private var image: File? = null
@@ -836,7 +836,7 @@ class MainController : Initializable {
 
     @FXML
     private fun downloadromButtonPressed(event: ActionEvent) {
-        branchComboBox.value?.let {branch ->
+        branchComboBox.value?.let { branch ->
             if (codenameTextField.text.isNotBlank()) {
                 val dc = DirectoryChooser()
                 dc.title = "Select the download location of the Fastboot ROM"
