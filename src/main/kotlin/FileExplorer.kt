@@ -15,13 +15,12 @@ object FileExplorer : Command() {
 
     private fun makeFile(out: String): AndroidFile? {
         val bits = mutableListOf<String>()
-        out.split(' ').forEach {
-            if (it.isNotBlank()) {
-                if (it == "->")
-                    return@forEach
-                bits.add(it)
+        for (bit in out.split(' '))
+            if (bit.isNotBlank()) {
+                if (bit == "->")
+                    break
+                bits.add(bit)
             }
-        }
         return when {
             bits.size < 6 -> null
             bits[5].length == 10 && bits[6].length == 5 -> AndroidFile(
