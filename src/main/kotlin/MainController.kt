@@ -637,10 +637,11 @@ class MainController : Initializable {
         if (checkFastboot()) {
             val dummy = File("dummy.img")
             dummy.writeBytes(ByteArray(8192))
-            val result = command.exec("fastboot flash antirbpass dummy.img")
-            if ("FAILED" in result)
-                command.exec_displayed("fastboot oem ignore_anti")
-            else outputTextArea.text = result
+            if ("FAILED" in command.exec("fastboot oem ignore_anti")) {
+                if ("FAILED" in command.exec("fastboot flash antirbpass dummy.img")) {
+                    outputTextArea.text = "Couldn't disable anti-rollback safeguard!"
+                } else outputTextArea.text = "Anti-rollback safeguard disabled!"
+            } else outputTextArea.text = "Anti-rollback safeguard disabled!"
             dummy.delete()
         }
     }
