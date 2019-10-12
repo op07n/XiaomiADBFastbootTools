@@ -814,16 +814,19 @@ class MainController : Initializable {
         branchComboBox.value?.let {
             if (codenameTextField.text.isNotBlank()) {
                 outputTextArea.appendText("\nLooking for $it...\n")
+                progressIndicator.isVisible = true
                 thread(true, true) {
                     val link = getLink(it, codenameTextField.text.trim())
                     Platform.runLater {
                         if (link != null && "bigota" in link) {
                             versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                             outputTextArea.appendText("$link\nLink copied to clipboard!\n")
+                            progressIndicator.isVisible = false
                             Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
                         } else {
                             versionLabel.text = "-"
                             outputTextArea.appendText("Link not found!\n")
+                            progressIndicator.isVisible = false
                         }
                     }
                 }
@@ -844,6 +847,7 @@ class MainController : Initializable {
                         if (link != null && "bigota" in link) {
                             Platform.runLater {
                                 versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                                progressIndicator.isVisible = true
                                 outputTextArea.appendText("Starting download...\n")
                                 downloaderPane.isDisable = true
                             }
@@ -875,12 +879,14 @@ class MainController : Initializable {
                             complete = true
                             Platform.runLater {
                                 outputTextArea.appendText("Download complete!\n\n")
+                                progressIndicator.isVisible = false
                                 downloadProgress.text = ""
                                 downloaderPane.isDisable = false
                             }
                         } else {
                             Platform.runLater {
                                 versionLabel.text = "-"
+                                progressIndicator.isVisible = false
                                 outputTextArea.appendText("Link not found!\n\n")
                             }
                         }
