@@ -820,13 +820,13 @@ class MainController : Initializable {
                     Platform.runLater {
                         if (link != null && "bigota" in link) {
                             versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                            outputTextArea.appendText("$link\nLink copied to clipboard!\n")
                             progressIndicator.isVisible = false
+                            outputTextArea.appendText("$link\nLink copied to clipboard!\n")
                             Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(link), null)
                         } else {
                             versionLabel.text = "-"
-                            outputTextArea.appendText("Link not found!\n")
                             progressIndicator.isVisible = false
+                            outputTextArea.appendText("Link not found!\n")
                         }
                     }
                 }
@@ -842,12 +842,12 @@ class MainController : Initializable {
                 dc.title = "Select the download location of the Fastboot ROM"
                 dc.showDialog((event.source as Node).scene.window)?.let {
                     outputTextArea.appendText("\nLooking for $branch...\n")
+                    progressIndicator.isVisible = true
                     thread(true, true) {
                         val link = getLink(branch, codenameTextField.text.trim())
                         if (link != null && "bigota" in link) {
                             Platform.runLater {
                                 versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                                progressIndicator.isVisible = true
                                 outputTextArea.appendText("Starting download...\n")
                                 downloaderPane.isDisable = true
                             }
@@ -878,8 +878,8 @@ class MainController : Initializable {
                             )
                             complete = true
                             Platform.runLater {
-                                outputTextArea.appendText("Download complete!\n\n")
                                 progressIndicator.isVisible = false
+                                outputTextArea.appendText("Download complete!\n\n")
                                 downloadProgress.text = ""
                                 downloaderPane.isDisable = false
                             }
