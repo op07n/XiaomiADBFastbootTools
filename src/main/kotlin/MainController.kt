@@ -833,18 +833,20 @@ class MainController : Initializable {
 
     @FXML
     private fun downloadromButtonPressed(event: ActionEvent) {
-        branchComboBox.value?.let {
+        branchComboBox.value?.let {branch ->
             if (codenameTextField.text.isNotBlank()) {
-                outputTextArea.appendText("\nLooking for $it...\n")
-                val link = getLink(it, codenameTextField.text.trim())
-                if (link != null && "bigota" in link) {
-                    val dc = DirectoryChooser()
-                    dc.title = "Select the download location of the Fastboot ROM"
-                    dc.showDialog((event.source as Node).scene.window)?.let {
-                        versionLabel.text = link.substringAfter(".com/").substringBefore('/')
-                        outputTextArea.appendText("Starting download...\n")
-                        downloaderPane.isDisable = true
-                        thread(true, true) {
+                val dc = DirectoryChooser()
+                dc.title = "Select the download location of the Fastboot ROM"
+                dc.showDialog((event.source as Node).scene.window)?.let {
+                    outputTextArea.appendText("\nLooking for $branch...\n")
+                    thread(true, true) {
+                        val link = getLink(branch, codenameTextField.text.trim())
+                        if (link != null && "bigota" in link) {
+                            Platform.runLater {
+                                versionLabel.text = link.substringAfter(".com/").substringBefore('/')
+                                outputTextArea.appendText("Starting download...\n")
+                                downloaderPane.isDisable = true
+                            }
                             var complete = false
                             val url = URL(link)
                             val size = url.openConnection().contentLengthLong * 1.0
@@ -856,11 +858,11 @@ class MainController : Initializable {
                                     val diff = (length - prev) / 1000.0
                                     val speed = if (diff < 1000.0)
                                         "${diff.toString().take(5)} KB/s"
-                                    else "${(diff / 1000.0).toString().take(5)} MB/s"
+                                    else "${(diff / 1000.0).toString().take(4)} MB/s"
                                     prev = length
                                     Platform.runLater {
                                         downloadProgress.text =
-                                            "${(file.length() / size * 100.0).toString().take(5)} %\t\t$speed"
+                                            "${(file.length() / size * 100.0).toString().take(4)} %\t\t$speed"
                                     }
                                     Thread.sleep(1000)
                                 }
@@ -876,11 +878,13 @@ class MainController : Initializable {
                                 downloadProgress.text = ""
                                 downloaderPane.isDisable = false
                             }
+                        } else {
+                            Platform.runLater {
+                                versionLabel.text = "-"
+                                outputTextArea.appendText("Link not found!\n\n")
+                            }
                         }
                     }
-                } else {
-                    versionLabel.text = "-"
-                    outputTextArea.appendText("Link not found!\n\n")
                 }
             }
         }
