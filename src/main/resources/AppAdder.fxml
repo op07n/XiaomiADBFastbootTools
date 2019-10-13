@@ -20,7 +20,7 @@
       </AnchorPane>
     <AnchorPane prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
-            <TextArea fx:id="appTextArea" prefHeight="200.0" prefWidth="200.0" promptText="com.example.app" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <TextArea fx:id="appTextArea" prefHeight="200.0" prefWidth="200.0" promptText="com.example.app: AppName" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                <font>
                   <Font size="16.0" />
                </font>
@@ -38,7 +38,7 @@
       </AnchorPane>
       <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="36.0">
          <children>
-            <Button fx:id="okButton" layoutX="195.0" layoutY="141.0" mnemonicParsing="false" onAction="#okButtonPressed" text="OK" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+            <Button fx:id="okButton" layoutX="195.0" layoutY="141.0" mnemonicParsing="false" onAction="#okButtonPressed" text="Save" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
                <font>
                   <Font size="15.0" />
                </font>

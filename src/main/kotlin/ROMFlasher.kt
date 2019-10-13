@@ -8,7 +8,7 @@ import kotlin.concurrent.thread
 
 object ROMFlasher : Command() {
     var directory: File? = null
-
+    private val isWin = "win" in System.getProperty("os.name").toLowerCase()
     lateinit var progressBar: ProgressBar
     lateinit var progressIndicator: ProgressIndicator
 
@@ -26,14 +26,16 @@ object ROMFlasher : Command() {
         return script
     }
 
-    fun exec(arg: String) {
+    fun exec(arg: String?) {
+        if (arg == null)
+            return
         pb.redirectErrorStream(true)
         var output = ""
         progressBar.progress = 0.0
         progressIndicator.isVisible = true
         thread(true, true) {
             val script: File
-            if ("win" in System.getProperty("os.name").toLowerCase()) {
+            if (isWin) {
                 script = createScript("$arg.bat")
                 pb.command("cmd.exe", "/c", script.absolutePath)
             } else {

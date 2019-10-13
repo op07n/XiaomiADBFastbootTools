@@ -136,7 +136,6 @@ class MainController : Initializable {
 
     private val command = Command()
     private var image: File? = null
-
     private val win = "win" in System.getProperty("os.name").toLowerCase()
     private val linux = "linux" in System.getProperty("os.name").toLowerCase()
 
@@ -676,15 +675,14 @@ class MainController : Initializable {
         dc.title = "Select the root directory of a Fastboot ROM"
         romLabel.text = "-"
         ROMFlasher.directory = dc.showDialog((event.source as Node).scene.window)
-        ROMFlasher.directory?.let {
-            if (File(it, "images").exists()) {
-                romLabel.text = it.name
+        ROMFlasher.directory?.let { dir ->
+            if (File(dir, "images").exists()) {
+                romLabel.text = dir.name
                 outputTextArea.text = "Fastboot ROM found!"
-                File(it, "flash_all.sh").setExecutable(true, false)
-                File(it, "flash_all_lock.sh").setExecutable(true, false)
-                File(it, "flash_all_except_storage.sh").setExecutable(true, false)
-                File(it, "flash_all_except_data.sh").setExecutable(true, false)
-                File(it, "flash_all_except_data_storage.sh").setExecutable(true, false)
+                dir.listFiles()?.forEach {
+                    if (!it.isDirectory)
+                        it.setExecutable(true, false)
+                }
             } else {
                 outputTextArea.text = "ERROR: Fastboot ROM not found!"
                 ROMFlasher.directory = null
@@ -694,7 +692,7 @@ class MainController : Initializable {
 
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
-        ROMFlasher.directory?.let {
+        ROMFlasher.directory?.let { dir ->
             scriptComboBox.value?.let { scb ->
                 if (checkFastboot())
                     confirm {
@@ -702,17 +700,7 @@ class MainController : Initializable {
                         when (scb) {
                             "Clean install" -> ROMFlasher.exec("flash_all")
                             "Clean install and lock" -> ROMFlasher.exec("flash_all_lock")
-                            "Update" -> when {
-                                File(
-                                    it,
-                                    "flash_all_except_data_storage.sh"
-                                ).exists() -> ROMFlasher.exec("flash_all_except_data_storage")
-                                File(
-                                    it,
-                                    "flash_all_except_data.sh"
-                                ).exists() -> ROMFlasher.exec("flash_all_except_data")
-                                else -> ROMFlasher.exec("flash_all_except_storage")
-                            }
+                            "Update" -> ROMFlasher.exec(dir.listFiles()?.find { "flash_all_except" in it.name }?.nameWithoutExtension)
                         }
                     }
             }

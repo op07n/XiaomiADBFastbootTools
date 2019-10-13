@@ -15,7 +15,10 @@ class AppAdderController : Initializable {
     @FXML
     private lateinit var appTextArea: TextArea
 
-    override fun initialize(location: URL?, resources: ResourceBundle?) {}
+    override fun initialize(location: URL?, resources: ResourceBundle?) {
+        if (AppManager.appsFile.exists())
+            appTextArea.text = AppManager.appsFile.readText()
+    }
 
     @FXML
     private fun loadButtonPressed(event: ActionEvent) {
@@ -27,15 +30,16 @@ class AppAdderController : Initializable {
 
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
-        if (!appTextArea.text.isNullOrBlank()) {
-            val alert = Alert(Alert.AlertType.WARNING)
-            alert.initStyle(StageStyle.UTILITY)
-            alert.isResizable = false
-            alert.headerText = "Uninstalling apps which aren't listed by default may brick your device."
-            alert.showAndWait()
-            appTextArea.text.trim().lines().forEach {
-                AppManager.addApp(it.trim())
+        if (appTextArea.text != null) {
+            if (appTextArea.text.isNotBlank()) {
+                val alert = Alert(Alert.AlertType.WARNING)
+                alert.initStyle(StageStyle.UTILITY)
+                alert.isResizable = false
+                alert.headerText = "Uninstalling apps which aren't listed by default may brick your device."
+                alert.showAndWait()
             }
+            AppManager.appsFile.writeText(appTextArea.text.trim())
+            AppManager.readPotentialApps()
             AppManager.createTables()
         }
         ((event.source as Node).scene.window as Stage).close()

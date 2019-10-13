@@ -1,0 +1,106 @@
+com.amazon.appmanager: Mobile Device Information Provider
+com.android.browser: Browser
+com.android.calendar: Calendar
+com.android.chrome: Google Chrome
+com.android.deskclock: Clock
+com.android.email: Mail
+com.android.providers.downloads.ui: Downloads
+com.android.providers.partnerbookmarks: PartnerBookmarks
+com.android.quicksearchbox: Search
+com.android.soundrecorder: Recorder
+com.bsp.catchlog: CatchLog
+com.facebook.appmanager: Facebook
+com.facebook.services: Facebook
+com.facebook.system: Facebook
+com.google.android.apps.books: Google Play Books
+com.google.android.apps.docs: Google Drive
+com.google.android.apps.googleassistant: Google Assistant
+com.google.android.apps.inputmethod.hindi: Google Indic Keyboard
+com.google.android.apps.inputmethod.zhuyin: Google Zhuyin Input
+com.google.android.apps.maps: Google Maps
+com.google.android.apps.photos: Google Photos
+com.google.android.apps.tachyon: Google Duo
+com.google.android.calculator: Google Calculator
+com.google.android.calendar: Google Calendar
+com.google.android.deskclock: Google Clock
+com.google.android.feedback: Market Feedback Agent
+com.google.android.gm: Gmail
+com.google.android.googlequicksearchbox: Google App
+com.google.android.inputmethod.korean: Google Korean Input
+com.google.android.inputmethod.latin: Gboard
+com.google.android.inputmethod.pinyin: Google Pinyin Input
+com.google.android.keep: Google Keep
+com.google.android.music: Google Play Music
+com.google.android.play.games: Google Play Games
+com.google.android.talk: Google Hangouts
+com.google.android.videos: Google Play Movies
+com.google.android.youtube: YouTube
+com.google.ar.lens: Google Lens
+com.huaqin.diaglogger: DiagLogger
+com.mi.android.globalFileexplorer: Mi File Manager
+com.mi.android.globallauncher: POCO Launcher
+com.mi.android.globalpersonalassistant: App Vault
+com.mi.dlabs.vr: Mi VR
+com.mi.globalTrendNews: News
+com.mi.webkit.core: MiWebView
+com.micredit.in: Mi Credit
+com.milink.service: UniPlay Service
+com.mipay.wallet: Mi Wallet
+com.mipay.wallet.id: Mi Pay
+com.mipay.wallet.in: Mi Pay
+com.miui.analytics: Analytics
+com.miui.antispam: Blocklist
+com.miui.backup: Backup
+com.miui.bugreport: Feedback
+com.miui.calculator: Calculator
+com.miui.cleanmaster: Cleaner
+com.miui.cloudbackup: Mi Cloud
+com.miui.cloudservice: Mi Cloud
+com.miui.cloudservice.sysbase: Mi Cloud
+com.miui.compass: Compass
+com.miui.daemon: MiuiDaemon
+com.miui.fm: FM Radio
+com.miui.freeform: Freeform
+com.miui.global.packageinstaller: Package Installer
+com.miui.hybrid: Quick Apps
+com.miui.hybrid.accessory: HybridAccessory
+com.miui.klo.bugreport: KLO Bugreport
+com.miui.micloudsync: Mi Cloud
+com.miui.miwallpaper: Mi Wallpaper
+com.miui.msa.global: MSA
+com.miui.nextpay: NextPay
+com.miui.notes: Notes
+com.miui.personalassistant: App Vault
+com.miui.player: Music
+com.miui.providers.weather: Weather
+com.miui.screenrecorder: Screen Recorder
+com.miui.smsextra: SMS Extra
+com.miui.systemAdSolution: MSA
+com.miui.touchassistant: Quick Ball
+com.miui.translation.kingsoft: Translation Service
+com.miui.translation.xmcloud: Translation Service
+com.miui.translation.youdao: Translation Service
+com.miui.translationservice: Translation Service
+com.miui.video: Mi Video
+com.miui.videoplayer: Mi Video
+com.miui.virtualsim: Mi Roaming
+com.miui.voiceassist: Mi AI
+com.miui.vsimcore: VsimCore
+com.miui.weather2: Weather
+com.miui.wmsvc: WMService
+com.miui.yellowpage: Yellow Pages
+com.netflix.partner.activation: PartnerNetflixActivation
+com.xiaomi.ab: MAB
+com.xiaomi.gameboosterglobal: Game Turbo
+com.xiaomi.glgm: Games
+com.xiaomi.joyose: Joyose
+com.xiaomi.mi_connect_service: MiConnectService
+com.xiaomi.midrop: Mi Drop
+com.xiaomi.mipicks: Mi App Store
+com.xiaomi.miplay_client: MiPlayClient
+com.xiaomi.mirecycle: Mi Recycle
+com.xiaomi.payment: Mi Credit
+com.xiaomi.scanner: Scanner
+com.xiaomi.simactivate.service: Xiaomi SIM Activate Service
+com.xiaomi.vipaccount: Xiaomi VIP Account
+com.xiaomi.xmsf: Xiaomi Service Framework
