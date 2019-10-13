@@ -133,11 +133,14 @@ class MainController : Initializable {
     private lateinit var downloaderPane: TitledPane
 
     private val version = "6.7"
-
     private val command = Command()
     private var image: File? = null
-    private val win = "win" in System.getProperty("os.name").toLowerCase()
-    private val linux = "linux" in System.getProperty("os.name").toLowerCase()
+
+    companion object {
+        val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
+        val win = "win" in System.getProperty("os.name").toLowerCase()
+        val linux = "linux" in System.getProperty("os.name").toLowerCase()
+    }
 
     private fun setPanels() {
         when (Device.mode) {
@@ -316,6 +319,7 @@ class MainController : Initializable {
                 val support = command.exec("adb shell cmd package install-existing xaft")
                 Device.reinstaller = !("not found" in support || "Unknown command" in support)
                 Device.disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
+                AppManager.readPotentialApps()
                 AppManager.createTables()
                 codenameTextField.text = Device.codename
                 if (Device.mode == Mode.ADB) {

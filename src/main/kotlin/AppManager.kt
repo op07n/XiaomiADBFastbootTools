@@ -17,12 +17,8 @@ object AppManager : Command() {
     lateinit var progress: ProgressBar
     lateinit var progressInd: ProgressIndicator
     var user = 0
-    val appsFile = File(System.getProperty("user.home"), "XiaomiADBFastbootTools" + File.pathSeparator + "apps.yml")
+    val appsFile = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
-
-    init {
-        readPotentialApps()
-    }
 
     private fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
         if (this[key] == null) {
@@ -46,7 +42,7 @@ object AppManager : Command() {
                     potentialApps[app[0].trim()] = app[1].trim()
                 }
             }
-        }
+        } else MainController.dir.mkdir()
     }
 
     fun createTables() {
@@ -69,7 +65,7 @@ object AppManager : Command() {
             deviceApps[it.substringAfter(':')] = "enabled"
         }
         potentialApps.forEach { (pkg, name) ->
-            when (deviceApps[name]) {
+            when (deviceApps[pkg]) {
                 "disabled" -> {
                     uninstallApps.add(name, pkg)
                     enableApps.add(name, pkg)
@@ -81,10 +77,10 @@ object AppManager : Command() {
                 "uninstalled" -> reinstallApps.add(name, pkg)
             }
         }
-        uninstallerTableView.items.addAll(uninstallApps.map { App(it.key, it.value) })
-        reinstallerTableView.items.addAll(reinstallApps.map { App(it.key, it.value) })
-        disablerTableView.items.addAll(disableApps.map { App(it.key, it.value) })
-        enablerTableView.items.addAll(enableApps.map { App(it.key, it.value) })
+        uninstallerTableView.items.addAll(uninstallApps.toSortedMap().map { App(it.key, it.value) })
+        reinstallerTableView.items.addAll(reinstallApps.toSortedMap().map { App(it.key, it.value) })
+        disablerTableView.items.addAll(disableApps.toSortedMap().map { App(it.key, it.value) })
+        enablerTableView.items.addAll(enableApps.toSortedMap().map { App(it.key, it.value) })
         uninstallerTableView.refresh()
         reinstallerTableView.refresh()
         disablerTableView.refresh()
