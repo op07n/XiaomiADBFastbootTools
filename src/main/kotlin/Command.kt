@@ -5,11 +5,11 @@ import java.util.*
 open class Command {
 
     var pb: ProcessBuilder = ProcessBuilder()
-    var prefix = ""
     lateinit var proc: Process
     private val userdir = File(System.getProperty("user.dir"))
 
     companion object {
+        var prefix = ""
         lateinit var outputTextArea: TextInputControl
     }
 
