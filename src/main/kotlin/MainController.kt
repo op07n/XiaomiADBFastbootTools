@@ -333,20 +333,20 @@ class MainController : Initializable {
                         Device.height.toString()
                     else "ERROR"
                 }
-                outputTextArea.text = "Device connected in ADB mode!\n\n"
+                outputTextArea.text = "Device connected in ADB mode!\n"
                 if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
                     outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
             }
             Device.readFastboot() -> {
                 progressIndicator.isVisible = false
                 codenameTextField.text = Device.codename
-                outputTextArea.text = "Device connected in Fastboot mode!"
+                outputTextArea.text = "Device connected in Fastboot mode!\n"
             }
             Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
-                outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!"
+                outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!\n"
             }
             (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "ERROR" !in outputTextArea.text -> {
-                outputTextArea.text = "ERROR: Device cannot be loaded!"
+                outputTextArea.text = "ERROR: Device cannot be loaded!\n"
             }
         }
         setUI()
