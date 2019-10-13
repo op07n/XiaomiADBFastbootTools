@@ -309,7 +309,7 @@ class MainController : Initializable {
     }
 
     private fun loadDevice() {
-        if ("Looking" !in outputTextArea.text)
+        if ("Looking for devices" !in outputTextArea.text)
             outputTextArea.text = "Looking for devices...\n"
         reloadMenuItem.isDisable = true
         progressIndicator.isVisible = true
