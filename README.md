@@ -72,7 +72,7 @@ JRE version requirements:
 * Oracle: 8 or later
 * OpenJDK: 11 or later
 
-On Windows/Mac, install Oracle Java from [here](https://www.oracle.com/technetwork/java/javase/downloads/index.html) or OpenJDK from [here](https://adoptopenjdk.net/).
+On Windows/Mac, install Oracle Java from [here](https://www.java.com/en/download/) or OpenJDK from [here](https://adoptopenjdk.net/).
 On Linux distributions, install `openjdk-11-jdk` or `openjdk-11-jre`.
 
 If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar XiaomiADBFastbootTools.jar`.
