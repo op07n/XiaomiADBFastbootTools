@@ -14,22 +14,22 @@ object ROMFlasher : Command() {
     private fun File.getCmdCount(): Int = this.readText().split("fastboot").size - 1
 
     private fun createScript(arg: String): File {
-        val script = File(directory, "script.${arg.substringAfter('.')}")
-        try {
-            script.writeText(File(directory, arg).readText().replace("fastboot", "${prefix}fastboot"))
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            ExceptionAlert(ex)
+        return File(directory, "script.${arg.substringAfter('.')}").apply {
+            try {
+                writeText(File(directory, arg).readText().replace("fastboot", "${prefix}fastboot"))
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                ExceptionAlert(ex)
+            }
+            setExecutable(true, false)
         }
-        script.setExecutable(true, false)
-        return script
     }
 
     fun exec(arg: String?) {
         if (arg == null)
             return
         pb.redirectErrorStream(true)
-        var output = ""
+        val sb = StringBuilder()
         progressBar.progress = 0.0
         progressIndicator.isVisible = true
         thread(true, true) {
@@ -43,18 +43,19 @@ object ROMFlasher : Command() {
             }
             val n = script.getCmdCount()
             proc = pb.start()
-            val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-            while (scan.hasNext()) {
-                output += scan.next()
-                if ("pause" in output)
-                    break
-                Platform.runLater {
-                    outputTextArea.text = output
-                    outputTextArea.appendText("")
-                    progressBar.progress = 1.0 * (output.toLowerCase().split("finished.").size - 1) / n
+            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                while (scanner.hasNext()) {
+                    sb.append(scanner.next())
+                    val full = sb.toString()
+                    if ("pause" in full)
+                        break
+                    Platform.runLater {
+                        outputTextArea.text = full
+                        outputTextArea.appendText("")
+                        progressBar.progress = 1.0 * (full.toLowerCase().split("finished.").size - 1) / n
+                    }
                 }
             }
-            scan.close()
             Platform.runLater {
                 outputTextArea.appendText("\nDone!")
                 progressBar.progress = 0.0

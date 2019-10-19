@@ -71,17 +71,17 @@ object FileExplorer : Command() {
         pb.redirectErrorStream(false)
         statusTextField.text = ""
         proc = pb.start()
-        val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-        while (scan.hasNextLine()) {
-            val output = scan.nextLine()
-            Platform.runLater {
-                if ('%' in output)
-                    progressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
-                else if (command in output)
-                    statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
+        Scanner(proc.inputStream, "UTF-8").useDelimiter("").use {scanner ->
+            while (scanner.hasNextLine()) {
+                val output = scanner.nextLine()
+                Platform.runLater {
+                    if ('%' in output)
+                        progressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
+                    else if (command in output)
+                        statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
+                }
             }
         }
-        scan.close()
         proc.waitFor()
     }
 

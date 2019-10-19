@@ -41,12 +41,13 @@ class FileExplorerController : Initializable {
 
         FileExplorer.statusTextField = statusTextField
         FileExplorer.progressBar = progressBar
-
-        listView.selectionModel.selectionMode = SelectionMode.MULTIPLE
-        listView.setCellFactory { FileListCell() }
         pathTextField.text = FileExplorer.path
-        listView.items = FileExplorer.getFiles()
-        listView.refresh()
+        listView.apply {
+            selectionModel.selectionMode = SelectionMode.MULTIPLE
+            setCellFactory { FileListCell() }
+            items = FileExplorer.getFiles()
+            refresh()
+        }
     }
 
     private fun loadList() {
@@ -89,13 +90,14 @@ class FileExplorerController : Initializable {
     @FXML
     private fun newFolderButtonPressed(event: ActionEvent) {
         if (Device.readADB()) {
-            val dialog = TextInputDialog()
-            dialog.initStyle(StageStyle.UTILITY)
-            dialog.isResizable = false
-            dialog.title = "New Folder"
-            dialog.contentText = "Folder name:"
-            dialog.headerText = null
-            dialog.graphic = null
+            val dialog = TextInputDialog().apply {
+                initStyle(StageStyle.UTILITY)
+                isResizable = false
+                title = "New Folder"
+                contentText = "Folder name:"
+                headerText = null
+                graphic = null
+            }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank())
                 FileExplorer.mkdir(result.get().trim()) {
@@ -109,14 +111,15 @@ class FileExplorerController : Initializable {
         if (Device.readADB()) {
             if (listView.selectionModel.selectedItems.isEmpty())
                 return
-            val alert = Alert(Alert.AlertType.CONFIRMATION)
-            alert.initStyle(StageStyle.UTILITY)
-            alert.isResizable = false
-            alert.dialogPane.prefWidth *= 0.6
-            alert.dialogPane.prefHeight *= 0.6
-            alert.title = "Delete"
-            alert.headerText = "Are you sure?"
-            alert.graphic = ImageView("delete.png")
+            val alert = Alert(Alert.AlertType.CONFIRMATION).apply {
+                initStyle(StageStyle.UTILITY)
+                isResizable = false
+                dialogPane.prefWidth *= 0.6
+                dialogPane.prefHeight *= 0.6
+                title = "Delete"
+                headerText = "Are you sure?"
+                graphic = ImageView("delete.png")
+            }
             val yes = ButtonType("Yes")
             val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
             alert.buttonTypes.setAll(yes, no)
@@ -134,15 +137,16 @@ class FileExplorerController : Initializable {
             if (listView.selectionModel.selectedItems.size != 1)
                 return
             val item = listView.selectionModel.selectedItems[0]
-            val dialog = TextInputDialog(item.name)
-            dialog.initStyle(StageStyle.UTILITY)
-            dialog.isResizable = false
-            dialog.title = "Rename"
-            dialog.contentText = if (item.dir)
-                "Folder name:"
-            else "File name:"
-            dialog.headerText = null
-            dialog.graphic = null
+            val dialog = TextInputDialog(item.name).apply {
+                initStyle(StageStyle.UTILITY)
+                isResizable = false
+                title = "Rename"
+                contentText = if (item.dir)
+                    "Folder name:"
+                else "File name:"
+                headerText = null
+                graphic = null
+            }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name)
                 FileExplorer.rename(item, result.get().trim()) {

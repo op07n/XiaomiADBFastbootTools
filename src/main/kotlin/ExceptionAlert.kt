@@ -14,20 +14,23 @@ class ExceptionAlert(ex: Exception) {
     private val printWriter = PrintWriter(stringWriter)
 
     init {
-        alert.initStyle(StageStyle.UTILITY)
-        alert.title = "ERROR"
-        alert.headerText =
-            "Unexpected exception!"
-        vb.alignment = Pos.CENTER
-        ex.printStackTrace(printWriter)
-        val textArea = TextArea(stringWriter.toString())
-        textArea.isEditable = false
-        textArea.isWrapText = true
-        textArea.maxWidth = Double.MAX_VALUE
-        textArea.maxHeight = Double.MAX_VALUE
-        vb.children.add(textArea)
-        alert.dialogPane.content = vb
-        alert.isResizable = false
-        alert.showAndWait()
+        alert.apply {
+            initStyle(StageStyle.UTILITY)
+            title = "ERROR"
+            headerText =
+                "Unexpected exception!"
+            vb.alignment = Pos.CENTER
+            ex.printStackTrace(printWriter)
+            val textArea = TextArea(stringWriter.toString()).apply {
+                isEditable = false
+                isWrapText = true
+                maxWidth = Double.MAX_VALUE
+                maxHeight = Double.MAX_VALUE
+            }
+            vb.children.add(textArea)
+            dialogPane.content = vb
+            isResizable = false
+            showAndWait()
+        }
     }
 }

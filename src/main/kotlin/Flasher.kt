@@ -10,22 +10,21 @@ object Flasher : Command() {
 
     fun exec(image: File?, vararg args: String) {
         pb.redirectErrorStream(true)
-        var output = ""
         progressIndicator.isVisible = true
+        outputTextArea.text = ""
         thread(true, true) {
             args.forEach {
                 val bits = it.split(' ').toMutableList()
                 bits[0] = prefix + bits[0]
                 proc = pb.command(bits + image?.absolutePath).start()
-                val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                while (scan.hasNext()) {
-                    output += scan.next()
-                    Platform.runLater {
-                        outputTextArea.text = output
-                        outputTextArea.appendText("")
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNext()) {
+                        val next = scanner.next()
+                        Platform.runLater {
+                            outputTextArea.appendText(next)
+                        }
                     }
                 }
-                scan.close()
                 proc.waitFor()
             }
             Platform.runLater {

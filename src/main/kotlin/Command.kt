@@ -17,9 +17,11 @@ open class Command {
         pb.directory(userdir)
         prefix = pref
         return try {
-            pb.command("${prefix}adb", "--version").start()
-            pb.command("${prefix}fastboot", "--version").start()
-            pb.command("${prefix}adb", "start-server").start()
+            pb.apply {
+                command("${prefix}adb", "--version").start()
+                command("${prefix}fastboot", "--version").start()
+                command("${prefix}adb", "start-server").start()
+            }
             true
         } catch (e: Exception) {
             false
@@ -29,39 +31,38 @@ open class Command {
     fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
         pb.directory(userdir)
         pb.redirectErrorStream(err)
-        var output = ""
+        val sb = StringBuilder()
         args.forEach {
             val bits = it.split(' ', limit = lim).toMutableList()
             bits[0] = prefix + bits[0]
             proc = pb.command(bits).start()
-            val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-            while (scan.hasNextLine())
-                output += scan.nextLine() + '\n'
-            scan.close()
+            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                while (scanner.hasNextLine())
+                    sb.append(scanner.nextLine() + '\n')
+            }
             proc.waitFor()
         }
-        return output
+        return sb.toString()
     }
 
     fun exec_displayed(vararg args: String, lim: Int = 0, err: Boolean = true): String {
         pb.directory(userdir)
         pb.redirectErrorStream(err)
-        var output = ""
+        val sb = StringBuilder()
         outputTextArea.text = ""
         args.forEach {
             val bits = it.split(' ', limit = lim).toMutableList()
             bits[0] = prefix + bits[0]
             proc = pb.command(bits).start()
-            val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-            var next: String
-            while (scan.hasNextLine()) {
-                next = scan.nextLine() + '\n'
-                output += next
-                outputTextArea.appendText(next)
+            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                while (scanner.hasNextLine()){
+                    val next = scanner.nextLine() + '\n'
+                    sb.append(next)
+                    outputTextArea.appendText(next)
+                }
             }
-            scan.close()
             proc.waitFor()
         }
-        return output
+        return sb.toString()
     }
 }

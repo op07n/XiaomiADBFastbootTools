@@ -98,15 +98,17 @@ object AppManager : Command() {
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg)
                             .start()
-                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    var output = ""
-                    while (scan.hasNextLine())
-                        output += scan.nextLine() + '\n'
-                    scan.close()
+                    val sb = StringBuilder()
+                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                        while (scanner.hasNextLine())
+                            sb.append(scanner.nextLine() + '\n')
+                    }
                     Platform.runLater {
-                        outputTextArea.appendText("App: ${it.appnameProperty().get()}\n")
-                        outputTextArea.appendText("Package: $pkg\n")
-                        outputTextArea.appendText("Result: $output\n")
+                        outputTextArea.apply {
+                            appendText("App: ${it.appnameProperty().get()}\n")
+                            appendText("Package: $pkg\n")
+                            appendText("Result: $sb\n")
+                        }
                         progress.progress += 1.0 / n
                     }
                 }
@@ -141,18 +143,21 @@ object AppManager : Command() {
                             pkg
                         )
                             .start()
-                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    var output = ""
-                    while (scan.hasNextLine())
-                        output += scan.nextLine() + '\n'
-                    scan.close()
+                    val sb = StringBuilder()
+                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                        while (scanner.hasNextLine())
+                            sb.append(scanner.nextLine() + '\n')
+                    }
+                    var output = sb.toString()
                     output = if ("installed for user" in output)
                         "Success\n"
                     else "Failure [${output.substringAfter(pkg).trim()}]\n"
                     Platform.runLater {
-                        outputTextArea.appendText("App: ${it.appnameProperty().get()}\n")
-                        outputTextArea.appendText("Package: $pkg\n")
-                        outputTextArea.appendText("Result: $output\n")
+                        outputTextArea.apply {
+                            appendText("App: ${it.appnameProperty().get()}\n")
+                            appendText("Package: $pkg\n")
+                            appendText("Result: $output\n")
+                        }
                         progress.progress += 1.0 / n
                     }
                 }
@@ -184,18 +189,20 @@ object AppManager : Command() {
                         "$user",
                         pkg
                     ).start()
-                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    var output = ""
-                    while (scan.hasNextLine())
-                        output += scan.nextLine() + '\n'
-                    scan.close()
-                    output = if ("disabled-user" in output)
+                    val sb = StringBuilder()
+                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                        while (scanner.hasNextLine())
+                            sb.append(scanner.nextLine() + '\n')
+                    }
+                    val output = if ("disabled-user" in sb.toString())
                         "Success\n"
                     else "Failure\n"
                     Platform.runLater {
-                        outputTextArea.appendText("App: ${it.appnameProperty().get()}\n")
-                        outputTextArea.appendText("Package: $pkg\n")
-                        outputTextArea.appendText("Result: $output\n")
+                        outputTextArea.apply {
+                            appendText("App: ${it.appnameProperty().get()}\n")
+                            appendText("Package: $pkg\n")
+                            appendText("Result: $output\n")
+                        }
                         progress.progress += 1.0 / n
                     }
                 }
@@ -221,18 +228,20 @@ object AppManager : Command() {
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg)
                             .start()
-                    val scan = Scanner(proc.inputStream, "UTF-8").useDelimiter("")
-                    var output = ""
-                    while (scan.hasNextLine())
-                        output += scan.nextLine() + '\n'
-                    scan.close()
-                    output = if ("enabled" in output)
+                    val sb = StringBuilder()
+                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                        while (scanner.hasNextLine())
+                            sb.append(scanner.nextLine() + '\n')
+                    }
+                    val output = if ("enabled" in sb.toString())
                         "Success\n"
                     else "Failure\n"
                     Platform.runLater {
-                        outputTextArea.appendText("App: ${it.appnameProperty().get()}\n")
-                        outputTextArea.appendText("Package: $pkg\n")
-                        outputTextArea.appendText("Result: $output\n")
+                        outputTextArea.apply {
+                            appendText("App: ${it.appnameProperty().get()}\n")
+                            appendText("Package: $pkg\n")
+                            appendText("Result: $output\n")
+                        }
                         progress.progress += 1.0 / n
                     }
                 }

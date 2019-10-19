@@ -261,38 +261,40 @@ class MainController : Initializable {
 
     private fun checkVersion() {
         val huc =
-            URL("https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection
-        huc.requestMethod = "GET"
-        huc.setRequestProperty("Referer", "https://github.com/")
-        huc.instanceFollowRedirects = false
-        try {
-            huc.connect()
-            huc.disconnect()
-        } catch (e: IOException) {
-            return
-        }
+            (URL("https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                setRequestProperty("Referer", "https://github.com/")
+                instanceFollowRedirects = false
+                try {
+                    connect()
+                    disconnect()
+                } catch (e: IOException) {
+                    return
+                }
+            }
         val link = huc.getHeaderField("Location")
         val latest = link.substringAfterLast('/')
         if (latest.versionToInt() > version.versionToInt())
             Platform.runLater {
-                val alert = Alert(AlertType.INFORMATION)
-                alert.initStyle(StageStyle.UTILITY)
-                alert.title = "New version available!"
-                alert.graphic = ImageView("mitu.png")
-                alert.headerText =
-                    "Version $latest is available!"
-                val vb = VBox()
-                vb.alignment = Pos.CENTER
-                val download = Hyperlink("Download")
-                download.onAction = EventHandler {
-                    if (linux)
-                        Runtime.getRuntime().exec("xdg-open $link")
-                    else Desktop.getDesktop().browse(URI(link))
+                Alert(AlertType.INFORMATION).apply {
+                    initStyle(StageStyle.UTILITY)
+                    title = "New version available!"
+                    graphic = ImageView("mitu.png")
+                    headerText =
+                        "Version $latest is available!"
+                    val vb = VBox()
+                    vb.alignment = Pos.CENTER
+                    val download = Hyperlink("Download")
+                    download.onAction = EventHandler {
+                        if (linux)
+                            Runtime.getRuntime().exec("xdg-open $link")
+                        else Desktop.getDesktop().browse(URI(link))
+                    }
+                    download.font = Font(15.0)
+                    vb.children.add(download)
+                    dialogPane.content = vb
+                    showAndWait()
                 }
-                download.font = Font(15.0)
-                vb.children.add(download)
-                alert.dialogPane.content = vb
-                alert.showAndWait()
             }
     }
 
@@ -426,11 +428,12 @@ class MainController : Initializable {
                 checkDevice()
             } else {
                 Platform.runLater {
-                    val alert = Alert(AlertType.ERROR)
-                    alert.title = "Fatal Error"
-                    alert.headerText =
-                        "ERROR: Can't find ADB/Fastboot!"
-                    alert.showAndWait()
+                    Alert(AlertType.ERROR).apply {
+                        title = "Fatal Error"
+                        headerText =
+                            "ERROR: Can't find ADB/Fastboot!"
+                        showAndWait()
+                    }
                     Platform.exit()
                 }
             }
@@ -438,16 +441,17 @@ class MainController : Initializable {
     }
 
     private inline fun confirm(msg: String = "", func: () -> Unit) {
-        val alert = Alert(AlertType.CONFIRMATION)
-        alert.initStyle(StageStyle.UTILITY)
-        alert.isResizable = false
-        alert.headerText = "${msg.trim()}\nAre you sure you want to proceed?".trim()
-        val yes = ButtonType("Yes")
-        val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
-        alert.buttonTypes.setAll(yes, no)
-        val result = alert.showAndWait()
-        if (result.get() == yes)
-            func()
+        Alert(AlertType.CONFIRMATION).apply {
+            initStyle(StageStyle.UTILITY)
+            isResizable = false
+            headerText = "${msg.trim()}\nAre you sure you want to proceed?".trim()
+            val yes = ButtonType("Yes")
+            val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
+            buttonTypes.setAll(yes, no)
+            val result = showAndWait()
+            if (result.get() == yes)
+                func()
+        }
     }
 
     private fun checkCamera2(): Boolean = "1" in command.exec("adb shell getprop persist.camera.HAL3.enabled")
@@ -514,13 +518,13 @@ class MainController : Initializable {
     private fun openButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml")).load<Parent>())
-            val stage = Stage()
-            stage.scene = scene
-            stage.initModality(Modality.APPLICATION_MODAL)
-            stage.scene = scene
-            stage.title = "File Explorer"
-            stage.isResizable = false
-            stage.showAndWait()
+            Stage().apply {
+                this.scene = scene
+                initModality(Modality.APPLICATION_MODAL)
+                title = "File Explorer"
+                isResizable = false
+                showAndWait()
+            }
         }
     }
 
@@ -605,29 +609,31 @@ class MainController : Initializable {
         when (Device.mode) {
             Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
                 val props = command.exec("adb shell getprop")
-                val fc = FileChooser()
-                fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-                fc.title = "Save properties"
-                fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
-                    try {
-                        it.writeText(props)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        ExceptionAlert(ex)
+                FileChooser().apply {
+                    extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
+                    title = "Save properties"
+                    showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
+                        try {
+                            it.writeText(props)
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
+                            ExceptionAlert(ex)
+                        }
                     }
                 }
             }
             Mode.FASTBOOT -> if (checkFastboot()) {
                 val props = command.exec("fastboot getvar all")
-                val fc = FileChooser()
-                fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-                fc.title = "Save properties"
-                fc.showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
-                    try {
-                        it.writeText(props)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        ExceptionAlert(ex)
+                FileChooser().apply {
+                    extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
+                    title = "Save properties"
+                    showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
+                        try {
+                            it.writeText(props)
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
+                            ExceptionAlert(ex)
+                        }
                     }
                 }
             }
@@ -651,11 +657,12 @@ class MainController : Initializable {
 
     @FXML
     private fun browseimageButtonPressed(event: ActionEvent) {
-        val fc = FileChooser()
-        fc.extensionFilters.add(FileChooser.ExtensionFilter("Image File", "*.*"))
-        fc.title = "Select an image"
-        image = fc.showOpenDialog((event.source as Node).scene.window)
-        imageLabel.text = image?.name
+        FileChooser().apply {
+            extensionFilters.add(FileChooser.ExtensionFilter("Image File", "*.*"))
+            title = "Select an image"
+            image = showOpenDialog((event.source as Node).scene.window)
+            imageLabel.text = image?.name
+        }
     }
 
     @FXML
@@ -675,10 +682,11 @@ class MainController : Initializable {
 
     @FXML
     private fun browseromButtonPressed(event: ActionEvent) {
-        val dc = DirectoryChooser()
-        dc.title = "Select the root directory of a Fastboot ROM"
-        romLabel.text = "-"
-        ROMFlasher.directory = dc.showDialog((event.source as Node).scene.window)
+        DirectoryChooser().apply {
+            title = "Select the root directory of a Fastboot ROM"
+            romLabel.text = "-"
+            ROMFlasher.directory = showDialog((event.source as Node).scene.window)
+        }
         ROMFlasher.directory?.let { dir ->
             if (File(dir, "images").exists()) {
                 romLabel.text = dir.name
@@ -758,18 +766,18 @@ class MainController : Initializable {
 
     private fun getLink(version: String, codename: String): String? {
         fun getLocation(codename: String, ending: String, region: String): String? {
-            val huc =
-                URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=F&r=$region&n=").openConnection() as HttpURLConnection
-            huc.requestMethod = "GET"
-            huc.setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-            huc.instanceFollowRedirects = false
-            try {
-                huc.connect()
-                huc.disconnect()
-            } catch (e: IOException) {
-                return null
-            }
-            return huc.getHeaderField("Location")
+            (URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=F&r=$region&n=").openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    setRequestProperty("Referer", "http://en.miui.com/a-234.html")
+                    instanceFollowRedirects = false
+                    try {
+                        connect()
+                        disconnect()
+                    } catch (e: IOException) {
+                        return null
+                    }
+                    return getHeaderField("Location")
+                }
         }
         when (version) {
             "China Stable" ->
@@ -1003,59 +1011,63 @@ class MainController : Initializable {
 
     @FXML
     private fun secondSpaceButtonPressed(event: ActionEvent) {
-        AppManager.user = if (secondSpaceButton.isSelected)
-            10
-        else 0
-        AppManager.createTables()
+        AppManager.apply {
+            user = if (secondSpaceButton.isSelected)
+                10
+            else 0
+            createTables()
+        }
     }
 
     @FXML
     private fun addAppsButtonPressed(event: ActionEvent) {
         if (checkADB()) {
             val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml")).load<Parent>())
-            val stage = Stage()
-            stage.initModality(Modality.APPLICATION_MODAL)
-            stage.scene = scene
-            stage.isResizable = false
-            stage.showAndWait()
+            Stage().apply {
+                initModality(Modality.APPLICATION_MODAL)
+                this.scene = scene
+                isResizable = false
+                showAndWait()
+            }
         }
     }
 
     @FXML
     private fun aboutMenuItemPressed(event: ActionEvent) {
-        val alert = Alert(AlertType.INFORMATION)
-        alert.initStyle(StageStyle.UTILITY)
-        alert.title = "About"
-        alert.graphic = ImageView("icon.png")
-        alert.headerText =
-            "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU\n\n" +
-                    "ADB/Fastboot\n${command.exec("adb --version").lines()[1]}"
-        val vb = VBox()
-        vb.alignment = Pos.CENTER
-        val discord = Hyperlink("Xiaomi Community on Discord")
-        discord.onAction = EventHandler {
-            if (linux)
-                Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
-            else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
+        Alert(AlertType.INFORMATION).apply {
+            initStyle(StageStyle.UTILITY)
+            title = "About"
+            graphic = ImageView("icon.png")
+            headerText =
+                "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU\n\n" +
+                        "ADB/Fastboot\n${command.exec("adb --version").lines()[1]}"
+            val vb = VBox()
+            vb.alignment = Pos.CENTER
+            val discord = Hyperlink("Xiaomi Community on Discord")
+            discord.onAction = EventHandler {
+                if (linux)
+                    Runtime.getRuntime().exec("xdg-open https://discord.gg/xiaomi")
+                else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
+            }
+            discord.font = Font(15.0)
+            val twitter = Hyperlink("Saki_EU on Twitter")
+            twitter.onAction = EventHandler {
+                if (linux)
+                    Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
+                else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
+            }
+            twitter.font = Font(15.0)
+            val github = Hyperlink("Repository on GitHub")
+            github.onAction = EventHandler {
+                if (linux)
+                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
+                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
+            }
+            github.font = Font(15.0)
+            vb.children.addAll(discord, twitter, github)
+            dialogPane.content = vb
+            isResizable = false
+            showAndWait()
         }
-        discord.font = Font(15.0)
-        val twitter = Hyperlink("Saki_EU on Twitter")
-        twitter.onAction = EventHandler {
-            if (linux)
-                Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
-            else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
-        }
-        twitter.font = Font(15.0)
-        val github = Hyperlink("Repository on GitHub")
-        github.onAction = EventHandler {
-            if (linux)
-                Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
-            else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
-        }
-        github.font = Font(15.0)
-        vb.children.addAll(discord, twitter, github)
-        alert.dialogPane.content = vb
-        alert.isResizable = false
-        alert.showAndWait()
     }
 }

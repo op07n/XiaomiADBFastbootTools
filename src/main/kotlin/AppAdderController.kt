@@ -32,15 +32,18 @@ class AppAdderController : Initializable {
     private fun okButtonPressed(event: ActionEvent) {
         if (appTextArea.text != null) {
             if (appTextArea.text.isNotBlank()) {
-                val alert = Alert(Alert.AlertType.WARNING)
-                alert.initStyle(StageStyle.UTILITY)
-                alert.isResizable = false
-                alert.headerText = "Uninstalling apps which aren't listed by default may brick your device."
-                alert.showAndWait()
+                Alert(Alert.AlertType.WARNING).apply {
+                    initStyle(StageStyle.UTILITY)
+                    isResizable = false
+                    headerText = "Uninstalling apps which aren't listed by default may brick your device."
+                    showAndWait()
+                }
             }
-            AppManager.appsFile.writeText(appTextArea.text.trim())
-            AppManager.readPotentialApps()
-            AppManager.createTables()
+            AppManager.apply {
+                appsFile.writeText(appTextArea.text.trim())
+                readPotentialApps()
+                createTables()
+            }
         }
         ((event.source as Node).scene.window as Stage).close()
     }

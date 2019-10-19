@@ -12,7 +12,7 @@ object Device {
     var mode = Mode.NONE
     var reinstaller = true
     var disabler = true
-    var command = Command()
+    val command = Command()
 
     fun readADB(): Boolean {
         val propstring = command.exec("adb shell getprop")
