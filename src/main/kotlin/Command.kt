@@ -55,7 +55,7 @@ open class Command {
             bits[0] = prefix + bits[0]
             proc = pb.command(bits).start()
             Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNextLine()){
+                while (scanner.hasNextLine()) {
                     val next = scanner.nextLine() + '\n'
                     sb.append(next)
                     outputTextArea.appendText(next)

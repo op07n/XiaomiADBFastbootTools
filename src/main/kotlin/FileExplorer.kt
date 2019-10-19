@@ -71,7 +71,7 @@ object FileExplorer : Command() {
         pb.redirectErrorStream(false)
         statusTextField.text = ""
         proc = pb.start()
-        Scanner(proc.inputStream, "UTF-8").useDelimiter("").use {scanner ->
+        Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
             while (scanner.hasNextLine()) {
                 val output = scanner.nextLine()
                 Platform.runLater {
