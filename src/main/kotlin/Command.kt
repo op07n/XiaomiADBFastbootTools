@@ -1,16 +1,22 @@
+import javafx.application.Platform
+import javafx.scene.control.ProgressBar
+import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
 import java.io.File
 import java.util.*
+import kotlin.concurrent.thread
 
 open class Command {
 
     var pb: ProcessBuilder = ProcessBuilder()
     lateinit var proc: Process
-    private val userdir = File(System.getProperty("user.dir"))
 
     companion object {
         var prefix = ""
+        val userdir = File(System.getProperty("user.dir"))
         lateinit var outputTextArea: TextInputControl
+        lateinit var progressBar: ProgressBar
+        lateinit var progressIndicator: ProgressIndicator
     }
 
     fun setup(pref: String): Boolean {
@@ -28,7 +34,7 @@ open class Command {
         }
     }
 
-    fun exec(vararg args: String, lim: Int = 0, err: Boolean = true): String {
+    fun exec(vararg args: String, err: Boolean = true, lim: Int = 0): String {
         pb.directory(userdir)
         pb.redirectErrorStream(err)
         val sb = StringBuilder()
@@ -45,7 +51,32 @@ open class Command {
         return sb.toString()
     }
 
-    fun exec_displayed(vararg args: String, lim: Int = 0, err: Boolean = true): String {
+    fun exec(vararg args: String, image: File?) {
+        pb.redirectErrorStream(true)
+        progressIndicator.isVisible = true
+        outputTextArea.text = ""
+        thread(true, true) {
+            args.forEach {
+                val bits = it.split(' ').toMutableList()
+                bits[0] = prefix + bits[0]
+                proc = pb.command(bits + image?.absolutePath).start()
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNext()) {
+                        val next = scanner.next()
+                        Platform.runLater {
+                            outputTextArea.appendText(next)
+                        }
+                    }
+                }
+                proc.waitFor()
+            }
+            Platform.runLater {
+                progressIndicator.isVisible = false
+            }
+        }
+    }
+
+    fun execDisplayed(vararg args: String, err: Boolean = true, lim: Int = 0): String {
         pb.directory(userdir)
         pb.redirectErrorStream(err)
         val sb = StringBuilder()

@@ -25,6 +25,8 @@ class FileExplorerController : Initializable {
     @FXML
     private lateinit var progressBar: ProgressBar
 
+    private lateinit var fileExplorer: FileExplorer
+
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         backButton.graphic = ImageView("back.png")
         backButton.setOnMouseClicked {
@@ -34,30 +36,28 @@ class FileExplorerController : Initializable {
             pathTextField.text = pathTextField.text.trim()
             if (!pathTextField.text.endsWith('/'))
                 pathTextField.text += '/'
-            FileExplorer.path = pathTextField.text
-            listView.items = FileExplorer.getFiles()
+            fileExplorer.path = pathTextField.text
+            listView.items = fileExplorer.getFiles()
             listView.refresh()
         }
-
-        FileExplorer.statusTextField = statusTextField
-        FileExplorer.progressBar = progressBar
-        pathTextField.text = FileExplorer.path
+        fileExplorer = FileExplorer(statusTextField, progressBar)
+        pathTextField.text = fileExplorer.path
         listView.apply {
             selectionModel.selectionMode = SelectionMode.MULTIPLE
             setCellFactory { FileListCell() }
-            items = FileExplorer.getFiles()
+            items = fileExplorer.getFiles()
             refresh()
         }
     }
 
     private fun loadList() {
-        pathTextField.text = FileExplorer.path
-        listView.items = FileExplorer.getFiles()
+        pathTextField.text = fileExplorer.path
+        listView.items = fileExplorer.getFiles()
         listView.refresh()
     }
 
     private fun navigate(where: String) {
-        FileExplorer.navigate(where)
+        fileExplorer.navigate(where)
         loadList()
     }
 
@@ -67,7 +67,7 @@ class FileExplorerController : Initializable {
             val fc = FileChooser()
             fc.title = "Select files to copy"
             fc.showOpenMultipleDialog((event.source as Node).scene.window)?.let {
-                FileExplorer.push(it) {
+                fileExplorer.push(it) {
                     loadList()
                 }
             }
@@ -80,7 +80,7 @@ class FileExplorerController : Initializable {
             val dc = DirectoryChooser()
             dc.title = "Select the destination"
             dc.showDialog((event.source as Node).scene.window)?.let {
-                FileExplorer.pull(listView.selectionModel.selectedItems, it) {
+                fileExplorer.pull(listView.selectionModel.selectedItems, it) {
                     loadList()
                 }
             }
@@ -100,7 +100,7 @@ class FileExplorerController : Initializable {
             }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank())
-                FileExplorer.mkdir(result.get().trim()) {
+                fileExplorer.mkdir(result.get().trim()) {
                     loadList()
                 }
         } else close(event)
@@ -125,7 +125,7 @@ class FileExplorerController : Initializable {
             alert.buttonTypes.setAll(yes, no)
             val result = alert.showAndWait()
             if (result.get() == yes)
-                FileExplorer.delete(listView.selectionModel.selectedItems) {
+                fileExplorer.delete(listView.selectionModel.selectedItems) {
                     loadList()
                 }
         } else close(event)
@@ -149,7 +149,7 @@ class FileExplorerController : Initializable {
             }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name)
-                FileExplorer.rename(item, result.get().trim()) {
+                fileExplorer.rename(item, result.get().trim()) {
                     loadList()
                 }
         } else close(event)

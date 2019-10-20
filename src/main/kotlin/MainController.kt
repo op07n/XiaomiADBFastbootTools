@@ -132,9 +132,10 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.7.1"
+    private val version = "6.7.2"
     private val command = Command()
     private var image: File? = null
+    private var romDirectory: File? = null
 
     companion object {
         val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
@@ -412,9 +413,8 @@ class MainController : Initializable {
         enablerTableView.columns.setAll(encheckTableColumn, enappTableColumn, enpackageTableColumn)
 
         Command.outputTextArea = outputTextArea
-        Flasher.progressIndicator = progressIndicator
-        ROMFlasher.progressBar = progressBar
-        ROMFlasher.progressIndicator = progressIndicator
+        Command.progressIndicator = progressIndicator
+        Command.progressBar = progressBar
         AppManager.uninstallerTableView = uninstallerTableView
         AppManager.reinstallerTableView = reinstallerTableView
         AppManager.disablerTableView = disablerTableView
@@ -531,7 +531,7 @@ class MainController : Initializable {
     @FXML
     private fun applyDpiButtonPressed(event: ActionEvent) {
         if (dpiTextField.text.isNotBlank() && checkADB()) {
-            val attempt = command.exec_displayed("adb shell wm density ${dpiTextField.text.trim()}")
+            val attempt = command.execDisplayed("adb shell wm density ${dpiTextField.text.trim()}")
             outputTextArea.text = when {
                 "permission" in attempt ->
                     "ERROR: Please allow USB debugging (Security settings)!"
@@ -548,7 +548,7 @@ class MainController : Initializable {
     @FXML
     private fun resetDpiButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            val attempt = command.exec_displayed("adb shell wm density reset")
+            val attempt = command.execDisplayed("adb shell wm density reset")
             outputTextArea.text = when {
                 "permission" in attempt ->
                     "ERROR: Please allow USB debugging (Security settings)!"
@@ -564,7 +564,7 @@ class MainController : Initializable {
     private fun applyResButtonPressed(event: ActionEvent) {
         if (widthTextField.text.isNotBlank() && heightTextField.text.isNotBlank() && checkADB()) {
             val attempt =
-                command.exec_displayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
+                command.execDisplayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
             outputTextArea.text = when {
                 "permission" in attempt ->
                     "ERROR: Please allow USB debugging (Security settings)!"
@@ -581,7 +581,7 @@ class MainController : Initializable {
     @FXML
     private fun resetResButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            val attempt = command.exec_displayed("adb shell wm size reset")
+            val attempt = command.execDisplayed("adb shell wm size reset")
             outputTextArea.text = when {
                 "permission" in attempt ->
                     "ERROR: Please allow USB debugging (Security settings)!"
@@ -597,9 +597,9 @@ class MainController : Initializable {
     private fun readPropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
             Mode.ADB, Mode.RECOVERY -> if (checkADB())
-                command.exec_displayed("adb shell getprop")
+                command.execDisplayed("adb shell getprop")
             Mode.FASTBOOT -> if (checkFastboot())
-                command.exec_displayed("fastboot getvar all")
+                command.execDisplayed("fastboot getvar all")
             else -> return
         }
     }
@@ -672,8 +672,8 @@ class MainController : Initializable {
                 if (it.absolutePath.isNotBlank() && pcb.isNotBlank() && checkFastboot()) {
                     confirm {
                         if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
-                            Flasher.exec(it, "fastboot flash ${pcb.trim()}", "fastboot boot")
-                        else Flasher.exec(it, "fastboot flash ${pcb.trim()}")
+                            command.exec("fastboot flash ${pcb.trim()}", "fastboot boot", image = it)
+                        else command.exec("fastboot flash ${pcb.trim()}", image = it)
                     }
                 }
             }
@@ -685,10 +685,13 @@ class MainController : Initializable {
         DirectoryChooser().apply {
             title = "Select the root directory of a Fastboot ROM"
             romLabel.text = "-"
-            ROMFlasher.directory = showDialog((event.source as Node).scene.window)
+            romDirectory = showDialog((event.source as Node).scene.window)
         }
-        ROMFlasher.directory?.let { dir ->
-            if (File(dir, "images").exists()) {
+        romDirectory?.let { dir ->
+            if (' ' in dir.absolutePath) {
+                outputTextArea.text = "ERROR: Space found in the path name!"
+                romDirectory = null
+            } else if ("images" in dir.list()!!) {
                 romLabel.text = dir.name
                 outputTextArea.text = "Fastboot ROM found!"
                 dir.listFiles()?.forEach {
@@ -697,22 +700,26 @@ class MainController : Initializable {
                 }
             } else {
                 outputTextArea.text = "ERROR: Fastboot ROM not found!"
-                ROMFlasher.directory = null
+                romDirectory = null
             }
         }
     }
 
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
-        ROMFlasher.directory?.let { dir ->
+        romDirectory?.let { dir ->
             scriptComboBox.value?.let { scb ->
                 if (checkFastboot())
                     confirm {
                         setPanels()
                         when (scb) {
-                            "Clean install" -> ROMFlasher.exec("flash_all")
-                            "Clean install and lock" -> ROMFlasher.exec("flash_all_lock")
-                            "Update" -> ROMFlasher.exec(dir.listFiles()?.find { "flash_all_except" in it.name }?.nameWithoutExtension)
+                            "Clean install" -> ROMFlasher(dir).flash("flash_all")
+                            "Clean install and lock" -> ROMFlasher(dir).flash("flash_all_lock")
+                            "Update" -> ROMFlasher(dir).flash(
+                                dir.list()?.find { "flash_all_except" in it }?.substringBefore(
+                                    '.'
+                                )
+                            )
                         }
                     }
             }
@@ -723,27 +730,27 @@ class MainController : Initializable {
     private fun bootButtonPressed(event: ActionEvent) {
         image?.let {
             if (it.absolutePath.isNotBlank() && checkFastboot())
-                Flasher.exec(it, "fastboot boot")
+                command.exec("fastboot boot", image = it)
         }
     }
 
     @FXML
     private fun cacheButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            command.exec_displayed("fastboot erase cache")
+            command.execDisplayed("fastboot erase cache")
     }
 
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm("All your data will be gone.") { command.exec_displayed("fastboot erase userdata") }
+            confirm("All your data will be gone.") { command.execDisplayed("fastboot erase userdata") }
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             confirm("All your data will be gone.") {
-                command.exec_displayed(
+                command.execDisplayed(
                     "fastboot erase cache",
                     "fastboot erase userdata"
                 )
@@ -754,14 +761,14 @@ class MainController : Initializable {
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             confirm("Your partitions must be intact in order to successfully lock the bootloader.") {
-                command.exec_displayed("fastboot oem lock")
+                command.execDisplayed("fastboot oem lock")
             }
     }
 
     @FXML
     private fun unlockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            command.exec_displayed("fastboot oem unlock")
+            command.execDisplayed("fastboot oem unlock")
     }
 
     private fun getLink(version: String, codename: String): String? {

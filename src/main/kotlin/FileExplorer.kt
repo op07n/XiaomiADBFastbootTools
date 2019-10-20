@@ -7,11 +7,9 @@ import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
 
-object FileExplorer : Command() {
+class FileExplorer(val statusTextField: TextField, val statusProgressBar: ProgressBar) : Command() {
 
     var path = "/"
-    lateinit var statusTextField: TextField
-    lateinit var progressBar: ProgressBar
 
     private fun makeFile(out: String): AndroidFile? {
         val bits = mutableListOf<String>()
@@ -76,7 +74,7 @@ object FileExplorer : Command() {
                 val output = scanner.nextLine()
                 Platform.runLater {
                     if ('%' in output)
-                        progressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
+                        statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
                     else if (command in output)
                         statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
                 }
@@ -99,7 +97,7 @@ object FileExplorer : Command() {
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
-                progressBar.progress = 0.0
+                statusProgressBar.progress = 0.0
                 func()
             }
         }
@@ -114,7 +112,7 @@ object FileExplorer : Command() {
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
-                progressBar.progress = 0.0
+                statusProgressBar.progress = 0.0
                 func()
             }
         }
@@ -131,7 +129,7 @@ object FileExplorer : Command() {
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
-                progressBar.progress = 0.0
+                statusProgressBar.progress = 0.0
                 func()
             }
         }
@@ -144,7 +142,7 @@ object FileExplorer : Command() {
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
-                progressBar.progress = 0.0
+                statusProgressBar.progress = 0.0
                 func()
             }
         }
@@ -157,7 +155,7 @@ object FileExplorer : Command() {
             Platform.runLater {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
-                progressBar.progress = 0.0
+                statusProgressBar.progress = 0.0
                 func()
             }
         }
