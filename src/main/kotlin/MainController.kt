@@ -689,7 +689,7 @@ class MainController : Initializable {
         }
         romDirectory?.let { dir ->
             if (' ' in dir.absolutePath) {
-                outputTextArea.text = "ERROR: Space found in the path name!"
+                outputTextArea.text = "ERROR: Space found in the pathname!"
                 romDirectory = null
             } else if ("images" in dir.list()!!) {
                 romLabel.text = dir.name
