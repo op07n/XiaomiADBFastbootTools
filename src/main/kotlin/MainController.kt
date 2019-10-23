@@ -273,30 +273,34 @@ class MainController : Initializable {
                     return
                 }
             }
-        val link = huc.getHeaderField("Location")
-        val latest = link.substringAfterLast('/')
-        if (latest.versionToInt() > version.versionToInt())
-            Platform.runLater {
-                Alert(AlertType.INFORMATION).apply {
-                    initStyle(StageStyle.UTILITY)
-                    title = "New version available!"
-                    graphic = ImageView("mitu.png")
-                    headerText =
-                        "Version $latest is available!"
-                    val vb = VBox()
-                    vb.alignment = Pos.CENTER
-                    val download = Hyperlink("Download")
-                    download.onAction = EventHandler {
-                        if (linux)
-                            Runtime.getRuntime().exec("xdg-open $link")
-                        else Desktop.getDesktop().browse(URI(link))
+        try {
+            val link = huc.getHeaderField("Location")
+            val latest = link.substringAfterLast('/')
+            if (latest.versionToInt() > version.versionToInt())
+                Platform.runLater {
+                    Alert(AlertType.INFORMATION).apply {
+                        initStyle(StageStyle.UTILITY)
+                        title = "New version available!"
+                        graphic = ImageView("mitu.png")
+                        headerText =
+                            "Version $latest is available!"
+                        val vb = VBox()
+                        vb.alignment = Pos.CENTER
+                        val download = Hyperlink("Download")
+                        download.onAction = EventHandler {
+                            if (linux)
+                                Runtime.getRuntime().exec("xdg-open $link")
+                            else Desktop.getDesktop().browse(URI(link))
+                        }
+                        download.font = Font(15.0)
+                        vb.children.add(download)
+                        dialogPane.content = vb
+                        showAndWait()
                     }
-                    download.font = Font(15.0)
-                    vb.children.add(download)
-                    dialogPane.content = vb
-                    showAndWait()
                 }
-            }
+        } catch (ex: Exception) {
+            return
+        }
     }
 
     private fun checkADB(): Boolean {
