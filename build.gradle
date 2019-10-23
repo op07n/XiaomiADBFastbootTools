@@ -4,7 +4,7 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.5'
 }
 
-group 'com.eu.saki'
+group 'com.eu.szaki'
 
 repositories {
     mavenCentral()

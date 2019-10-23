@@ -262,7 +262,7 @@ class MainController : Initializable {
 
     private fun checkVersion() {
         val huc =
-            (URL("https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection).apply {
+            (URL("https://github.com/Szaki/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
                 setRequestProperty("Referer", "https://github.com/")
                 instanceFollowRedirects = false
@@ -1046,7 +1046,7 @@ class MainController : Initializable {
             title = "About"
             graphic = ImageView("icon.png")
             headerText =
-                "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Saki_EU\n\n" +
+                "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Szaki\n\n" +
                         "ADB/Fastboot\n${command.exec("adb --version").lines()[1]}"
             val vb = VBox()
             vb.alignment = Pos.CENTER
@@ -1057,18 +1057,18 @@ class MainController : Initializable {
                 else Desktop.getDesktop().browse(URI("https://discord.gg/xiaomi"))
             }
             discord.font = Font(15.0)
-            val twitter = Hyperlink("Saki_EU on Twitter")
+            val twitter = Hyperlink("Szaki on Twitter")
             twitter.onAction = EventHandler {
                 if (linux)
-                    Runtime.getRuntime().exec("xdg-open https://twitter.com/Saki_EU")
-                else Desktop.getDesktop().browse(URI("https://twitter.com/Saki_EU"))
+                    Runtime.getRuntime().exec("xdg-open https://twitter.com/Szaki_EU")
+                else Desktop.getDesktop().browse(URI("https://twitter.com/Szaki_EU"))
             }
             twitter.font = Font(15.0)
             val github = Hyperlink("Repository on GitHub")
             github.onAction = EventHandler {
                 if (linux)
-                    Runtime.getRuntime().exec("xdg-open https://github.com/Saki-EU/XiaomiADBFastbootTools")
-                else Desktop.getDesktop().browse(URI("https://github.com/Saki-EU/XiaomiADBFastbootTools"))
+                    Runtime.getRuntime().exec("xdg-open https://github.com/Szaki/XiaomiADBFastbootTools")
+                else Desktop.getDesktop().browse(URI("https://github.com/Szaki/XiaomiADBFastbootTools"))
             }
             github.font = Font(15.0)
             vb.children.addAll(discord, twitter, github)

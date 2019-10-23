@@ -1,8 +1,8 @@
 # Xiaomi ADB/Fastboot Tools 😊
 
-![](https://img.shields.io/github/downloads/Saki-EU/XiaomiADBFastbootTools/total.svg)
-![](https://img.shields.io/github/license/Saki-EU/XiaomiADBFastbootTools.svg)
-[![](https://img.shields.io/twitter/url/https/github.com/Saki-EU/XiaomiADBFastbootTools.svg?style=social)](https://twitter.com/Saki_EU)
+![](https://img.shields.io/github/downloads/Szaki/XiaomiADBFastbootTools/total.svg)
+![](https://img.shields.io/github/license/Szaki/XiaomiADBFastbootTools.svg)
+[![](https://img.shields.io/twitter/url/https/github.com/Szaki/XiaomiADBFastbootTools.svg?style=social)](https://twitter.com/Szaki_EU)
 
 ## Modules
 
@@ -29,7 +29,7 @@ Available downloads:
 
 If you have ADB and Fastboot in your `PATH` (installed system-wide), download the JAR, otherwise download the OS-specific ZIP.
 
-### [Latest release](https://github.com/Saki-EU/XiaomiADBFastbootTools/releases/latest)
+### [Latest release](https://github.com/Szaki/XiaomiADBFastbootTools/releases/latest)
 
 **Warning: Use the program at your own risk!**
 
