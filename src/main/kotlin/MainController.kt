@@ -988,7 +988,7 @@ class MainController : Initializable {
                 setPanels()
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
-                items.forEach {
+                items.asSequence().forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
                         n += it.packagenameProperty().get().trim().lines().size

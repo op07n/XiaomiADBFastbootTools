@@ -29,12 +29,12 @@ object AppManager : Command() {
     fun readPotentialApps() {
         potentialApps.clear()
         potentialApps["android.autoinstalls.config.Xiaomi.${Device.codename}"] = "PAI"
-        this::class.java.classLoader.getResource("apps.yml")!!.readText().trim().lines().forEach { line ->
+        this::class.java.classLoader.getResource("apps.yml")!!.readText().trim().lineSequence().forEach { line ->
             val app = line.split(':')
             potentialApps[app[0].trim()] = app[1].trim()
         }
         if (appsFile.exists()) {
-            appsFile.readText().trim().lines().forEach { line ->
+            appsFile.readText().trim().lineSequence().forEach { line ->
                 val app = line.split(':')
                 if (app.size == 1) {
                     potentialApps[app[0].trim()] = app[0].trim()
@@ -55,16 +55,16 @@ object AppManager : Command() {
         val disableApps = mutableMapOf<String, MutableList<String>>()
         val enableApps = mutableMapOf<String, MutableList<String>>()
         val deviceApps = mutableMapOf<String, String>()
-        exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -u --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':')] = "uninstalled"
         }
-        exec("adb shell pm list packages -d --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -d --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':')] = "disabled"
         }
-        exec("adb shell pm list packages -e --user $user").trim().lines().forEach {
+        exec("adb shell pm list packages -e --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':')] = "enabled"
         }
-        potentialApps.forEach { (pkg, name) ->
+        potentialApps.asSequence().forEach { (pkg, name) ->
             when (deviceApps[pkg]) {
                 "disabled" -> {
                     uninstallApps.add(name, pkg)
@@ -93,7 +93,7 @@ object AppManager : Command() {
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
-            selected.forEach {
+            selected.asSequence().forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg)
@@ -129,7 +129,7 @@ object AppManager : Command() {
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
-            selected.forEach {
+            selected.asSequence().forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command(
@@ -178,7 +178,7 @@ object AppManager : Command() {
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
-            selected.forEach {
+            selected.asSequence().forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc = pb.command(
                         "${prefix}adb",
@@ -223,7 +223,7 @@ object AppManager : Command() {
         progress.progress = 0.0
         progressInd.isVisible = true
         thread(true, true) {
-            selected.forEach {
+            selected.asSequence().forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg)
