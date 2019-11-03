@@ -132,10 +132,11 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.7.4"
+    private val version = "6.7.5"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
+    private var loading = false
 
     companion object {
         val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
@@ -304,70 +305,79 @@ class MainController : Initializable {
     }
 
     private fun checkADB(): Boolean {
-        val adb = Device.readADB()
+        if (!Device.readADB()) {
+            checkDevice()
+            return false
+        }
         setUI()
-        return adb
+        return true
     }
 
     private fun checkFastboot(): Boolean {
-        val fb = Device.readFastboot()
-        setUI()
-        return fb
-    }
-
-    private fun loadDevice() {
-        if ("Looking for devices" !in outputTextArea.text)
-            outputTextArea.text = "Looking for devices...\n"
-        reloadMenuItem.isDisable = true
-        progressIndicator.isVisible = true
-        when {
-            Device.readADB() -> {
-                progressIndicator.isVisible = false
-                val support = command.exec("adb shell cmd package install-existing xaft")
-                Device.reinstaller = !("not found" in support || "Unknown command" in support)
-                Device.disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
-                AppManager.readPotentialApps()
-                AppManager.createTables()
-                codenameTextField.text = Device.codename
-                if (Device.mode == Mode.ADB) {
-                    dpiTextField.text = if (Device.dpi != -1)
-                        Device.dpi.toString()
-                    else "ERROR"
-                    widthTextField.text = if (Device.width != -1)
-                        Device.width.toString()
-                    else "ERROR"
-                    heightTextField.text = if (Device.height != -1)
-                        Device.height.toString()
-                    else "ERROR"
-                }
-                outputTextArea.text = "Device connected in ADB mode!\n"
-                if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
-                    outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
-            }
-            Device.readFastboot() -> {
-                progressIndicator.isVisible = false
-                codenameTextField.text = Device.codename
-                outputTextArea.text = "Device connected in Fastboot mode!\n"
-            }
-            Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
-                outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!\n"
-            }
-            (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "ERROR" !in outputTextArea.text -> {
-                outputTextArea.text = "ERROR: Device cannot be loaded!\n"
-            }
+        if (!Device.readFastboot()) {
+            checkDevice()
+            return false
         }
         setUI()
+        return true
     }
 
     private fun checkDevice() {
-        thread(true, true) {
-            while (true) {
-                if (Device.mode != Mode.ADB && Device.mode != Mode.FASTBOOT && Device.mode != Mode.RECOVERY)
-                    Platform.runLater { loadDevice() }
-                try {
-                    Thread.sleep(2000)
-                } catch (ie: InterruptedException) {
-                    break
+        if (!loading) {
+            loading = true
+            thread(true, true) {
+                while (loading) {
+                    Platform.runLater {
+                        if ("Looking for devices" !in outputTextArea.text) {
+                            outputTextArea.text = "Looking for devices...\n"
+                            reloadMenuItem.isDisable = true
+                            progressIndicator.isVisible = true
+                        }
+                        when {
+                            Device.readADB() -> {
+                                progressIndicator.isVisible = false
+                                val support = command.exec("adb shell cmd package install-existing xaft")
+                                Device.reinstaller = !("not found" in support || "Unknown command" in support)
+                                Device.disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
+                                AppManager.readPotentialApps()
+                                AppManager.createTables()
+                                codenameTextField.text = Device.codename
+                                if (Device.mode == Mode.ADB) {
+                                    dpiTextField.text = if (Device.dpi != -1)
+                                        Device.dpi.toString()
+                                    else "ERROR"
+                                    widthTextField.text = if (Device.width != -1)
+                                        Device.width.toString()
+                                    else "ERROR"
+                                    heightTextField.text = if (Device.height != -1)
+                                        Device.height.toString()
+                                    else "ERROR"
+                                }
+                                outputTextArea.text = "Device connected in ADB mode!\n"
+                                if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
+                                    outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
+                                loading = false
+                            }
+                            Device.readFastboot() -> {
+                                progressIndicator.isVisible = false
+                                codenameTextField.text = Device.codename
+                                outputTextArea.text = "Device connected in Fastboot mode!\n"
+                                loading = false
+                            }
+                            Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
+                                outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!\n"
+                            }
+                            (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "loaded" !in outputTextArea.text -> {
+                                outputTextArea.text = "ERROR: Device cannot be loaded!\n"
+                            }
+                        }
+                        setUI()
+                    }
+                    try {
+                        Thread.sleep(1000)
+                    } catch (ie: InterruptedException) {
+                        break
+                    }
                 }
             }
         }
@@ -435,7 +445,7 @@ class MainController : Initializable {
                     Alert(AlertType.ERROR).apply {
                         title = "Fatal Error"
                         headerText =
-                            "ERROR: Can't find ADB/Fastboot!"
+                            "ERROR: Cannot find ADB/Fastboot!"
                         showAndWait()
                     }
                     Platform.exit()
@@ -911,7 +921,7 @@ class MainController : Initializable {
     private fun reload() {
         outputTextArea.clear()
         infoTextArea.clear()
-        loadDevice()
+        checkDevice()
     }
 
     @FXML
