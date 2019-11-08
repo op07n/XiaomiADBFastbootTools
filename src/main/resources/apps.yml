@@ -39,6 +39,7 @@ com.google.ar.lens: Google Lens
 com.huaqin.diaglogger: DiagLogger
 com.mi.android.globalFileexplorer: Mi File Manager
 com.mi.android.globallauncher: POCO Launcher
+com.mi.android.globalminusscreen: App Vault
 com.mi.android.globalpersonalassistant: App Vault
 com.mi.dlabs.vr: Mi VR
 com.mi.globalTrendNews: News
@@ -66,6 +67,7 @@ com.miui.hybrid: Quick Apps
 com.miui.hybrid.accessory: HybridAccessory
 com.miui.klo.bugreport: KLO Bugreport
 com.miui.micloudsync: Mi Cloud
+com.miui.miservice: Services & feedback
 com.miui.miwallpaper: Mi Wallpaper
 com.miui.msa.global: MSA
 com.miui.nextpay: NextPay
