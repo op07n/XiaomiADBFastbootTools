@@ -4,6 +4,7 @@ com.android.calendar: Calendar
 com.android.chrome: Google Chrome
 com.android.deskclock: Clock
 com.android.email: Mail
+com.android.midrive: Mi Drive
 com.android.providers.downloads.ui: Downloads
 com.android.providers.partnerbookmarks: PartnerBookmarks
 com.android.quicksearchbox: Search
