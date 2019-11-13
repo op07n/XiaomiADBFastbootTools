@@ -29,12 +29,12 @@ object AppManager : Command() {
     fun readPotentialApps() {
         potentialApps.clear()
         potentialApps["android.autoinstalls.config.Xiaomi.${Device.codename}"] = "PAI"
-        this::class.java.classLoader.getResource("apps.yml")!!.readText().trim().lineSequence().forEach { line ->
+        this::class.java.classLoader.getResource("apps.yml")!!.readText().lineSequence().forEach { line ->
             val app = line.split(':')
             potentialApps[app[0].trim()] = app[1].trim()
         }
         if (appsFile.exists()) {
-            appsFile.readText().trim().lineSequence().forEach { line ->
+            appsFile.forEachLine { line ->
                 val app = line.split(':')
                 if (app.size == 1) {
                     potentialApps[app[0].trim()] = app[0].trim()
@@ -55,14 +55,14 @@ object AppManager : Command() {
         val disableApps = mutableMapOf<String, MutableList<String>>()
         val enableApps = mutableMapOf<String, MutableList<String>>()
         val deviceApps = mutableMapOf<String, String>()
-        exec("adb shell pm list packages -u --user $user").trim().lineSequence().forEach {
-            deviceApps[it.substringAfter(':')] = "uninstalled"
+        exec("adb shell pm list packages -u --user $user").lineSequence().forEach {
+            deviceApps[it.substringAfter(':').trim()] = "uninstalled"
         }
-        exec("adb shell pm list packages -d --user $user").trim().lineSequence().forEach {
-            deviceApps[it.substringAfter(':')] = "disabled"
+        exec("adb shell pm list packages -d --user $user").lineSequence().forEach {
+            deviceApps[it.substringAfter(':').trim()] = "disabled"
         }
-        exec("adb shell pm list packages -e --user $user").trim().lineSequence().forEach {
-            deviceApps[it.substringAfter(':')] = "enabled"
+        exec("adb shell pm list packages -e --user $user").lineSequence().forEach {
+            deviceApps[it.substringAfter(':').trim()] = "enabled"
         }
         potentialApps.asSequence().forEach { (pkg, name) ->
             when (deviceApps[pkg]) {
@@ -94,9 +94,9 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     proc =
-                        pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg)
+                        pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg.trim())
                             .start()
                     val sb = StringBuilder()
                     Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
@@ -130,7 +130,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     proc =
                         pb.command(
                             "${prefix}adb",
@@ -140,7 +140,7 @@ object AppManager : Command() {
                             "install-existing",
                             "--user",
                             "$user",
-                            pkg
+                            pkg.trim()
                         )
                             .start()
                     val sb = StringBuilder()
@@ -179,7 +179,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     proc = pb.command(
                         "${prefix}adb",
                         "shell",
@@ -187,7 +187,7 @@ object AppManager : Command() {
                         "disable-user",
                         "--user",
                         "$user",
-                        pkg
+                        pkg.trim()
                     ).start()
                     val sb = StringBuilder()
                     Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
@@ -224,9 +224,9 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                it.packagenameProperty().get().lines().forEach { pkg ->
                     proc =
-                        pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg)
+                        pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg.trim())
                             .start()
                     val sb = StringBuilder()
                     Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->

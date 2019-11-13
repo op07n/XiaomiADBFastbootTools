@@ -1001,7 +1001,7 @@ class MainController : Initializable {
                 items.asSequence().forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
-                        n += it.packagenameProperty().get().trim().lines().size
+                        n += it.packagenameProperty().get().lines().size
                     }
                 }
                 func(selected, n) {

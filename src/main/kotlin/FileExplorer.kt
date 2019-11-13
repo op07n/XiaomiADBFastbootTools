@@ -54,7 +54,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
 
     fun getFiles(): ObservableList<AndroidFile> {
         val files = FXCollections.observableArrayList<AndroidFile>()
-        exec("adb shell ls -l $path", lim = 5).trim().lineSequence().forEach {
+        exec("adb shell ls -l $path", lim = 5).lines().forEach {
             if ("ls:" !in it && ':' in it)
                 makeFile(it)?.let { file ->
                     files.add(file)

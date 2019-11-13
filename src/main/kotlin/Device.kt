@@ -33,7 +33,7 @@ object Device {
         if (mode == Mode.ADB && serial in propstring && dpi != -1 && width != -1 && height != -1)
             return true
         props.clear()
-        propstring.trim().lineSequence().forEach {
+        propstring.lineSequence().forEach {
             val parts = it.split("]: [")
             if (parts.size == 2)
                 props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
@@ -78,7 +78,7 @@ object Device {
             mode == Mode.FASTBOOT && serial in status -> return true
         }
         props.clear()
-        command.exec("fastboot getvar all").trim().lineSequence().forEach {
+        command.exec("fastboot getvar all").lineSequence().forEach {
             if (it[0] == '(')
                 props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
         }
