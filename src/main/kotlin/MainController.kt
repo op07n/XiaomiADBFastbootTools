@@ -258,7 +258,8 @@ class MainController : Initializable {
 
     private fun checkVersion() {
         try {
-            val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText().substringAfter("\"html_url\":\"").substringBefore('"')
+            val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                .substringAfter("\"html_url\":\"").substringBefore('"')
             val latest = link.substringAfterLast('/')
             if (latest > version)
                 Platform.runLater {

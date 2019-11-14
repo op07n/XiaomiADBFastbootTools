@@ -24,7 +24,8 @@ object AppManager : Command() {
 
     init {
         apps = try {
-            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText().trim().lineSequence()
+            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText()
+                .trim().lineSequence()
         } catch (ex: Exception) {
             this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lineSequence()
         }
