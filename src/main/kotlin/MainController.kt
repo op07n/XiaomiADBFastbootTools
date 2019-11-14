@@ -238,11 +238,6 @@ class MainController : Initializable {
         }
     }
 
-    private fun String.versionToInt(): Int {
-        val bits = "$this.0".split('.')
-        return bits[0].toInt() * 100 + bits[1].toInt() * 10 + bits[2].toInt()
-    }
-
     private fun checkADBFastboot(): Boolean {
         return if (win) {
             when {
@@ -262,22 +257,10 @@ class MainController : Initializable {
     }
 
     private fun checkVersion() {
-        val huc =
-            (URL("https://github.com/Szaki/XiaomiADBFastbootTools/releases/latest").openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                setRequestProperty("Referer", "https://github.com/")
-                instanceFollowRedirects = false
-                try {
-                    connect()
-                    disconnect()
-                } catch (e: IOException) {
-                    return
-                }
-            }
         try {
-            val link = huc.getHeaderField("Location")
+            val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText().substringAfter("\"html_url\": \"").substringBefore('"')
             val latest = link.substringAfterLast('/')
-            if (latest.versionToInt() > version.versionToInt())
+            if (latest > version)
                 Platform.runLater {
                     Alert(AlertType.INFORMATION).apply {
                         initStyle(StageStyle.UTILITY)

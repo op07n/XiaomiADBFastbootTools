@@ -4,6 +4,7 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
 import java.io.File
+import java.net.URL
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -17,8 +18,17 @@ object AppManager : Command() {
     lateinit var progress: ProgressBar
     lateinit var progressInd: ProgressIndicator
     var user = 0
-    val appsFile = File(MainController.dir, "apps.yml")
+    private val apps: Sequence<String>?
+    private val customApps = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
+
+    init {
+        apps = try {
+            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText().lineSequence()
+        } catch (ex: Exception) {
+            this::class.java.classLoader.getResource("apps.yml")?.readText()?.lineSequence()
+        }
+    }
 
     private fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
         if (this[key] == null) {
@@ -29,12 +39,12 @@ object AppManager : Command() {
     fun readPotentialApps() {
         potentialApps.clear()
         potentialApps["android.autoinstalls.config.Xiaomi.${Device.codename}"] = "PAI"
-        this::class.java.classLoader.getResource("apps.yml")!!.readText().lineSequence().forEach { line ->
+        apps?.forEach { line ->
             val app = line.split(':')
             potentialApps[app[0].trim()] = app[1].trim()
         }
-        if (appsFile.exists()) {
-            appsFile.forEachLine { line ->
+        if (customApps.exists()) {
+            customApps.forEachLine { line ->
                 val app = line.split(':')
                 if (app.size == 1) {
                     potentialApps[app[0].trim()] = app[0].trim()
