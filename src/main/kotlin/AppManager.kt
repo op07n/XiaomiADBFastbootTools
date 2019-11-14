@@ -19,14 +19,14 @@ object AppManager : Command() {
     lateinit var progressInd: ProgressIndicator
     var user = 0
     private val apps: Sequence<String>?
-    private val customApps = File(MainController.dir, "apps.yml")
+    val customApps = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
 
     init {
         apps = try {
-            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText().lineSequence()
+            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText().trim().lineSequence()
         } catch (ex: Exception) {
-            this::class.java.classLoader.getResource("apps.yml")?.readText()?.lineSequence()
+            this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lineSequence()
         }
     }
 

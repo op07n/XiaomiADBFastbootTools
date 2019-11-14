@@ -16,8 +16,8 @@ class AppAdderController : Initializable {
     private lateinit var appTextArea: TextArea
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        if (AppManager.appsFile.exists())
-            appTextArea.text = AppManager.appsFile.readText()
+        if (AppManager.customApps.exists())
+            appTextArea.text = AppManager.customApps.readText()
     }
 
     @FXML
@@ -40,7 +40,7 @@ class AppAdderController : Initializable {
                 }
             }
             AppManager.apply {
-                appsFile.writeText(appTextArea.text.trim())
+                customApps.writeText(appTextArea.text.trim())
                 readPotentialApps()
                 createTables()
             }
