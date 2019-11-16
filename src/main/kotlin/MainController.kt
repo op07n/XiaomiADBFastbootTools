@@ -132,7 +132,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.8"
+    private val version = "6.8.1"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
@@ -985,7 +985,7 @@ class MainController : Initializable {
                 items.asSequence().forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
-                        n += it.packagenameProperty().get().lines().size
+                        n += it.packagenameProperty().get().trim().lines().size
                     }
                 }
                 func(selected, n) {

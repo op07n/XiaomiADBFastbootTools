@@ -66,13 +66,13 @@ object AppManager : Command() {
         val disableApps = mutableMapOf<String, MutableList<String>>()
         val enableApps = mutableMapOf<String, MutableList<String>>()
         val deviceApps = mutableMapOf<String, String>()
-        exec("adb shell pm list packages -u --user $user").lineSequence().forEach {
+        exec("adb shell pm list packages -u --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':').trim()] = "uninstalled"
         }
-        exec("adb shell pm list packages -d --user $user").lineSequence().forEach {
+        exec("adb shell pm list packages -d --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':').trim()] = "disabled"
         }
-        exec("adb shell pm list packages -e --user $user").lineSequence().forEach {
+        exec("adb shell pm list packages -e --user $user").trim().lineSequence().forEach {
             deviceApps[it.substringAfter(':').trim()] = "enabled"
         }
         potentialApps.asSequence().forEach { (pkg, name) ->
@@ -105,7 +105,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().lines().forEach { pkg ->
+                it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg.trim())
                             .start()
@@ -141,7 +141,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().lines().forEach { pkg ->
+                it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command(
                             "${prefix}adb",
@@ -190,7 +190,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().lines().forEach { pkg ->
+                it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc = pb.command(
                         "${prefix}adb",
                         "shell",
@@ -235,7 +235,7 @@ object AppManager : Command() {
         progressInd.isVisible = true
         thread(true, true) {
             selected.asSequence().forEach {
-                it.packagenameProperty().get().lines().forEach { pkg ->
+                it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg.trim())
                             .start()
