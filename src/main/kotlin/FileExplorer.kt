@@ -5,7 +5,7 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import java.io.File
 import java.util.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 
 class FileExplorer(val statusTextField: TextField, val statusProgressBar: ProgressBar) : Command() {
 
@@ -65,14 +65,14 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
 
     fun String.fmt(): String = "'$this'"
 
-    fun init(command: String = "adb") {
+    fun init(command: String = "adb") = runBlocking(Dispatchers.IO) {
         pb.redirectErrorStream(false)
         statusTextField.text = ""
         proc = pb.start()
         Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
             while (scanner.hasNextLine()) {
                 val output = scanner.nextLine()
-                Platform.runLater {
+                withContext(Dispatchers.Main) {
                     if ('%' in output)
                         statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
                     else if (command in output)
@@ -84,7 +84,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     }
 
     inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
-        thread(true, true) {
+        GlobalScope.launch {
             if (selected.isEmpty()) {
                 pb.command("${prefix}adb", "pull", path, to.absolutePath)
                 init()
@@ -94,7 +94,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
                     init()
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
                 statusProgressBar.progress = 0.0
@@ -104,12 +104,12 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     }
 
     inline fun push(selected: List<File>, crossinline func: () -> Unit) {
-        thread(true, true) {
+        GlobalScope.launch {
             selected.forEach {
                 pb.command("${prefix}adb", "push", it.absolutePath, path)
                 init()
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
                 statusProgressBar.progress = 0.0
@@ -119,14 +119,14 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     }
 
     inline fun delete(selected: List<AndroidFile>, crossinline func: () -> Unit) {
-        thread(true, true) {
+        GlobalScope.launch {
             selected.forEach {
                 if (it.dir)
                     pb.command("${prefix}adb", "shell", "rm", "-rf", (path + it.name).fmt())
                 else pb.command("${prefix}adb", "shell", "rm", "-f", (path + it.name).fmt())
                 init("rm")
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
                 statusProgressBar.progress = 0.0
@@ -136,10 +136,10 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     }
 
     inline fun mkdir(name: String, crossinline func: () -> Unit) {
-        thread(true, true) {
+        GlobalScope.launch {
             pb.command("${prefix}adb", "shell", "mkdir", (path + name).fmt())
             init("mkdir")
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
                 statusProgressBar.progress = 0.0
@@ -149,10 +149,10 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     }
 
     inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
-        thread(true, true) {
+        GlobalScope.launch {
             pb.command("${prefix}adb", "shell", "mv", (path + selected.name).fmt(), (path + to).fmt())
             init("mv")
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 if (statusTextField.text.isEmpty())
                     statusTextField.text = "Done!"
                 statusProgressBar.progress = 0.0

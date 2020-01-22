@@ -29,7 +29,7 @@ import java.net.URI
 import java.net.URL
 import java.nio.channels.Channels
 import java.util.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 
 class MainController : Initializable {
 
@@ -132,7 +132,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.8.1"
+    private val version = "6.9"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
@@ -256,38 +256,6 @@ class MainController : Initializable {
         }
     }
 
-    private fun checkVersion() {
-        try {
-            val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
-                .substringAfter("\"html_url\":\"").substringBefore('"')
-            val latest = link.substringAfterLast('/')
-            if (latest > version)
-                Platform.runLater {
-                    Alert(AlertType.INFORMATION).apply {
-                        initStyle(StageStyle.UTILITY)
-                        title = "New version available!"
-                        graphic = ImageView("mitu.png")
-                        headerText =
-                            "Version $latest is available!"
-                        val vb = VBox()
-                        vb.alignment = Pos.CENTER
-                        val download = Hyperlink("Download")
-                        download.onAction = EventHandler {
-                            if (linux)
-                                Runtime.getRuntime().exec("xdg-open $link")
-                            else Desktop.getDesktop().browse(URI(link))
-                        }
-                        download.font = Font(15.0)
-                        vb.children.add(download)
-                        dialogPane.content = vb
-                        showAndWait()
-                    }
-                }
-        } catch (ex: Exception) {
-            return
-        }
-    }
-
     private fun checkADB(): Boolean {
         if (!Device.readADB()) {
             checkDevice()
@@ -309,9 +277,9 @@ class MainController : Initializable {
     private fun checkDevice() {
         if (!loading) {
             loading = true
-            thread(true, true) {
+            GlobalScope.launch {
                 while (loading) {
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         if ("Looking for devices" !in outputTextArea.text) {
                             outputTextArea.text = "Looking for devices...\n"
                             reloadMenuItem.isDisable = true
@@ -358,7 +326,7 @@ class MainController : Initializable {
                         setUI()
                     }
                     try {
-                        Thread.sleep(1000)
+                        delay(1000)
                     } catch (ie: InterruptedException) {
                         break
                     }
@@ -420,12 +388,40 @@ class MainController : Initializable {
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
 
-        thread(true, true) {
+        GlobalScope.launch(Dispatchers.IO) {
             if (checkADBFastboot()) {
-                checkVersion()
+                try {
+                    val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                        .substringAfter("\"html_url\":\"").substringBefore('"')
+                    val latest = link.substringAfterLast('/')
+                    if (latest > version)
+                        withContext(Dispatchers.Main) {
+                            Alert(AlertType.INFORMATION).apply {
+                                initStyle(StageStyle.UTILITY)
+                                title = "New version available!"
+                                graphic = ImageView("mitu.png")
+                                headerText =
+                                    "Version $latest is available!"
+                                val vb = VBox()
+                                vb.alignment = Pos.CENTER
+                                val download = Hyperlink("Download")
+                                download.onAction = EventHandler {
+                                    if (linux)
+                                        Runtime.getRuntime().exec("xdg-open $link")
+                                    else Desktop.getDesktop().browse(URI(link))
+                                }
+                                download.font = Font(15.0)
+                                vb.children.add(download)
+                                dialogPane.content = vb
+                                showAndWait()
+                            }
+                        }
+                } catch (ex: Exception) {
+                    // OK
+                }
                 checkDevice()
             } else {
-                Platform.runLater {
+                withContext(Dispatchers.Main) {
                     Alert(AlertType.ERROR).apply {
                         title = "Fatal Error"
                         headerText =
@@ -821,9 +817,9 @@ class MainController : Initializable {
             if (codenameTextField.text.isNotBlank()) {
                 outputTextArea.appendText("\nLooking for $it...\n")
                 progressIndicator.isVisible = true
-                thread(true, true) {
+                GlobalScope.launch {
                     val link = getLink(it, codenameTextField.text.trim())
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         if (link != null && "bigota" in link) {
                             versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                             progressIndicator.isVisible = false
@@ -849,19 +845,19 @@ class MainController : Initializable {
                 dc.showDialog((event.source as Node).scene.window)?.let {
                     outputTextArea.appendText("\nLooking for $branch...\n")
                     progressIndicator.isVisible = true
-                    thread(true, true) {
+                    GlobalScope.launch {
                         val link = getLink(branch, codenameTextField.text.trim())
                         if (link != null && "bigota" in link) {
-                            Platform.runLater {
+                            withContext(Dispatchers.Main) {
                                 versionLabel.text = link.substringAfter(".com/").substringBefore('/')
                                 outputTextArea.appendText("Starting download...\n")
                                 downloaderPane.isDisable = true
                             }
                             var complete = false
-                            val url = URL(link)
-                            val size = url.openConnection().contentLengthLong * 1.0
-                            val file = File(it, link.substringAfterLast('/'))
-                            thread(true, true) {
+                            launch(Dispatchers.IO) {
+                                val url = URL(link)
+                                val size = url.openConnection().contentLengthLong * 1.0
+                                val file = File(it, link.substringAfterLast('/'))
                                 var prev = 0L
                                 while (!complete) {
                                     val length = file.length()
@@ -870,27 +866,27 @@ class MainController : Initializable {
                                         "${diff.toString().take(5)} KB/s"
                                     else "${(diff / 1000.0).toString().take(4)} MB/s"
                                     prev = length
-                                    Platform.runLater {
+                                    withContext(Dispatchers.Main) {
                                         downloadProgress.text =
                                             "${(file.length() / size * 100.0).toString().take(4)} %\t\t$speed"
                                     }
-                                    Thread.sleep(1000)
+                                    delay(1000)
                                 }
+                                FileOutputStream(file).channel.transferFrom(
+                                    Channels.newChannel(url.openStream()),
+                                    0,
+                                    Long.MAX_VALUE
+                                )
                             }
-                            FileOutputStream(file).channel.transferFrom(
-                                Channels.newChannel(url.openStream()),
-                                0,
-                                Long.MAX_VALUE
-                            )
                             complete = true
-                            Platform.runLater {
+                            withContext(Dispatchers.Main) {
                                 progressIndicator.isVisible = false
                                 outputTextArea.appendText("Download complete!\n\n")
                                 downloadProgress.text = ""
                                 downloaderPane.isDisable = false
                             }
                         } else {
-                            Platform.runLater {
+                            withContext(Dispatchers.Main) {
                                 versionLabel.text = "-"
                                 progressIndicator.isVisible = false
                                 outputTextArea.appendText("Link not found!\n\n")
@@ -982,7 +978,7 @@ class MainController : Initializable {
                 setPanels()
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
-                items.asSequence().forEach {
+                items.forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
                         n += it.packagenameProperty().get().trim().lines().size

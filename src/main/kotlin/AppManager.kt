@@ -6,7 +6,7 @@ import javafx.scene.control.TableView
 import java.io.File
 import java.net.URL
 import java.util.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 
 
 object AppManager : Command() {
@@ -18,16 +18,16 @@ object AppManager : Command() {
     lateinit var progress: ProgressBar
     lateinit var progressInd: ProgressIndicator
     var user = 0
-    private val apps: Sequence<String>?
+    private val apps: List<String>?
     val customApps = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
 
     init {
         apps = try {
             URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText()
-                .trim().lineSequence()
+                .trim().lines()
         } catch (ex: Exception) {
-            this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lineSequence()
+            this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lines()
         }
     }
 
@@ -66,16 +66,16 @@ object AppManager : Command() {
         val disableApps = mutableMapOf<String, MutableList<String>>()
         val enableApps = mutableMapOf<String, MutableList<String>>()
         val deviceApps = mutableMapOf<String, String>()
-        exec("adb shell pm list packages -u --user $user").trim().lineSequence().forEach {
+        exec("adb shell pm list packages -u --user $user").trim().lines().forEach {
             deviceApps[it.substringAfter(':').trim()] = "uninstalled"
         }
-        exec("adb shell pm list packages -d --user $user").trim().lineSequence().forEach {
+        exec("adb shell pm list packages -d --user $user").trim().lines().forEach {
             deviceApps[it.substringAfter(':').trim()] = "disabled"
         }
-        exec("adb shell pm list packages -e --user $user").trim().lineSequence().forEach {
+        exec("adb shell pm list packages -e --user $user").trim().lines().forEach {
             deviceApps[it.substringAfter(':').trim()] = "enabled"
         }
-        potentialApps.asSequence().forEach { (pkg, name) ->
+        potentialApps.forEach { (pkg, name) ->
             when (deviceApps[pkg]) {
                 "disabled" -> {
                     uninstallApps.add(name, pkg)
@@ -103,8 +103,8 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        thread(true, true) {
-            selected.asSequence().forEach {
+        GlobalScope.launch {
+            selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg.trim())
@@ -114,7 +114,7 @@ object AppManager : Command() {
                         while (scanner.hasNextLine())
                             sb.append(scanner.nextLine() + '\n')
                     }
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         outputTextArea.apply {
                             appendText("App: ${it.appnameProperty().get()}\n")
                             appendText("Package: $pkg\n")
@@ -124,7 +124,7 @@ object AppManager : Command() {
                     }
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 outputTextArea.appendText("Done!")
                 progress.progress = 0.0
                 progressInd.isVisible = false
@@ -139,8 +139,8 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        thread(true, true) {
-            selected.asSequence().forEach {
+        GlobalScope.launch {
+            selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command(
@@ -163,7 +163,7 @@ object AppManager : Command() {
                     output = if ("installed for user" in output)
                         "Success\n"
                     else "Failure [${output.substringAfter(pkg).trim()}]\n"
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         outputTextArea.apply {
                             appendText("App: ${it.appnameProperty().get()}\n")
                             appendText("Package: $pkg\n")
@@ -173,7 +173,7 @@ object AppManager : Command() {
                     }
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 outputTextArea.appendText("Done!")
                 progress.progress = 0.0
                 progressInd.isVisible = false
@@ -188,8 +188,8 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        thread(true, true) {
-            selected.asSequence().forEach {
+        GlobalScope.launch {
+            selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc = pb.command(
                         "${prefix}adb",
@@ -208,7 +208,7 @@ object AppManager : Command() {
                     val output = if ("disabled-user" in sb.toString())
                         "Success\n"
                     else "Failure\n"
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         outputTextArea.apply {
                             appendText("App: ${it.appnameProperty().get()}\n")
                             appendText("Package: $pkg\n")
@@ -218,7 +218,7 @@ object AppManager : Command() {
                     }
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 outputTextArea.appendText("Done!")
                 progress.progress = 0.0
                 progressInd.isVisible = false
@@ -233,8 +233,8 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        thread(true, true) {
-            selected.asSequence().forEach {
+        GlobalScope.launch {
+            selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg.trim())
@@ -247,7 +247,7 @@ object AppManager : Command() {
                     val output = if ("enabled" in sb.toString())
                         "Success\n"
                     else "Failure\n"
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         outputTextArea.apply {
                             appendText("App: ${it.appnameProperty().get()}\n")
                             appendText("Package: $pkg\n")
@@ -257,7 +257,7 @@ object AppManager : Command() {
                     }
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 outputTextArea.appendText("Done!")
                 progress.progress = 0.0
                 progressInd.isVisible = false

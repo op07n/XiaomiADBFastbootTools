@@ -1,20 +1,19 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.60'
     id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
     id 'org.openjfx.javafxplugin' version '0.0.5'
 }
-
-group 'com.eu.szaki'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "org.openjfx:javafx-graphics:11.0.2:linux"
-    compile "org.openjfx:javafx-graphics:11.0.2:win"
-    compile "org.openjfx:javafx-graphics:11.0.2:mac"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.3.3"
+    implementation "org.openjfx:javafx-graphics:11.0.2:linux"
+    implementation "org.openjfx:javafx-graphics:11.0.2:win"
+    implementation "org.openjfx:javafx-graphics:11.0.2:mac"
 }
 
 jar {
@@ -28,11 +27,11 @@ jar {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 javafx {
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml' ]
 }
 
-mainClassName = 'Main'
+mainClassName = "Main"

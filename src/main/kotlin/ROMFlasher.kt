@@ -2,7 +2,7 @@ import javafx.application.Platform
 import java.io.File
 import java.io.IOException
 import java.util.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 
 class ROMFlasher(val directory: File) : Command() {
 
@@ -43,7 +43,7 @@ class ROMFlasher(val directory: File) : Command() {
         val sb = StringBuilder()
         progressBar.progress = 0.0
         progressIndicator.isVisible = true
-        thread(true, true) {
+        GlobalScope.launch(Dispatchers.IO) {
             val script = setupScript(arg)
             val n = script.getCmdCount()
             proc = pb.start()
@@ -53,14 +53,14 @@ class ROMFlasher(val directory: File) : Command() {
                     val full = sb.toString()
                     if ("pause" in full)
                         break
-                    Platform.runLater {
+                    withContext(Dispatchers.Main) {
                         outputTextArea.text = full
                         outputTextArea.appendText("")
                         progressBar.progress = 1.0 * (full.toLowerCase().split("finished.").size - 1) / n
                     }
                 }
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 outputTextArea.appendText("\nDone!")
                 progressBar.progress = 0.0
                 progressIndicator.isVisible = false

@@ -4,7 +4,7 @@ import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
 import java.io.File
 import java.util.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.*
 
 open class Command {
 
@@ -55,7 +55,7 @@ open class Command {
         pb.redirectErrorStream(true)
         progressIndicator.isVisible = true
         outputTextArea.text = ""
-        thread(true, true) {
+        GlobalScope.launch {
             args.forEach {
                 val bits = it.split(' ').toMutableList()
                 bits[0] = prefix + bits[0]
@@ -63,14 +63,14 @@ open class Command {
                 Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                     while (scanner.hasNext()) {
                         val next = scanner.next()
-                        Platform.runLater {
+                        withContext(Dispatchers.Main) {
                             outputTextArea.appendText(next)
                         }
                     }
                 }
                 proc.waitFor()
             }
-            Platform.runLater {
+            withContext(Dispatchers.Main) {
                 progressIndicator.isVisible = false
             }
         }
