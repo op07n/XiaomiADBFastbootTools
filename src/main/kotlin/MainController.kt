@@ -845,7 +845,7 @@ class MainController : Initializable {
                 dc.showDialog((event.source as Node).scene.window)?.let {
                     outputTextArea.appendText("\nLooking for $branch...\n")
                     progressIndicator.isVisible = true
-                    GlobalScope.launch {
+                    GlobalScope.launch(Dispatchers.IO) {
                         val link = getLink(branch, codenameTextField.text.trim())
                         if (link != null && "bigota" in link) {
                             withContext(Dispatchers.Main) {
@@ -854,10 +854,10 @@ class MainController : Initializable {
                                 downloaderPane.isDisable = true
                             }
                             var complete = false
-                            launch(Dispatchers.IO) {
-                                val url = URL(link)
-                                val size = url.openConnection().contentLengthLong * 1.0
-                                val file = File(it, link.substringAfterLast('/'))
+                            val url = URL(link)
+                            val size = url.openConnection().contentLengthLong * 1.0
+                            val file = File(it, link.substringAfterLast('/'))
+                            launch {
                                 var prev = 0L
                                 while (!complete) {
                                     val length = file.length()
@@ -872,12 +872,12 @@ class MainController : Initializable {
                                     }
                                     delay(1000)
                                 }
-                                FileOutputStream(file).channel.transferFrom(
-                                    Channels.newChannel(url.openStream()),
-                                    0,
-                                    Long.MAX_VALUE
-                                )
                             }
+                            FileOutputStream(file).channel.transferFrom(
+                                Channels.newChannel(url.openStream()),
+                                0,
+                                Long.MAX_VALUE
+                            )
                             complete = true
                             withContext(Dispatchers.Main) {
                                 progressIndicator.isVisible = false
@@ -975,7 +975,7 @@ class MainController : Initializable {
     ) {
         if (isAppSelected(items) && checkADB())
             confirm {
-                setPanels()
+                appManagerPane.isDisable = true
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
                 items.forEach {
