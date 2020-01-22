@@ -1,11 +1,10 @@
-import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
-import kotlinx.coroutines.*
 
 class FileExplorer(val statusTextField: TextField, val statusProgressBar: ProgressBar) : Command() {
 

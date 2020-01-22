@@ -1,8 +1,10 @@
-import javafx.application.Platform
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.util.*
-import kotlinx.coroutines.*
 
 class ROMFlasher(val directory: File) : Command() {
 

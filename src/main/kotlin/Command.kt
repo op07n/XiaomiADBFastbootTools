@@ -1,10 +1,12 @@
-import javafx.application.Platform
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
-import kotlinx.coroutines.*
 
 open class Command {
 

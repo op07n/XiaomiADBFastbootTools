@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.*
+import kotlinx.coroutines.*
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -29,7 +30,6 @@ import java.net.URI
 import java.net.URL
 import java.nio.channels.Channels
 import java.util.*
-import kotlinx.coroutines.*
 
 class MainController : Initializable {
 
@@ -391,8 +391,9 @@ class MainController : Initializable {
         GlobalScope.launch(Dispatchers.IO) {
             if (checkADBFastboot()) {
                 try {
-                    val link = URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
-                        .substringAfter("\"html_url\":\"").substringBefore('"')
+                    val link =
+                        URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                            .substringAfter("\"html_url\":\"").substringBefore('"')
                     val latest = link.substringAfterLast('/')
                     if (latest > version)
                         withContext(Dispatchers.Main) {

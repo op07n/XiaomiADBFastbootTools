@@ -1,12 +1,14 @@
-import javafx.application.Platform
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
 import java.util.*
-import kotlinx.coroutines.*
 
 
 object AppManager : Command() {
