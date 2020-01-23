@@ -82,11 +82,11 @@ object Device {
             if (it[0] == '(')
                 props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
         }
-        if (props["serialno"].isNullOrEmpty() || props["product"].isNullOrEmpty()) {
+        if ((props["serialno"].isNullOrEmpty() && props["serial"].isNullOrEmpty()) || props["product"].isNullOrEmpty()) {
             mode = Mode.FB_ERROR
             return false
         }
-        serial = props["serialno"] ?: ""
+        serial = props["serialno"] ?: props["serial"] ?: ""
         codename = props["product"] ?: ""
         bootloader = props["unlocked"]?.contains("yes") ?: false
         anti = props["anti"]?.toInt() ?: -1

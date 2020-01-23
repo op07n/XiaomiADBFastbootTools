@@ -144,8 +144,8 @@ class MainController : Initializable {
         val linux = "linux" in System.getProperty("os.name").toLowerCase()
     }
 
-    private fun setPanels() {
-        when (Device.mode) {
+    private fun setPanels(mode: Mode = Device.mode) {
+        when (mode) {
             Mode.ADB -> {
                 appManagerPane.isDisable = false
                 appManagerMenu.isDisable = false
@@ -706,7 +706,7 @@ class MainController : Initializable {
             scriptComboBox.value?.let { scb ->
                 if (checkFastboot())
                     confirm {
-                        setPanels()
+                        setPanels(Mode.NONE)
                         when (scb) {
                             "Clean install" -> ROMFlasher(dir).flash("flash_all")
                             "Clean install and lock" -> ROMFlasher(dir).flash("flash_all_lock")
@@ -976,7 +976,7 @@ class MainController : Initializable {
     ) {
         if (isAppSelected(items) && checkADB())
             confirm {
-                appManagerPane.isDisable = true
+                setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
                 items.forEach {

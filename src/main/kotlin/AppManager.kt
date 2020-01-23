@@ -105,7 +105,7 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
@@ -141,7 +141,7 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
@@ -190,7 +190,7 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc = pb.command(
@@ -235,7 +235,7 @@ object AppManager : Command() {
         outputTextArea.text = ""
         progress.progress = 0.0
         progressInd.isVisible = true
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             selected.forEach {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =

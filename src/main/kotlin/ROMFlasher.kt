@@ -50,8 +50,8 @@ class ROMFlasher(val directory: File) : Command() {
             val n = script.getCmdCount()
             proc = pb.start()
             Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNext()) {
-                    sb.append(scanner.next())
+                while (scanner.hasNextLine()) {
+                    sb.append(scanner.nextLine() + '\n')
                     val full = sb.toString()
                     if ("pause" in full)
                         break

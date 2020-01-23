@@ -57,14 +57,14 @@ open class Command {
         pb.redirectErrorStream(true)
         progressIndicator.isVisible = true
         outputTextArea.text = ""
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             args.forEach {
                 val bits = it.split(' ').toMutableList()
                 bits[0] = prefix + bits[0]
                 proc = pb.command(bits + image?.absolutePath).start()
                 Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                    while (scanner.hasNext()) {
-                        val next = scanner.next()
+                    while (scanner.hasNextLine()) {
+                        val next = scanner.nextLine() + '\n'
                         withContext(Dispatchers.Main) {
                             outputTextArea.appendText(next)
                         }
