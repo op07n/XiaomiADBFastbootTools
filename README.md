@@ -70,7 +70,7 @@ Yes, the Xiaomi ADB/Fastboot Tools was developed in Kotlin for the Java Virtual 
 
 On Windows/MacOS, install Oracle Java from [here](https://www.oracle.com/technetwork/java/javase/downloads/index.html) or OpenJDK from [here](https://adoptopenjdk.net/).
 
-On Linux distributions, install `openjdk-11-jdk`/`openjdk-11-jre` or later.
+On Linux distributions, install `openjdk-11-jdk`, `openjdk-11-jre` or later.
 
 If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar XiaomiADBFastbootTools.jar`.
 
