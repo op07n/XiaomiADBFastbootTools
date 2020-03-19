@@ -263,11 +263,9 @@ class MainController : Initializable {
         when (Device.mode) {
             Mode.ADB, Mode.RECOVERY -> {
                 infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
-                        "Codename:\t\t${Device.codename}\n" +
-                        "Bootloader:\t\t"
+                        "Codename:\t\t${Device.codename}\n"
                 if (Device.bootloader)
-                    infoTextArea.appendText("unlocked\n")
-                else infoTextArea.appendText("locked\n")
+                    infoTextArea.appendText("Bootloader:\t\tunlocked\n")
                 if (Device.camera2)
                     infoTextArea.appendText("Camera2:\t\t\tenabled")
             }
@@ -1093,7 +1091,7 @@ class MainController : Initializable {
             graphic = ImageView("icon.png")
             headerText =
                 "Xiaomi ADB/Fastboot Tools\nVersion $version\nCreated by Szaki\n\n" +
-                        "ADB/Fastboot\n${command.exec("adb --version").lines()[1]}"
+                        "SDK Platform Tools\n${command.exec("adb --version").lines()[1]}"
             val vb = VBox()
             vb.alignment = Pos.CENTER
             val discord = Hyperlink("Xiaomi Community on Discord")
