@@ -179,7 +179,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.9"
+    private val version = "6.9.1"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
