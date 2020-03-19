@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
@@ -35,100 +34,148 @@ class MainController : Initializable {
 
     @FXML
     private lateinit var deviceMenu: Menu
+
     @FXML
     private lateinit var appManagerMenu: Menu
+
     @FXML
     private lateinit var secondSpaceButton: CheckMenuItem
+
     @FXML
     private lateinit var recoveryMenuItem: MenuItem
+
     @FXML
     private lateinit var reloadMenuItem: MenuItem
+
     @FXML
     private lateinit var infoTextArea: TextArea
+
     @FXML
     private lateinit var outputTextArea: TextArea
+
     @FXML
     private lateinit var progressBar: ProgressBar
+
     @FXML
     private lateinit var progressIndicator: ProgressIndicator
+
     @FXML
     private lateinit var uninstallerTableView: TableView<App>
+
     @FXML
     private lateinit var reinstallerTableView: TableView<App>
+
     @FXML
     private lateinit var disablerTableView: TableView<App>
+
     @FXML
     private lateinit var enablerTableView: TableView<App>
+
     @FXML
     private lateinit var uncheckTableColumn: TableColumn<App, Boolean>
+
     @FXML
     private lateinit var unappTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var unpackageTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var recheckTableColumn: TableColumn<App, Boolean>
+
     @FXML
     private lateinit var reappTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var repackageTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var discheckTableColumn: TableColumn<App, Boolean>
+
     @FXML
     private lateinit var disappTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var dispackageTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var encheckTableColumn: TableColumn<App, Boolean>
+
     @FXML
     private lateinit var enappTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var enpackageTableColumn: TableColumn<App, String>
+
     @FXML
     private lateinit var dpiTextField: TextField
+
     @FXML
     private lateinit var widthTextField: TextField
+
     @FXML
     private lateinit var heightTextField: TextField
+
     @FXML
     private lateinit var partitionComboBox: ComboBox<String>
+
     @FXML
     private lateinit var scriptComboBox: ComboBox<String>
+
     @FXML
     private lateinit var autobootCheckBox: CheckBox
+
     @FXML
     private lateinit var imageLabel: Label
+
     @FXML
     private lateinit var romLabel: Label
+
     @FXML
     private lateinit var codenameTextField: TextField
+
     @FXML
     private lateinit var branchComboBox: ComboBox<String>
+
     @FXML
     private lateinit var downloadProgress: Label
+
     @FXML
     private lateinit var versionLabel: Label
+
     @FXML
     private lateinit var appManagerPane: TabPane
+
     @FXML
     private lateinit var reinstallerTab: Tab
+
     @FXML
     private lateinit var disablerTab: Tab
+
     @FXML
     private lateinit var enablerTab: Tab
+
     @FXML
     private lateinit var fileExplorerPane: TitledPane
+
     @FXML
     private lateinit var camera2Pane: TitledPane
+
     @FXML
     private lateinit var resolutionPane: TitledPane
+
     @FXML
     private lateinit var flasherPane: TitledPane
+
     @FXML
     private lateinit var wiperPane: TitledPane
+
     @FXML
     private lateinit var oemPane: TitledPane
+
     @FXML
     private lateinit var dpiPane: TitledPane
+
     @FXML
     private lateinit var downloaderPane: TitledPane
 
@@ -512,7 +559,7 @@ class MainController : Initializable {
     @FXML
     private fun openButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml")).load<Parent>())
+            val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml")).load())
             Stage().apply {
                 this.scene = scene
                 initModality(Modality.APPLICATION_MODAL)
@@ -683,19 +730,23 @@ class MainController : Initializable {
             romDirectory = showDialog((event.source as Node).scene.window)
         }
         romDirectory?.let { dir ->
-            if (' ' in dir.absolutePath) {
-                outputTextArea.text = "ERROR: Space found in the pathname!"
-                romDirectory = null
-            } else if ("images" in dir.list()!!) {
-                romLabel.text = dir.name
-                outputTextArea.text = "Fastboot ROM found!"
-                dir.listFiles()?.forEach {
-                    if (!it.isDirectory)
-                        it.setExecutable(true, false)
+            when {
+                ' ' in dir.absolutePath -> {
+                    outputTextArea.text = "ERROR: Space found in the pathname!"
+                    romDirectory = null
                 }
-            } else {
-                outputTextArea.text = "ERROR: Fastboot ROM not found!"
-                romDirectory = null
+                "images" in dir.list()!! -> {
+                    romLabel.text = dir.name
+                    outputTextArea.text = "Fastboot ROM found!"
+                    dir.listFiles()?.forEach {
+                        if (!it.isDirectory)
+                            it.setExecutable(true, false)
+                    }
+                }
+                else -> {
+                    outputTextArea.text = "ERROR: Fastboot ROM not found!"
+                    romDirectory = null
+                }
             }
         }
     }
@@ -1024,7 +1075,7 @@ class MainController : Initializable {
     @FXML
     private fun addAppsButtonPressed(event: ActionEvent) {
         if (checkADB()) {
-            val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml")).load<Parent>())
+            val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml")).load())
             Stage().apply {
                 initModality(Modality.APPLICATION_MODAL)
                 this.scene = scene

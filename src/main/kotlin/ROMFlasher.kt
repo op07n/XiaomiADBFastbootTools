@@ -6,7 +6,7 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
-class ROMFlasher(val directory: File) : Command() {
+class ROMFlasher(private val directory: File) : Command() {
 
     private fun File.getCmdCount(): Int = this.readText().split("fastboot").size - 1
 

@@ -8,11 +8,11 @@ object Device {
     var dpi = -1
     var width = -1
     var height = -1
-    var props = mutableMapOf<String, String>()
+    private var props = mutableMapOf<String, String>()
     var mode = Mode.NONE
     var reinstaller = true
     var disabler = true
-    val command = Command()
+    private val command = Command()
 
     fun readADB(): Boolean {
         val propstring = command.exec("adb shell getprop")

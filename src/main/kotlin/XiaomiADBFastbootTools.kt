@@ -1,6 +1,5 @@
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
-import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
@@ -17,7 +16,7 @@ class XiaomiADBFastbootTools : Application() {
 
     @Throws(Exception::class)
     override fun start(stage: Stage) {
-        stage.scene = Scene(FXMLLoader.load<Parent>(javaClass.classLoader.getResource("Main.fxml")))
+        stage.scene = Scene(FXMLLoader.load(javaClass.classLoader.getResource("Main.fxml")))
         stage.title = "Xiaomi ADB/Fastboot Tools"
         stage.icons.add(Image("icon.png"))
         stage.show()

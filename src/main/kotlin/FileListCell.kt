@@ -12,12 +12,16 @@ class FileListCell : ListCell<AndroidFile>() {
 
     @FXML
     private lateinit var gridPane: GridPane
+
     @FXML
     private lateinit var dir: ImageView
+
     @FXML
     private lateinit var name: Label
+
     @FXML
     private lateinit var size: Label
+
     @FXML
     private lateinit var time: Label
 

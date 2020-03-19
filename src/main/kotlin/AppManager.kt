@@ -20,18 +20,14 @@ object AppManager : Command() {
     lateinit var progress: ProgressBar
     lateinit var progressInd: ProgressIndicator
     var user = 0
-    private val apps: List<String>?
+    private val apps: List<String>? = try {
+        URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText()
+            .trim().lines()
+    } catch (ex: Exception) {
+        this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lines()
+    }
     val customApps = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
-
-    init {
-        apps = try {
-            URL("https://raw.githubusercontent.com/Szaki/XiaomiADBFastbootTools/master/src/main/resources/apps.yml").readText()
-                .trim().lines()
-        } catch (ex: Exception) {
-            this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lines()
-        }
-    }
 
     private fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
         if (this[key] == null) {
@@ -146,15 +142,15 @@ object AppManager : Command() {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command(
-                            "${prefix}adb",
-                            "shell",
-                            "cmd",
-                            "package",
-                            "install-existing",
-                            "--user",
-                            "$user",
-                            pkg.trim()
-                        )
+                                "${prefix}adb",
+                                "shell",
+                                "cmd",
+                                "package",
+                                "install-existing",
+                                "--user",
+                                "$user",
+                                pkg.trim()
+                            )
                             .start()
                     val sb = StringBuilder()
                     Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->

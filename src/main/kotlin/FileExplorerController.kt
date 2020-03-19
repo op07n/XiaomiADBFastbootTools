@@ -16,12 +16,16 @@ class FileExplorerController : Initializable {
 
     @FXML
     private lateinit var listView: ListView<AndroidFile>
+
     @FXML
     private lateinit var pathTextField: TextField
+
     @FXML
     private lateinit var backButton: Button
+
     @FXML
     private lateinit var statusTextField: TextField
+
     @FXML
     private lateinit var progressBar: ProgressBar
 
