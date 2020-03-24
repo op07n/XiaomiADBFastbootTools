@@ -46,6 +46,7 @@ com.mi.android.globallauncher: POCO Launcher
 com.mi.android.globalminusscreen: App Vault
 com.mi.android.globalpersonalassistant: App Vault
 com.mi.dlabs.vr: Mi VR
+com.mi.globalbrowser: Mi Browser
 com.mi.globalTrendNews: News
 com.mi.health: Mi Health
 com.mi.webkit.core: MiWebView
@@ -98,6 +99,7 @@ com.miui.weather2: Weather
 com.miui.wmsvc: WMService
 com.miui.yellowpage: Yellow Pages
 com.netflix.partner.activation: PartnerNetflixActivation
+com.qisiemoji.inputmethod: Kika Keyboard
 com.xiaomi.ab: MAB
 com.xiaomi.gameboosterglobal: Game Turbo
 com.xiaomi.glgm: Games
