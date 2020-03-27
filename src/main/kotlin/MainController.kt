@@ -14,6 +14,7 @@ import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.cell.CheckBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.image.ImageView
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.*
@@ -22,13 +23,12 @@ import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
-import java.nio.channels.Channels
 import java.util.*
+import java.util.zip.ZipFile
 
 class MainController : Initializable {
 
@@ -179,7 +179,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.9.2"
+    private val version = "6.10"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
@@ -187,9 +187,12 @@ class MainController : Initializable {
 
     companion object {
         val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
-        val workingDir = System.getProperty("user.dir")
         val win = "win" in System.getProperty("os.name").toLowerCase()
         val linux = "linux" in System.getProperty("os.name").toLowerCase()
+    }
+
+    init {
+        dir.mkdir()
     }
 
     private fun setPanels(mode: Mode = Device.mode) {
@@ -417,49 +420,113 @@ class MainController : Initializable {
         AppManager.progressInd = progressIndicator
 
         GlobalScope.launch(Dispatchers.IO) {
-            if (command.check(win)) {
-                try {
-                    val link =
-                        URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
-                            .substringAfter("\"html_url\":\"").substringBefore('"')
-                    val latest = link.substringAfterLast('/')
-                    if (latest > version)
+            if (!command.check(win)) {
+                Alert(AlertType.ERROR).apply {
+                    initStyle(StageStyle.UNDECORATED)
+                    title = "Downloading SDK Platform Tools..."
+                    headerText =
+                        "ERROR: Cannot find ADB/Fastboot!\nDownloading..."
+                    val hb = HBox()
+                    hb.alignment = Pos.CENTER
+                    val label = Label()
+                    val indicator = ProgressIndicator()
+                    hb.children.addAll(label, indicator)
+                    dialogPane.content = hb
+                    isResizable = false
+                    withContext(Dispatchers.Main) {
+                        show()
+                    }
+                    val file = File(dir, "bin.zip")
+                    val downloader = when {
+                        win -> Downloader(
+                            "https://dl.google.com/android/repository/platform-tools-latest-windows.zip",
+                            file
+                        )
+                        linux -> Downloader(
+                            "https://dl.google.com/android/repository/platform-tools-latest-linux.zip",
+                            file
+                        )
+                        else -> Downloader(
+                            "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip",
+                            file
+                        )
+                    }
+                    launch(Dispatchers.IO) {
+                        downloader.start()
+                    }
+                    while (!downloader.complete) {
+                        val speed = downloader.getSpeed() / 1000f
+                        val progress = downloader.getProgress().toString().take(4)
                         withContext(Dispatchers.Main) {
-                            Alert(AlertType.INFORMATION).apply {
-                                initStyle(StageStyle.UTILITY)
-                                title = "New version available!"
-                                graphic = ImageView("mitu.png")
-                                headerText =
-                                    "Version $latest is available!"
-                                val vb = VBox()
-                                vb.alignment = Pos.CENTER
-                                val download = Hyperlink("Download")
-                                download.onAction = EventHandler {
-                                    if (linux)
-                                        Runtime.getRuntime().exec("xdg-open $link")
-                                    else Desktop.getDesktop().browse(URI(link))
-                                }
-                                download.font = Font(15.0)
-                                vb.children.add(download)
-                                dialogPane.content = vb
-                                showAndWait()
+                            label.text = if (speed < 1000f)
+                                "$progress %\t\t${speed.toString().take(5)} KB/s"
+                            else "$progress %\t\t${(speed / 1000f).toString().take(5)} MB/s"
+                        }
+                        delay(1000)
+                    }
+                    withContext(Dispatchers.Main) {
+                        indicator.isVisible = false
+                        label.text = "Unzipping..."
+                    }
+                    ZipFile(file).use { zip ->
+                        zip.entries().asSequence().forEach { entry ->
+                            zip.getInputStream(entry).use { input ->
+                                if ("adb" in entry.name.toLowerCase() || "fastboot" in entry.name.toLowerCase())
+                                    File(dir, entry.name).apply {
+                                        outputStream().use { output ->
+                                            input.copyTo(output)
+                                        }
+                                        setExecutable(true, false)
+                                    }
                             }
                         }
-                } catch (ex: Exception) {
-                    // OK
-                }
-                checkDevice()
-            } else {
-                withContext(Dispatchers.Main) {
-                    Alert(AlertType.ERROR).apply {
-                        title = "Fatal Error"
-                        headerText =
-                            "ERROR: Cannot find ADB/Fastboot!"
-                        showAndWait()
                     }
-                    Platform.exit()
+                    withContext(Dispatchers.Main) {
+                        close()
+                    }
+                    if (!command.check(win))
+                        withContext(Dispatchers.Main) {
+                            Alert(AlertType.ERROR).apply {
+                                title = "Fatal Error"
+                                headerText =
+                                    "ERROR: Couldn't run ADB/Fastboot!"
+                                showAndWait()
+                            }
+                            Platform.exit()
+                        }
                 }
             }
+            try {
+                val link =
+                    URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                        .substringAfter("\"html_url\":\"").substringBefore('"')
+                val latest = link.substringAfterLast('/')
+                if (latest > version)
+                    withContext(Dispatchers.Main) {
+                        Alert(AlertType.INFORMATION).apply {
+                            initStyle(StageStyle.UTILITY)
+                            title = "New version available!"
+                            graphic = ImageView("mitu.png")
+                            headerText =
+                                "Version $latest is available!"
+                            val vb = VBox()
+                            vb.alignment = Pos.CENTER
+                            val download = Hyperlink("Download")
+                            download.onAction = EventHandler {
+                                if (linux)
+                                    Runtime.getRuntime().exec("xdg-open $link")
+                                else Desktop.getDesktop().browse(URI(link))
+                            }
+                            download.font = Font(15.0)
+                            vb.children.add(download)
+                            dialogPane.content = vb
+                            showAndWait()
+                        }
+                    }
+            } catch (ex: Exception) {
+                // OK
+            }
+            checkDevice()
         }
     }
 
@@ -886,36 +953,24 @@ class MainController : Initializable {
                                 outputTextArea.appendText("Starting download...\n")
                                 downloaderPane.isDisable = true
                             }
-                            var complete = false
-                            val url = URL(link)
-                            val size = url.openConnection().contentLengthLong * 1.0
-                            val file = File(it, link.substringAfterLast('/'))
-                            launch {
-                                var prev = 0L
-                                while (!complete) {
-                                    val length = file.length()
-                                    val diff = (length - prev) / 1000.0
-                                    val speed = if (diff < 1000.0)
-                                        "${diff.toString().take(5)} KB/s"
-                                    else "${(diff / 1000.0).toString().take(4)} MB/s"
-                                    prev = length
-                                    withContext(Dispatchers.Main) {
-                                        downloadProgress.text =
-                                            "${(file.length() / size * 100.0).toString().take(4)} %\t\t$speed"
-                                    }
-                                    delay(1000)
-                                }
+                            val downloader = Downloader(link, it)
+                            launch(Dispatchers.IO) {
+                                downloader.start()
                             }
-                            FileOutputStream(file).channel.transferFrom(
-                                Channels.newChannel(url.openStream()),
-                                0,
-                                Long.MAX_VALUE
-                            )
-                            complete = true
+                            while (!downloader.complete) {
+                                val speed = downloader.getSpeed() / 1000f
+                                val progress = downloader.getProgress().toString().take(4)
+                                withContext(Dispatchers.Main) {
+                                    downloadProgress.text = if (speed < 1000f)
+                                        "$progress %\t\t${speed.toString().take(5)} KB/s"
+                                    else "$progress %\t\t${(speed / 1000f).toString().take(5)} MB/s"
+                                }
+                                delay(1000)
+                            }
                             withContext(Dispatchers.Main) {
                                 progressIndicator.isVisible = false
                                 outputTextArea.appendText("Download complete!\n\n")
-                                downloadProgress.text = ""
+                                downloadProgress.text = "100.0%"
                                 downloaderPane.isDisable = false
                             }
                         } else {

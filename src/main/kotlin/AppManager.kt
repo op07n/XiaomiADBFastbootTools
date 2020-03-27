@@ -42,7 +42,7 @@ object AppManager : Command() {
             val app = line.split(':')
             potentialApps[app[0].trim()] = app[1].trim()
         }
-        if (customApps.exists()) {
+        if (customApps.exists())
             customApps.forEachLine { line ->
                 val app = line.split(':')
                 if (app.size == 1) {
@@ -51,7 +51,6 @@ object AppManager : Command() {
                     potentialApps[app[0].trim()] = app[1].trim()
                 }
             }
-        } else MainController.dir.mkdir()
     }
 
     fun createTables() {
