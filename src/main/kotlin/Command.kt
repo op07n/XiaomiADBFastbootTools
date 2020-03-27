@@ -11,33 +11,47 @@ import java.util.*
 open class Command {
 
     var pb: ProcessBuilder = ProcessBuilder()
+    var prefix = ""
+    private val workingDirFile = File(MainController.workingDir)
     lateinit var proc: Process
 
     companion object {
-        var prefix = ""
-        val userdir = File(System.getProperty("user.dir"))
         lateinit var outputTextArea: TextInputControl
         lateinit var progressBar: ProgressBar
         lateinit var progressIndicator: ProgressIndicator
     }
 
-    fun setup(pref: String): Boolean {
-        pb.directory(userdir)
+    init {
+        pb.directory(workingDirFile)
+    }
+
+    private fun setup(pref: String): Boolean {
         prefix = pref
-        return try {
-            pb.apply {
-                command("${prefix}adb", "--version").start()
-                command("${prefix}fastboot", "--version").start()
-                command("${prefix}adb", "start-server").start()
+        if (prefix == "" || File(prefix + "adb").exists())
+            return try {
+                pb.apply {
+                    command("${prefix}adb", "--version").start()
+                    command("${prefix}fastboot", "--version").start()
+                    command("${prefix}adb", "start-server").start()
+                }
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
             }
-            true
-        } catch (e: Exception) {
-            false
+        return false
+    }
+
+    fun check(win: Boolean): Boolean {
+        return if (win) {
+            setup("${MainController.workingDir}\\bin\\") || setup("${MainController.workingDir}\\") || setup("")
+        } else {
+            setup("${MainController.workingDir}/bin/") || setup("${MainController.workingDir}/") || setup("")
         }
     }
 
     fun exec(vararg args: String, err: Boolean = true, lim: Int = 0): String {
-        pb.directory(userdir)
+        pb.directory(workingDirFile)
         pb.redirectErrorStream(err)
         val sb = StringBuilder()
         args.forEach {
@@ -79,7 +93,7 @@ open class Command {
     }
 
     fun execDisplayed(vararg args: String, err: Boolean = true, lim: Int = 0): String {
-        pb.directory(userdir)
+        pb.directory(workingDirFile)
         pb.redirectErrorStream(err)
         val sb = StringBuilder()
         outputTextArea.text = ""

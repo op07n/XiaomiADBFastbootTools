@@ -142,15 +142,15 @@ object AppManager : Command() {
                 it.packagenameProperty().get().trim().lines().forEach { pkg ->
                     proc =
                         pb.command(
-                                "${prefix}adb",
-                                "shell",
-                                "cmd",
-                                "package",
-                                "install-existing",
-                                "--user",
-                                "$user",
-                                pkg.trim()
-                            )
+                            "${prefix}adb",
+                            "shell",
+                            "cmd",
+                            "package",
+                            "install-existing",
+                            "--user",
+                            "$user",
+                            pkg.trim()
+                        )
                             .start()
                     val sb = StringBuilder()
                     Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->

@@ -179,7 +179,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.9.1"
+    private val version = "6.9.2"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
@@ -187,6 +187,7 @@ class MainController : Initializable {
 
     companion object {
         val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
+        val workingDir = System.getProperty("user.dir")
         val win = "win" in System.getProperty("os.name").toLowerCase()
         val linux = "linux" in System.getProperty("os.name").toLowerCase()
     }
@@ -280,24 +281,6 @@ class MainController : Initializable {
                     infoTextArea.appendText("\nAnti version:\t\t${Device.anti}")
             }
             else -> infoTextArea.text = ""
-        }
-    }
-
-    private fun checkADBFastboot(): Boolean {
-        return if (win) {
-            when {
-                (command.setup(".\\bin\\")) -> true
-                (command.setup(".\\")) -> true
-                (command.setup("")) -> true
-                else -> false
-            }
-        } else {
-            when {
-                (command.setup("./bin/")) -> true
-                (command.setup("./")) -> true
-                (command.setup("")) -> true
-                else -> false
-            }
         }
     }
 
@@ -434,7 +417,7 @@ class MainController : Initializable {
         AppManager.progressInd = progressIndicator
 
         GlobalScope.launch(Dispatchers.IO) {
-            if (checkADBFastboot()) {
+            if (command.check(win)) {
                 try {
                     val link =
                         URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
