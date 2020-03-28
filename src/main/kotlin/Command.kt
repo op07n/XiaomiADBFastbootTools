@@ -36,9 +36,9 @@ open class Command {
 
     fun check(win: Boolean): Boolean {
         return if (win) {
-            setup("") || setup("${MainController.dir.absolutePath}\\")
+            setup("") || setup("${MainController.dir.absolutePath}\\platform-tools\\")
         } else {
-            setup("") || setup("${MainController.dir.absolutePath}/")
+            setup("") || setup("${MainController.dir.absolutePath}/platform-tools/")
         }
     }
 

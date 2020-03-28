@@ -421,80 +421,81 @@ class MainController : Initializable {
 
         GlobalScope.launch(Dispatchers.IO) {
             if (!command.check(win)) {
-                Alert(AlertType.ERROR).apply {
-                    initStyle(StageStyle.UNDECORATED)
-                    title = "Downloading SDK Platform Tools..."
-                    headerText =
-                        "ERROR: Cannot find ADB/Fastboot!\nDownloading..."
-                    val hb = HBox()
-                    hb.alignment = Pos.CENTER
-                    val label = Label()
-                    val indicator = ProgressIndicator()
-                    hb.children.addAll(label, indicator)
-                    dialogPane.content = hb
-                    isResizable = false
-                    withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
+                    Alert(AlertType.ERROR).apply {
+                        initStyle(StageStyle.UNDECORATED)
+                        title = "Downloading SDK Platform Tools..."
+                        headerText =
+                            "ERROR: Cannot find ADB/Fastboot!\nDownloading..."
+                        val hb = HBox()
+                        hb.alignment = Pos.CENTER
+                        val label = Label()
+                        val indicator = ProgressIndicator()
+                        hb.children.addAll(label, indicator)
+                        dialogPane.content = hb
+                        isResizable = false
                         show()
-                    }
-                    val file = File(dir, "bin.zip")
-                    val downloader = when {
-                        win -> Downloader(
-                            "https://dl.google.com/android/repository/platform-tools-latest-windows.zip",
-                            file
-                        )
-                        linux -> Downloader(
-                            "https://dl.google.com/android/repository/platform-tools-latest-linux.zip",
-                            file
-                        )
-                        else -> Downloader(
-                            "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip",
-                            file
-                        )
-                    }
-                    launch(Dispatchers.IO) {
-                        downloader.start()
-                    }
-                    while (!downloader.complete) {
-                        val speed = downloader.getSpeed() / 1000f
-                        val progress = downloader.getProgress().toString().take(4)
-                        withContext(Dispatchers.Main) {
-                            label.text = if (speed < 1000f)
-                                "$progress %\t\t${speed.toString().take(5)} KB/s"
-                            else "$progress %\t\t${(speed / 1000f).toString().take(5)} MB/s"
-                        }
-                        delay(1000)
-                    }
-                    withContext(Dispatchers.Main) {
-                        indicator.isVisible = false
-                        label.text = "Unzipping..."
-                    }
-                    ZipFile(file).use { zip ->
-                        zip.entries().asSequence().forEach { entry ->
-                            zip.getInputStream(entry).use { input ->
-                                if ("adb" in entry.name.toLowerCase() || "fastboot" in entry.name.toLowerCase())
-                                    File(dir, entry.name).apply {
-                                        outputStream().use { output ->
-                                            input.copyTo(output)
+                        withContext(Dispatchers.IO) {
+                            val file = File(dir, "bin.zip")
+                            val downloader = when {
+                                win -> Downloader(
+                                    "https://dl.google.com/android/repository/platform-tools-latest-windows.zip",
+                                    file
+                                )
+                                linux -> Downloader(
+                                    "https://dl.google.com/android/repository/platform-tools-latest-linux.zip",
+                                    file
+                                )
+                                else -> Downloader(
+                                    "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip",
+                                    file
+                                )
+                            }
+                            launch(Dispatchers.IO) {
+                                downloader.start()
+                            }
+                            while (!downloader.complete) {
+                                val speed = downloader.getSpeed() / 1000f
+                                val progress = downloader.getProgress().toString().take(4)
+                                withContext(Dispatchers.Main) {
+                                    label.text = if (speed < 1000f)
+                                        "$progress %\t\t${speed.toString().take(5)} KB/s"
+                                    else "$progress %\t\t${(speed / 1000f).toString().take(5)} MB/s"
+                                }
+                                delay(1000)
+                            }
+                            withContext(Dispatchers.Main) {
+                                indicator.isVisible = false
+                                label.text = "Unzipping..."
+                            }
+                            ZipFile(file).use { zip ->
+                                zip.stream().forEach { entry ->
+                                    if (entry.isDirectory)
+                                        File(dir, entry.name).mkdirs()
+                                    else zip.getInputStream(entry).use { input ->
+                                        File(dir, entry.name).apply {
+                                            outputStream().use { output ->
+                                                input.copyTo(output)
+                                            }
+                                            setExecutable(true, false)
                                         }
-                                        setExecutable(true, false)
                                     }
+                                }
                             }
                         }
-                    }
-                    withContext(Dispatchers.Main) {
                         close()
                     }
-                    if (!command.check(win))
-                        withContext(Dispatchers.Main) {
-                            Alert(AlertType.ERROR).apply {
-                                title = "Fatal Error"
-                                headerText =
-                                    "ERROR: Couldn't run ADB/Fastboot!"
-                                showAndWait()
-                            }
-                            Platform.exit()
-                        }
                 }
+                if (!command.check(win))
+                    withContext(Dispatchers.Main) {
+                        Alert(AlertType.ERROR).apply {
+                            title = "Fatal Error"
+                            headerText =
+                                "ERROR: Couldn't run ADB/Fastboot!"
+                            showAndWait()
+                        }
+                        Platform.exit()
+                    }
             }
             try {
                 val link =
@@ -953,7 +954,7 @@ class MainController : Initializable {
                                 outputTextArea.appendText("Starting download...\n")
                                 downloaderPane.isDisable = true
                             }
-                            val downloader = Downloader(link, it)
+                            val downloader = Downloader(link, File(it, link.substringAfterLast('/')))
                             launch(Dispatchers.IO) {
                                 downloader.start()
                             }
