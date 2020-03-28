@@ -1,26 +1,27 @@
+import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.TextArea
 import javafx.scene.layout.VBox
 import javafx.stage.StageStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 
-class ExceptionAlert(ex: Exception) {
-
-    private val alert = Alert(Alert.AlertType.ERROR)
-    private val vb = VBox()
-    private val stringWriter = StringWriter()
-    private val printWriter = PrintWriter(stringWriter)
-
-    init {
-        alert.apply {
+suspend fun Exception.alert() {
+    val stringWriter = StringWriter()
+    val printWriter = PrintWriter(stringWriter)
+    this.printStackTrace(printWriter)
+    withContext(Dispatchers.Main) {
+        Alert(Alert.AlertType.ERROR).apply {
             initStyle(StageStyle.UTILITY)
             title = "ERROR"
             headerText =
                 "Unexpected exception!"
+            val vb = VBox()
             vb.alignment = Pos.CENTER
-            ex.printStackTrace(printWriter)
             val textArea = TextArea(stringWriter.toString()).apply {
                 isEditable = false
                 isWrapText = true
@@ -33,4 +34,13 @@ class ExceptionAlert(ex: Exception) {
             showAndWait()
         }
     }
+    Platform.exit()
+}
+
+fun File.getCmdCount(): Int = this.readText().split("fastboot").size - 1
+
+fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
+    if (this[key] == null) {
+        this[key] = mutableListOf(value)
+    } else this[key]!!.add(value)
 }

@@ -9,6 +9,9 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 import java.util.*
 
@@ -71,8 +74,10 @@ class FileExplorerController : Initializable {
             val fc = FileChooser()
             fc.title = "Select files to copy"
             fc.showOpenMultipleDialog((event.source as Node).scene.window)?.let {
-                fileExplorer.push(it) {
-                    loadList()
+                GlobalScope.launch(Dispatchers.IO) {
+                    fileExplorer.push(it) {
+                        loadList()
+                    }
                 }
             }
         } else close(event)
@@ -84,8 +89,10 @@ class FileExplorerController : Initializable {
             val dc = DirectoryChooser()
             dc.title = "Select the destination"
             dc.showDialog((event.source as Node).scene.window)?.let {
-                fileExplorer.pull(listView.selectionModel.selectedItems, it) {
-                    loadList()
+                GlobalScope.launch(Dispatchers.IO) {
+                    fileExplorer.pull(listView.selectionModel.selectedItems, it) {
+                        loadList()
+                    }
                 }
             }
         } else close(event)
@@ -104,8 +111,10 @@ class FileExplorerController : Initializable {
             }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank())
-                fileExplorer.mkdir(result.get().trim()) {
-                    loadList()
+                GlobalScope.launch(Dispatchers.IO) {
+                    fileExplorer.mkdir(result.get().trim()) {
+                        loadList()
+                    }
                 }
         } else close(event)
     }
@@ -129,8 +138,10 @@ class FileExplorerController : Initializable {
             alert.buttonTypes.setAll(yes, no)
             val result = alert.showAndWait()
             if (result.get() == yes)
-                fileExplorer.delete(listView.selectionModel.selectedItems) {
-                    loadList()
+                GlobalScope.launch(Dispatchers.IO) {
+                    fileExplorer.delete(listView.selectionModel.selectedItems) {
+                        loadList()
+                    }
                 }
         } else close(event)
     }
@@ -153,8 +164,10 @@ class FileExplorerController : Initializable {
             }
             val result = dialog.showAndWait()
             if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name)
-                fileExplorer.rename(item, result.get().trim()) {
-                    loadList()
+                GlobalScope.launch(Dispatchers.IO) {
+                    fileExplorer.rename(item, result.get().trim()) {
+                        loadList()
+                    }
                 }
         } else close(event)
     }

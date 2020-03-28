@@ -625,76 +625,88 @@ class MainController : Initializable {
 
     @FXML
     private fun applyDpiButtonPressed(event: ActionEvent) {
-        if (dpiTextField.text.isNotBlank() && checkADB()) {
-            val attempt = command.execDisplayed("adb shell wm density ${dpiTextField.text.trim()}")
-            outputTextArea.text = when {
-                "permission" in attempt ->
-                    "ERROR: Please allow USB debugging (Security settings)!"
-                "bad" in attempt ->
-                    "ERROR: Invalid value!"
-                attempt.isEmpty() ->
-                    "Done!"
-                else ->
-                    "ERROR: $attempt"
+        if (dpiTextField.text.isNotBlank() && checkADB())
+            GlobalScope.launch(Dispatchers.IO) {
+                val attempt = command.execDisplayed("adb shell wm density ${dpiTextField.text.trim()}")
+                withContext(Dispatchers.Main) {
+                    outputTextArea.text = when {
+                        "permission" in attempt ->
+                            "ERROR: Please allow USB debugging (Security settings)!"
+                        "bad" in attempt ->
+                            "ERROR: Invalid value!"
+                        attempt.isEmpty() ->
+                            "Done!"
+                        else ->
+                            "ERROR: $attempt"
+                    }
+                }
             }
-        }
     }
 
     @FXML
     private fun resetDpiButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            val attempt = command.execDisplayed("adb shell wm density reset")
-            outputTextArea.text = when {
-                "permission" in attempt ->
-                    "ERROR: Please allow USB debugging (Security settings)!"
-                attempt.isEmpty() ->
-                    "Done!"
-                else ->
-                    "ERROR: $attempt"
+        if (checkADB())
+            GlobalScope.launch(Dispatchers.IO) {
+                val attempt = command.execDisplayed("adb shell wm density reset")
+                withContext(Dispatchers.Main) {
+                    outputTextArea.text = when {
+                        "permission" in attempt ->
+                            "ERROR: Please allow USB debugging (Security settings)!"
+                        attempt.isEmpty() ->
+                            "Done!"
+                        else ->
+                            "ERROR: $attempt"
+                    }
+                }
             }
-        }
     }
 
     @FXML
     private fun applyResButtonPressed(event: ActionEvent) {
-        if (widthTextField.text.isNotBlank() && heightTextField.text.isNotBlank() && checkADB()) {
-            val attempt =
-                command.execDisplayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
-            outputTextArea.text = when {
-                "permission" in attempt ->
-                    "ERROR: Please allow USB debugging (Security settings)!"
-                "bad" in attempt ->
-                    "ERROR: Invalid value!"
-                attempt.isEmpty() ->
-                    "Done!"
-                else ->
-                    "ERROR: $attempt"
+        if (widthTextField.text.isNotBlank() && heightTextField.text.isNotBlank() && checkADB())
+            GlobalScope.launch(Dispatchers.IO) {
+                val attempt =
+                    command.execDisplayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
+                withContext(Dispatchers.Main) {
+                    outputTextArea.text = when {
+                        "permission" in attempt ->
+                            "ERROR: Please allow USB debugging (Security settings)!"
+                        "bad" in attempt ->
+                            "ERROR: Invalid value!"
+                        attempt.isEmpty() ->
+                            "Done!"
+                        else ->
+                            "ERROR: $attempt"
+                    }
+                }
             }
-        }
     }
 
     @FXML
     private fun resetResButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            val attempt = command.execDisplayed("adb shell wm size reset")
-            outputTextArea.text = when {
-                "permission" in attempt ->
-                    "ERROR: Please allow USB debugging (Security settings)!"
-                attempt.isEmpty() ->
-                    "Done!"
-                else ->
-                    "ERROR: $attempt"
+        if (checkADB())
+            GlobalScope.launch(Dispatchers.IO) {
+                val attempt = command.execDisplayed("adb shell wm size reset")
+                withContext(Dispatchers.Main) {
+                    outputTextArea.text = when {
+                        "permission" in attempt ->
+                            "ERROR: Please allow USB debugging (Security settings)!"
+                        attempt.isEmpty() ->
+                            "Done!"
+                        else ->
+                            "ERROR: $attempt"
+                    }
+                }
             }
-        }
     }
 
     @FXML
     private fun readPropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
             Mode.ADB, Mode.RECOVERY -> if (checkADB())
-                command.execDisplayed("adb shell getprop")
+                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("adb shell getprop") }
             Mode.FASTBOOT -> if (checkFastboot())
-                command.execDisplayed("fastboot getvar all")
+                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot getvar all") }
             else -> return
         }
     }
@@ -702,36 +714,46 @@ class MainController : Initializable {
     @FXML
     private fun savePropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
-                val props = command.exec("adb shell getprop")
-                FileChooser().apply {
-                    extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-                    title = "Save properties"
-                    showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
-                        try {
-                            it.writeText(props)
-                        } catch (ex: Exception) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
+            Mode.ADB, Mode.RECOVERY -> if (checkADB())
+                GlobalScope.launch(Dispatchers.IO) {
+                    val props = command.exec("adb shell getprop")
+                    withContext(Dispatchers.Main) {
+                        FileChooser().apply {
+                            extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
+                            title = "Save properties"
+                            showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
+                                withContext(Dispatchers.IO) {
+                                    try {
+                                        it.writeText(props)
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
+                                        ex.alert()
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            }
-            Mode.FASTBOOT -> if (checkFastboot()) {
-                val props = command.exec("fastboot getvar all")
-                FileChooser().apply {
-                    extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-                    title = "Save properties"
-                    showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
-                        try {
-                            it.writeText(props)
-                        } catch (ex: Exception) {
-                            ex.printStackTrace()
-                            ExceptionAlert(ex)
+            Mode.FASTBOOT -> if (checkFastboot())
+                GlobalScope.launch(Dispatchers.IO) {
+                    val props = command.exec("fastboot getvar all")
+                    withContext(Dispatchers.Main) {
+                        FileChooser().apply {
+                            extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
+                            title = "Save properties"
+                            showSaveDialog((event.target as MenuItem).parentPopup.ownerWindow)?.let {
+                                withContext(Dispatchers.IO) {
+                                    try {
+                                        it.writeText(props)
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
+                                        ex.alert()
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            }
             else -> return
         }
     }
@@ -766,9 +788,11 @@ class MainController : Initializable {
             partitionComboBox.value?.let { pcb ->
                 if (it.absolutePath.isNotBlank() && pcb.isNotBlank() && checkFastboot()) {
                     confirm {
-                        if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
-                            command.exec("fastboot flash ${pcb.trim()}", "fastboot boot", image = it)
-                        else command.exec("fastboot flash ${pcb.trim()}", image = it)
+                        GlobalScope.launch(Dispatchers.IO) {
+                            if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
+                                command.exec("fastboot flash ${pcb.trim()}", "fastboot boot", image = it)
+                            else command.exec("fastboot flash ${pcb.trim()}", image = it)
+                        }
                     }
                 }
             }
@@ -811,14 +835,16 @@ class MainController : Initializable {
                 if (checkFastboot())
                     confirm {
                         setPanels(Mode.NONE)
-                        when (scb) {
-                            "Clean install" -> ROMFlasher(dir).flash("flash_all")
-                            "Clean install and lock" -> ROMFlasher(dir).flash("flash_all_lock")
-                            "Update" -> ROMFlasher(dir).flash(
-                                dir.list()?.find { "flash_all_except" in it }?.substringBefore(
-                                    '.'
+                        GlobalScope.launch(Dispatchers.IO) {
+                            when (scb) {
+                                "Clean install" -> ROMFlasher(dir).flash("flash_all")
+                                "Clean install and lock" -> ROMFlasher(dir).flash("flash_all_lock")
+                                "Update" -> ROMFlasher(dir).flash(
+                                    dir.list()?.find { "flash_all_except" in it }?.substringBefore(
+                                        '.'
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
             }
@@ -829,30 +855,32 @@ class MainController : Initializable {
     private fun bootButtonPressed(event: ActionEvent) {
         image?.let {
             if (it.absolutePath.isNotBlank() && checkFastboot())
-                command.exec("fastboot boot", image = it)
+                GlobalScope.launch(Dispatchers.IO) { command.exec("fastboot boot", image = it) }
         }
     }
 
     @FXML
     private fun cacheButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            command.execDisplayed("fastboot erase cache")
+            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase cache") }
     }
 
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            confirm("All your data will be gone.") { command.execDisplayed("fastboot erase userdata") }
+            confirm("All your data will be gone.") { GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase userdata") } }
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             confirm("All your data will be gone.") {
-                command.execDisplayed(
-                    "fastboot erase cache",
-                    "fastboot erase userdata"
-                )
+                GlobalScope.launch(Dispatchers.IO) {
+                    command.execDisplayed(
+                        "fastboot erase cache",
+                        "fastboot erase userdata"
+                    )
+                }
             }
     }
 
@@ -860,14 +888,14 @@ class MainController : Initializable {
     private fun lockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
             confirm("Your partitions must be intact in order to successfully lock the bootloader.") {
-                command.execDisplayed("fastboot oem lock")
+                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot oem lock") }
             }
     }
 
     @FXML
     private fun unlockButtonPressed(event: ActionEvent) {
         if (checkFastboot())
-            command.execDisplayed("fastboot oem unlock")
+            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot oem unlock") }
     }
 
     private fun getLink(version: String, codename: String): String? {
@@ -1062,45 +1090,88 @@ class MainController : Initializable {
         } else false
     }
 
-    private inline fun executeAppManagerAction(
-        items: ObservableList<App>,
-        func: (ObservableList<App>, Int, () -> Unit) -> Unit
-    ) {
-        if (isAppSelected(items) && checkADB())
+    @FXML
+    private fun uninstallButtonPressed(event: ActionEvent) {
+        if (isAppSelected(uninstallerTableView.items) && checkADB())
             confirm {
                 setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
                 var n = 0
-                items.forEach {
+                uninstallerTableView.items.forEach {
                     if (it.selectedProperty().get()) {
                         selected.add(it)
                         n += it.packagenameProperty().get().trim().lines().size
                     }
                 }
-                func(selected, n) {
-                    setPanels()
+                GlobalScope.launch(Dispatchers.IO) {
+                    AppManager.uninstall(selected, n) {
+                        setPanels()
+                    }
                 }
             }
     }
 
     @FXML
-    private fun uninstallButtonPressed(event: ActionEvent) {
-        executeAppManagerAction(uninstallerTableView.items, AppManager::uninstall)
-    }
-
-    @FXML
     private fun reinstallButtonPressed(event: ActionEvent) {
-        executeAppManagerAction(reinstallerTableView.items, AppManager::reinstall)
+        if (isAppSelected(reinstallerTableView.items) && checkADB())
+            confirm {
+                setPanels(Mode.NONE)
+                val selected = FXCollections.observableArrayList<App>()
+                var n = 0
+                reinstallerTableView.items.forEach {
+                    if (it.selectedProperty().get()) {
+                        selected.add(it)
+                        n += it.packagenameProperty().get().trim().lines().size
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    AppManager.reinstall(selected, n) {
+                        setPanels()
+                    }
+                }
+            }
     }
 
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
-        executeAppManagerAction(disablerTableView.items, AppManager::disable)
+        if (isAppSelected(disablerTableView.items) && checkADB())
+            confirm {
+                setPanels(Mode.NONE)
+                val selected = FXCollections.observableArrayList<App>()
+                var n = 0
+                disablerTableView.items.forEach {
+                    if (it.selectedProperty().get()) {
+                        selected.add(it)
+                        n += it.packagenameProperty().get().trim().lines().size
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    AppManager.disable(selected, n) {
+                        setPanels()
+                    }
+                }
+            }
     }
 
     @FXML
     private fun enableButtonPressed(event: ActionEvent) {
-        executeAppManagerAction(enablerTableView.items, AppManager::enable)
+        if (isAppSelected(enablerTableView.items) && checkADB())
+            confirm {
+                setPanels(Mode.NONE)
+                val selected = FXCollections.observableArrayList<App>()
+                var n = 0
+                enablerTableView.items.forEach {
+                    if (it.selectedProperty().get()) {
+                        selected.add(it)
+                        n += it.packagenameProperty().get().trim().lines().size
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    AppManager.enable(selected, n) {
+                        setPanels()
+                    }
+                }
+            }
     }
 
     @FXML

@@ -3,8 +3,6 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TableView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
@@ -28,12 +26,6 @@ object AppManager : Command() {
     }
     val customApps = File(MainController.dir, "apps.yml")
     private var potentialApps = mutableMapOf<String, String>()
-
-    private fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
-        if (this[key] == null) {
-            this[key] = mutableListOf(value)
-        } else this[key]!!.add(value)
-    }
 
     fun readPotentialApps() {
         potentialApps.clear()
@@ -95,50 +87,53 @@ object AppManager : Command() {
         enablerTableView.refresh()
     }
 
-    inline fun uninstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
+    suspend inline fun uninstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         pb.redirectErrorStream(false)
-        outputTextArea.text = ""
-        progress.progress = 0.0
-        progressInd.isVisible = true
-        GlobalScope.launch(Dispatchers.IO) {
-            selected.forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+        withContext(Dispatchers.Main) {
+            outputTextArea.text = ""
+            progress.progress = 0.0
+            progressInd.isVisible = true
+        }
+        selected.forEach {
+            it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                val sb = StringBuilder()
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                     proc =
                         pb.command("${prefix}adb", "shell", "pm", "uninstall", "--user", "$user", pkg.trim())
                             .start()
-                    val sb = StringBuilder()
-                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                        while (scanner.hasNextLine())
-                            sb.append(scanner.nextLine() + '\n')
+                    while (scanner.hasNextLine())
+                        sb.append(scanner.nextLine() + '\n')
+                }
+                withContext(Dispatchers.Main) {
+                    outputTextArea.apply {
+                        appendText("App: ${it.appnameProperty().get()}\n")
+                        appendText("Package: $pkg\n")
+                        appendText("Result: $sb\n")
                     }
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.apply {
-                            appendText("App: ${it.appnameProperty().get()}\n")
-                            appendText("Package: $pkg\n")
-                            appendText("Result: $sb\n")
-                        }
-                        progress.progress += 1.0 / n
-                    }
+                    progress.progress += 1.0 / n
                 }
             }
-            withContext(Dispatchers.Main) {
-                outputTextArea.appendText("Done!")
-                progress.progress = 0.0
-                progressInd.isVisible = false
-                createTables()
-                func()
-            }
+        }
+        withContext(Dispatchers.Main) {
+            outputTextArea.appendText("Done!")
+            progress.progress = 0.0
+            progressInd.isVisible = false
+            createTables()
+            func()
         }
     }
 
-    inline fun reinstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
+    suspend inline fun reinstall(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         pb.redirectErrorStream(false)
-        outputTextArea.text = ""
-        progress.progress = 0.0
-        progressInd.isVisible = true
-        GlobalScope.launch(Dispatchers.IO) {
-            selected.forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
+        withContext(Dispatchers.Main) {
+            outputTextArea.text = ""
+            progress.progress = 0.0
+            progressInd.isVisible = true
+        }
+        selected.forEach {
+            it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                val sb = StringBuilder()
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                     proc =
                         pb.command(
                             "${prefix}adb",
@@ -151,116 +146,113 @@ object AppManager : Command() {
                             pkg.trim()
                         )
                             .start()
-                    val sb = StringBuilder()
-                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                        while (scanner.hasNextLine())
-                            sb.append(scanner.nextLine() + '\n')
+                    while (scanner.hasNextLine())
+                        sb.append(scanner.nextLine() + '\n')
+                }
+                var output = sb.toString()
+                output = if ("installed for user" in output)
+                    "Success\n"
+                else "Failure [${output.substringAfter(pkg).trim()}]\n"
+                withContext(Dispatchers.Main) {
+                    outputTextArea.apply {
+                        appendText("App: ${it.appnameProperty().get()}\n")
+                        appendText("Package: $pkg\n")
+                        appendText("Result: $output\n")
                     }
-                    var output = sb.toString()
-                    output = if ("installed for user" in output)
-                        "Success\n"
-                    else "Failure [${output.substringAfter(pkg).trim()}]\n"
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.apply {
-                            appendText("App: ${it.appnameProperty().get()}\n")
-                            appendText("Package: $pkg\n")
-                            appendText("Result: $output\n")
-                        }
-                        progress.progress += 1.0 / n
-                    }
+                    progress.progress += 1.0 / n
                 }
             }
-            withContext(Dispatchers.Main) {
-                outputTextArea.appendText("Done!")
-                progress.progress = 0.0
-                progressInd.isVisible = false
-                createTables()
-                func()
-            }
+        }
+        withContext(Dispatchers.Main) {
+            outputTextArea.appendText("Done!")
+            progress.progress = 0.0
+            progressInd.isVisible = false
+            createTables()
+            func()
         }
     }
 
-    inline fun disable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
+    suspend inline fun disable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         pb.redirectErrorStream(false)
-        outputTextArea.text = ""
-        progress.progress = 0.0
-        progressInd.isVisible = true
-        GlobalScope.launch(Dispatchers.IO) {
-            selected.forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    proc = pb.command(
-                        "${prefix}adb",
-                        "shell",
-                        "pm",
-                        "disable-user",
-                        "--user",
-                        "$user",
-                        pkg.trim()
-                    ).start()
-                    val sb = StringBuilder()
-                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                        while (scanner.hasNextLine())
-                            sb.append(scanner.nextLine() + '\n')
+        withContext(Dispatchers.Main) {
+            outputTextArea.text = ""
+            progress.progress = 0.0
+            progressInd.isVisible = true
+        }
+        selected.forEach {
+            it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                proc = pb.command(
+                    "${prefix}adb",
+                    "shell",
+                    "pm",
+                    "disable-user",
+                    "--user",
+                    "$user",
+                    pkg.trim()
+                ).start()
+                val sb = StringBuilder()
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNextLine())
+                        sb.append(scanner.nextLine() + '\n')
+                }
+                val output = if ("disabled-user" in sb.toString())
+                    "Success\n"
+                else "Failure\n"
+                withContext(Dispatchers.Main) {
+                    outputTextArea.apply {
+                        appendText("App: ${it.appnameProperty().get()}\n")
+                        appendText("Package: $pkg\n")
+                        appendText("Result: $output\n")
                     }
-                    val output = if ("disabled-user" in sb.toString())
-                        "Success\n"
-                    else "Failure\n"
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.apply {
-                            appendText("App: ${it.appnameProperty().get()}\n")
-                            appendText("Package: $pkg\n")
-                            appendText("Result: $output\n")
-                        }
-                        progress.progress += 1.0 / n
-                    }
+                    progress.progress += 1.0 / n
                 }
             }
-            withContext(Dispatchers.Main) {
-                outputTextArea.appendText("Done!")
-                progress.progress = 0.0
-                progressInd.isVisible = false
-                createTables()
-                func()
-            }
+        }
+        withContext(Dispatchers.Main) {
+            outputTextArea.appendText("Done!")
+            progress.progress = 0.0
+            progressInd.isVisible = false
+            createTables()
+            func()
         }
     }
 
-    inline fun enable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
+    suspend inline fun enable(selected: ObservableList<App>, n: Int, crossinline func: () -> Unit) {
         pb.redirectErrorStream(false)
-        outputTextArea.text = ""
-        progress.progress = 0.0
-        progressInd.isVisible = true
-        GlobalScope.launch(Dispatchers.IO) {
-            selected.forEach {
-                it.packagenameProperty().get().trim().lines().forEach { pkg ->
-                    proc =
-                        pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg.trim())
-                            .start()
-                    val sb = StringBuilder()
-                    Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                        while (scanner.hasNextLine())
-                            sb.append(scanner.nextLine() + '\n')
+        withContext(Dispatchers.Main) {
+            outputTextArea.text = ""
+            progress.progress = 0.0
+            progressInd.isVisible = true
+        }
+        selected.forEach {
+            it.packagenameProperty().get().trim().lines().forEach { pkg ->
+                proc =
+                    pb.command("${prefix}adb", "shell", "pm", "enable", "--user", "$user", pkg.trim())
+                        .start()
+                val sb = StringBuilder()
+                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNextLine())
+                        sb.append(scanner.nextLine() + '\n')
+                }
+                val output = if ("enabled" in sb.toString())
+                    "Success\n"
+                else "Failure\n"
+                withContext(Dispatchers.Main) {
+                    outputTextArea.apply {
+                        appendText("App: ${it.appnameProperty().get()}\n")
+                        appendText("Package: $pkg\n")
+                        appendText("Result: $output\n")
                     }
-                    val output = if ("enabled" in sb.toString())
-                        "Success\n"
-                    else "Failure\n"
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.apply {
-                            appendText("App: ${it.appnameProperty().get()}\n")
-                            appendText("Package: $pkg\n")
-                            appendText("Result: $output\n")
-                        }
-                        progress.progress += 1.0 / n
-                    }
+                    progress.progress += 1.0 / n
                 }
             }
-            withContext(Dispatchers.Main) {
-                outputTextArea.appendText("Done!")
-                progress.progress = 0.0
-                progressInd.isVisible = false
-                createTables()
-                func()
-            }
+        }
+        withContext(Dispatchers.Main) {
+            outputTextArea.appendText("Done!")
+            progress.progress = 0.0
+            progressInd.isVisible = false
+            createTables()
+            func()
         }
     }
 }

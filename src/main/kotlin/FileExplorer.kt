@@ -2,7 +2,9 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
@@ -82,81 +84,71 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
         proc.waitFor()
     }
 
-    inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
-        GlobalScope.launch {
-            if (selected.isEmpty()) {
-                pb.command("${prefix}adb", "pull", path, to.absolutePath)
-                init()
-            } else {
-                selected.forEach {
-                    pb.command("${prefix}adb", "pull", path + it.name, to.absolutePath)
-                    init()
-                }
-            }
-            withContext(Dispatchers.Main) {
-                if (statusTextField.text.isEmpty())
-                    statusTextField.text = "Done!"
-                statusProgressBar.progress = 0.0
-                func()
-            }
-        }
-    }
-
-    inline fun push(selected: List<File>, crossinline func: () -> Unit) {
-        GlobalScope.launch {
+    suspend inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
+        if (selected.isEmpty()) {
+            pb.command("${prefix}adb", "pull", path, to.absolutePath)
+            init()
+        } else {
             selected.forEach {
-                pb.command("${prefix}adb", "push", it.absolutePath, path)
+                pb.command("${prefix}adb", "pull", path + it.name, to.absolutePath)
                 init()
             }
-            withContext(Dispatchers.Main) {
-                if (statusTextField.text.isEmpty())
-                    statusTextField.text = "Done!"
-                statusProgressBar.progress = 0.0
-                func()
-            }
+        }
+        withContext(Dispatchers.Main) {
+            if (statusTextField.text.isEmpty())
+                statusTextField.text = "Done!"
+            statusProgressBar.progress = 0.0
+            func()
         }
     }
 
-    inline fun delete(selected: List<AndroidFile>, crossinline func: () -> Unit) {
-        GlobalScope.launch {
-            selected.forEach {
-                if (it.dir)
-                    pb.command("${prefix}adb", "shell", "rm", "-rf", (path + it.name).fmt())
-                else pb.command("${prefix}adb", "shell", "rm", "-f", (path + it.name).fmt())
-                init("rm")
-            }
-            withContext(Dispatchers.Main) {
-                if (statusTextField.text.isEmpty())
-                    statusTextField.text = "Done!"
-                statusProgressBar.progress = 0.0
-                func()
-            }
+    suspend inline fun push(selected: List<File>, crossinline func: () -> Unit) {
+        selected.forEach {
+            pb.command("${prefix}adb", "push", it.absolutePath, path)
+            init()
+        }
+        withContext(Dispatchers.Main) {
+            if (statusTextField.text.isEmpty())
+                statusTextField.text = "Done!"
+            statusProgressBar.progress = 0.0
+            func()
         }
     }
 
-    inline fun mkdir(name: String, crossinline func: () -> Unit) {
-        GlobalScope.launch {
-            pb.command("${prefix}adb", "shell", "mkdir", (path + name).fmt())
-            init("mkdir")
-            withContext(Dispatchers.Main) {
-                if (statusTextField.text.isEmpty())
-                    statusTextField.text = "Done!"
-                statusProgressBar.progress = 0.0
-                func()
-            }
+    suspend inline fun delete(selected: List<AndroidFile>, crossinline func: () -> Unit) {
+        selected.forEach {
+            if (it.dir)
+                pb.command("${prefix}adb", "shell", "rm", "-rf", (path + it.name).fmt())
+            else pb.command("${prefix}adb", "shell", "rm", "-f", (path + it.name).fmt())
+            init("rm")
+        }
+        withContext(Dispatchers.Main) {
+            if (statusTextField.text.isEmpty())
+                statusTextField.text = "Done!"
+            statusProgressBar.progress = 0.0
+            func()
         }
     }
 
-    inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
-        GlobalScope.launch {
-            pb.command("${prefix}adb", "shell", "mv", (path + selected.name).fmt(), (path + to).fmt())
-            init("mv")
-            withContext(Dispatchers.Main) {
-                if (statusTextField.text.isEmpty())
-                    statusTextField.text = "Done!"
-                statusProgressBar.progress = 0.0
-                func()
-            }
+    suspend inline fun mkdir(name: String, crossinline func: () -> Unit) {
+        pb.command("${prefix}adb", "shell", "mkdir", (path + name).fmt())
+        init("mkdir")
+        withContext(Dispatchers.Main) {
+            if (statusTextField.text.isEmpty())
+                statusTextField.text = "Done!"
+            statusProgressBar.progress = 0.0
+            func()
+        }
+    }
+
+    suspend inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
+        pb.command("${prefix}adb", "shell", "mv", (path + selected.name).fmt(), (path + to).fmt())
+        init("mv")
+        withContext(Dispatchers.Main) {
+            if (statusTextField.text.isEmpty())
+                statusTextField.text = "Done!"
+            statusProgressBar.progress = 0.0
+            func()
         }
     }
 

@@ -5,10 +5,10 @@ import java.nio.channels.Channels
 
 class Downloader(val link: String, val target: File) {
 
-    val url = URL(link)
-    val size = url.openConnection().contentLengthLong.toFloat()
+    private val url = URL(link)
+    private val size = url.openConnection().contentLengthLong.toFloat()
+    private var startTime = 0L
     var complete = false
-    var startTime = 0L
 
     fun start() {
         complete = false

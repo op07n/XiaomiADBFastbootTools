@@ -6,7 +6,6 @@ import javafx.scene.control.ListCell
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.GridPane
-import java.io.IOException
 
 class FileListCell : ListCell<AndroidFile>() {
 
@@ -31,12 +30,7 @@ class FileListCell : ListCell<AndroidFile>() {
     init {
         val fxmlLoader = FXMLLoader(javaClass.classLoader.getResource("File.fxml"))
         fxmlLoader.setController(this)
-        try {
-            fxmlLoader.load<Parent>()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            ExceptionAlert(e)
-        }
+        fxmlLoader.load<Parent>()
     }
 
     override fun updateItem(item: AndroidFile?, empty: Boolean) {

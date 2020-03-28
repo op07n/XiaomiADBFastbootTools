@@ -2,8 +2,6 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
@@ -20,26 +18,30 @@ open class Command {
         lateinit var progressIndicator: ProgressIndicator
     }
 
-    private fun setup(pref: String): Boolean {
+    private fun setup(pref: String) {
         prefix = pref
-        return try {
-            pb.apply {
-                command("${prefix}adb", "--version").start()
-                command("${prefix}fastboot", "--version").start()
-                command("${prefix}adb", "start-server").start()
-            }
-            true
-        } catch (e: Exception) {
-            false
+        pb.apply {
+            command("${prefix}adb", "--version").start()
+            command("${prefix}fastboot", "--version").start()
+            command("${prefix}adb", "start-server").start()
         }
     }
 
-    fun check(win: Boolean): Boolean {
-        return if (win) {
-            setup("") || setup("${MainController.dir.absolutePath}\\platform-tools\\")
-        } else {
-            setup("") || setup("${MainController.dir.absolutePath}/platform-tools/")
+    fun check(win: Boolean, printErr: Boolean = false): Boolean {
+        try {
+            setup("")
+        } catch (e: Exception) {
+            try {
+                if (win)
+                    setup("${MainController.dir.absolutePath}\\platform-tools\\")
+                else setup("${MainController.dir.absolutePath}/platform-tools/")
+            } catch (ex: Exception) {
+                if (printErr)
+                    ex.printStackTrace()
+                return false
+            }
         }
+        return true
     }
 
     fun exec(vararg args: String, err: Boolean = true, lim: Int = 0): String {
@@ -58,35 +60,37 @@ open class Command {
         return sb.toString()
     }
 
-    fun exec(vararg args: String, image: File?) {
+    suspend fun exec(vararg args: String, image: File?) {
         pb.redirectErrorStream(true)
-        progressIndicator.isVisible = true
-        outputTextArea.text = ""
-        GlobalScope.launch(Dispatchers.IO) {
-            args.forEach {
-                val bits = it.split(' ').toMutableList()
-                bits[0] = prefix + bits[0]
-                proc = pb.command(bits + image?.absolutePath).start()
-                Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                    while (scanner.hasNextLine()) {
-                        val next = scanner.nextLine() + '\n'
-                        withContext(Dispatchers.Main) {
-                            outputTextArea.appendText(next)
-                        }
+        withContext(Dispatchers.Main) {
+            progressIndicator.isVisible = true
+            outputTextArea.text = ""
+        }
+        args.forEach {
+            val bits = it.split(' ').toMutableList()
+            bits[0] = prefix + bits[0]
+            proc = pb.command(bits + image?.absolutePath).start()
+            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                while (scanner.hasNextLine()) {
+                    val next = scanner.nextLine() + '\n'
+                    withContext(Dispatchers.Main) {
+                        outputTextArea.appendText(next)
                     }
                 }
-                proc.waitFor()
             }
-            withContext(Dispatchers.Main) {
-                progressIndicator.isVisible = false
-            }
+            proc.waitFor()
+        }
+        withContext(Dispatchers.Main) {
+            progressIndicator.isVisible = false
         }
     }
 
-    fun execDisplayed(vararg args: String, err: Boolean = true, lim: Int = 0): String {
+    suspend fun execDisplayed(vararg args: String, err: Boolean = true, lim: Int = 0): String {
         pb.redirectErrorStream(err)
         val sb = StringBuilder()
-        outputTextArea.text = ""
+        withContext(Dispatchers.Main) {
+            outputTextArea.text = ""
+        }
         args.forEach {
             val bits = it.split(' ', limit = lim).toMutableList()
             bits[0] = prefix + bits[0]
@@ -95,7 +99,9 @@ open class Command {
                 while (scanner.hasNextLine()) {
                     val next = scanner.nextLine() + '\n'
                     sb.append(next)
-                    outputTextArea.appendText(next)
+                    withContext(Dispatchers.Main) {
+                        outputTextArea.appendText(next)
+                    }
                 }
             }
             proc.waitFor()
