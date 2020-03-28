@@ -11,10 +11,10 @@ import java.util.*
 open class Command {
 
     var pb: ProcessBuilder = ProcessBuilder().directory(MainController.dir)
-    var prefix = ""
     lateinit var proc: Process
 
     companion object {
+        var prefix = ""
         lateinit var outputTextArea: TextInputControl
         lateinit var progressBar: ProgressBar
         lateinit var progressIndicator: ProgressIndicator

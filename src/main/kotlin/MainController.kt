@@ -179,7 +179,7 @@ class MainController : Initializable {
     @FXML
     private lateinit var downloaderPane: TitledPane
 
-    private val version = "6.10"
+    private val version = "7.0"
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
@@ -422,21 +422,23 @@ class MainController : Initializable {
         GlobalScope.launch(Dispatchers.IO) {
             if (!command.check(win)) {
                 withContext(Dispatchers.Main) {
-                    Alert(AlertType.ERROR).apply {
-                        initStyle(StageStyle.UNDECORATED)
+                    Alert(AlertType.WARNING).apply {
+                        initStyle(StageStyle.UTILITY)
                         title = "Downloading SDK Platform Tools..."
                         headerText =
-                            "ERROR: Cannot find ADB/Fastboot!\nDownloading..."
-                        val hb = HBox()
+                            "ERROR: Cannot find ADB/Fastboot!\nDownloading the latest version..."
+                        val hb = HBox(15.0)
                         hb.alignment = Pos.CENTER
                         val label = Label()
+                        label.font = Font(15.0)
                         val indicator = ProgressIndicator()
-                        hb.children.addAll(label, indicator)
+                        indicator.setPrefSize(35.0, 35.0)
+                        hb.children.addAll(indicator, label)
                         dialogPane.content = hb
                         isResizable = false
                         show()
                         withContext(Dispatchers.IO) {
-                            val file = File(dir, "bin.zip")
+                            val file = File(dir, "platform-tools.zip")
                             val downloader = when {
                                 win -> Downloader(
                                     "https://dl.google.com/android/repository/platform-tools-latest-windows.zip",
@@ -459,15 +461,15 @@ class MainController : Initializable {
                                 val progress = downloader.getProgress().toString().take(4)
                                 withContext(Dispatchers.Main) {
                                     label.text = if (speed < 1000f)
-                                        "$progress %\t\t${speed.toString().take(5)} KB/s"
-                                    else "$progress %\t\t${(speed / 1000f).toString().take(5)} MB/s"
+                                        "$progress %\t${speed.toString().take(5)} KB/s"
+                                    else "$progress %\t${(speed / 1000f).toString().take(5)} MB/s"
                                 }
                                 delay(1000)
                             }
                             withContext(Dispatchers.Main) {
-                                indicator.isVisible = false
                                 label.text = "Unzipping..."
                             }
+                            File(dir, "platform-tools").mkdirs()
                             ZipFile(file).use { zip ->
                                 zip.stream().forEach { entry ->
                                     if (entry.isDirectory)
@@ -482,8 +484,10 @@ class MainController : Initializable {
                                     }
                                 }
                             }
+                            file.delete()
                         }
-                        close()
+                        hb.children.remove(indicator)
+                        label.text = "Done!"
                     }
                 }
                 if (!command.check(win))
