@@ -25,7 +25,7 @@ object AppManager : Command() {
         this::class.java.classLoader.getResource("apps.yml")?.readText()?.trim()?.lines()
     }
     val customApps = File(MainController.dir, "apps.yml")
-    private var potentialApps = mutableMapOf<String, String>()
+    private val potentialApps = mutableMapOf<String, String>()
 
     fun readPotentialApps() {
         potentialApps.clear()

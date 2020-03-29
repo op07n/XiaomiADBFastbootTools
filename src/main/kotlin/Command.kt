@@ -1,4 +1,3 @@
-import javafx.scene.control.ProgressBar
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextInputControl
 import kotlinx.coroutines.Dispatchers
@@ -8,13 +7,11 @@ import java.util.*
 
 open class Command {
 
-    var pb: ProcessBuilder = ProcessBuilder().directory(MainController.dir)
-    lateinit var proc: Process
+    var pb = ProcessBuilder().directory(MainController.dir)
 
     companion object {
         var prefix = ""
         lateinit var outputTextArea: TextInputControl
-        lateinit var progressBar: ProgressBar
         lateinit var progressIndicator: ProgressIndicator
     }
 
@@ -50,7 +47,7 @@ open class Command {
         args.forEach {
             val bits = it.split(' ', limit = lim).toMutableList()
             bits[0] = prefix + bits[0]
-            proc = pb.command(bits).start()
+            val proc = pb.command(bits).start()
             Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                 while (scanner.hasNextLine())
                     sb.append(scanner.nextLine() + '\n')
@@ -69,7 +66,7 @@ open class Command {
         args.forEach {
             val bits = it.split(' ').toMutableList()
             bits[0] = prefix + bits[0]
-            proc = pb.command(bits + image?.absolutePath).start()
+            val proc = pb.command(bits + image?.absolutePath).start()
             Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                 while (scanner.hasNextLine()) {
                     val next = scanner.nextLine() + '\n'
@@ -94,7 +91,7 @@ open class Command {
         args.forEach {
             val bits = it.split(' ', limit = lim).toMutableList()
             bits[0] = prefix + bits[0]
-            proc = pb.command(bits).start()
+            val proc = pb.command(bits).start()
             Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
                 while (scanner.hasNextLine()) {
                     val next = scanner.nextLine() + '\n'

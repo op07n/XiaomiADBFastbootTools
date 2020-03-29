@@ -70,13 +70,14 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun pushButtonPressed(event: ActionEvent) {
-        if (Device.readADB()) {
-            val fc = FileChooser()
-            fc.title = "Select files to copy"
-            fc.showOpenMultipleDialog((event.source as Node).scene.window)?.let {
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileExplorer.push(it) {
-                        loadList()
+        if (Device.checkADB()) {
+            FileChooser().apply {
+                title = "Select files to copy"
+                showOpenMultipleDialog((event.source as Node).scene.window)?.let {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        fileExplorer.push(it) {
+                            loadList()
+                        }
                     }
                 }
             }
@@ -85,7 +86,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun pullButtonPressed(event: ActionEvent) {
-        if (Device.readADB()) {
+        if (Device.checkADB()) {
             val dc = DirectoryChooser()
             dc.title = "Select the destination"
             dc.showDialog((event.source as Node).scene.window)?.let {
@@ -100,7 +101,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun newFolderButtonPressed(event: ActionEvent) {
-        if (Device.readADB()) {
+        if (Device.checkADB()) {
             val dialog = TextInputDialog().apply {
                 initStyle(StageStyle.UTILITY)
                 isResizable = false
@@ -121,7 +122,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun deleteButtonPressed(event: ActionEvent) {
-        if (Device.readADB()) {
+        if (Device.checkADB()) {
             if (listView.selectionModel.selectedItems.isEmpty())
                 return
             val alert = Alert(Alert.AlertType.CONFIRMATION).apply {
@@ -148,7 +149,7 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun renameButtonPressed(event: ActionEvent) {
-        if (Device.readADB()) {
+        if (Device.checkADB()) {
             if (listView.selectionModel.selectedItems.size != 1)
                 return
             val item = listView.selectionModel.selectedItems[0]

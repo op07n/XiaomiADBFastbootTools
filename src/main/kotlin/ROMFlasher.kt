@@ -1,9 +1,13 @@
+import javafx.scene.control.ProgressBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class ROMFlasher(private val directory: File) : Command() {
+object ROMFlasher : Command() {
+
+    var directory = MainController.dir
+    lateinit var progressBar: ProgressBar
 
     private suspend fun setupScript(arg: String): File {
         val script: File
@@ -44,7 +48,7 @@ class ROMFlasher(private val directory: File) : Command() {
         }
         val script = setupScript(arg)
         val n = script.getCmdCount()
-        proc = pb.start()
+        val proc = pb.start()
         Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
             while (scanner.hasNextLine()) {
                 sb.append(scanner.nextLine() + '\n')

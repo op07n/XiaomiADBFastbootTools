@@ -69,7 +69,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     fun init(command: String = "adb") = runBlocking(Dispatchers.IO) {
         pb.redirectErrorStream(false)
         statusTextField.text = ""
-        proc = pb.start()
+        val proc = pb.start()
         Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
             while (scanner.hasNextLine()) {
                 val output = scanner.nextLine()

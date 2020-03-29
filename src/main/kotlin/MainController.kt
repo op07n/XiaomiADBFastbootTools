@@ -1,6 +1,5 @@
 import javafx.application.Platform
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -23,8 +22,6 @@ import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
-import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.util.*
@@ -183,7 +180,6 @@ class MainController : Initializable {
     private val command = Command()
     private var image: File? = null
     private var romDirectory: File? = null
-    private var loading = false
 
     companion object {
         val dir = File(System.getProperty("user.home"), "XiaomiADBFastbootTools")
@@ -195,7 +191,7 @@ class MainController : Initializable {
         dir.mkdir()
     }
 
-    private fun setPanels(mode: Mode = Device.mode) {
+    private fun setPanels(mode: Mode) {
         when (mode) {
             Mode.ADB -> {
                 appManagerPane.isDisable = false
@@ -263,15 +259,34 @@ class MainController : Initializable {
     }
 
     private fun setUI() {
-        setPanels()
+        setPanels(Device.mode)
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> {
+            Mode.ADB -> {
                 infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
                         "Codename:\t\t${Device.codename}\n"
                 if (Device.bootloader)
                     infoTextArea.appendText("Bootloader:\t\tunlocked\n")
                 if (Device.camera2)
                     infoTextArea.appendText("Camera2:\t\t\tenabled")
+                codenameTextField.text = Device.codename
+                dpiTextField.text = if (Device.dpi != -1)
+                    Device.dpi.toString()
+                else "ERROR"
+                widthTextField.text = if (Device.width != -1)
+                    Device.width.toString()
+                else "ERROR"
+                heightTextField.text = if (Device.height != -1)
+                    Device.height.toString()
+                else "ERROR"
+            }
+            Mode.RECOVERY -> {
+                infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
+                        "Codename:\t\t${Device.codename}\n"
+                if (Device.bootloader)
+                    infoTextArea.appendText("Bootloader:\t\tunlocked\n")
+                if (Device.camera2)
+                    infoTextArea.appendText("Camera2:\t\t\tenabled")
+                codenameTextField.text = Device.codename
             }
             Mode.FASTBOOT -> {
                 infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
@@ -282,87 +297,61 @@ class MainController : Initializable {
                 else infoTextArea.appendText("locked")
                 if (Device.anti != -1)
                     infoTextArea.appendText("\nAnti version:\t\t${Device.anti}")
+                codenameTextField.text = Device.codename
             }
-            else -> infoTextArea.text = ""
+            else -> {
+                infoTextArea.clear()
+                codenameTextField.clear()
+                dpiTextField.clear()
+                widthTextField.clear()
+                heightTextField.clear()
+            }
         }
-    }
-
-    private fun checkADB(): Boolean {
-        if (!Device.readADB()) {
-            checkDevice()
-            return false
-        }
-        setUI()
-        return true
-    }
-
-    private fun checkFastboot(): Boolean {
-        if (!Device.readFastboot()) {
-            checkDevice()
-            return false
-        }
-        setUI()
-        return true
     }
 
     private fun checkDevice() {
-        if (!loading) {
-            loading = true
-            GlobalScope.launch {
-                while (loading) {
-                    withContext(Dispatchers.Main) {
-                        if ("Looking for devices" !in outputTextArea.text) {
-                            outputTextArea.text = "Looking for devices...\n"
-                            reloadMenuItem.isDisable = true
-                            progressIndicator.isVisible = true
+        Device.mode = Mode.NONE
+        setUI()
+        outputTextArea.text = "Looking for devices...\n"
+        progressIndicator.isVisible = true
+        GlobalScope.launch(Dispatchers.IO) {
+            do {
+                Device.checkADB()
+                Device.checkFastboot()
+                withContext(Dispatchers.Main) {
+                    when (Device.mode) {
+                        Mode.ADB -> {
+                            progressIndicator.isVisible = false
+                            outputTextArea.text = "Device connected in ADB mode!\n"
+                            if (!Device.reinstaller || !Device.disabler)
+                                outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
+                            AppManager.readPotentialApps()
+                            AppManager.createTables()
                         }
-                        when {
-                            Device.readADB() -> {
-                                progressIndicator.isVisible = false
-                                val support = command.exec("adb shell cmd package install-existing xaft")
-                                Device.reinstaller = !("not found" in support || "Unknown command" in support)
-                                Device.disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
-                                AppManager.readPotentialApps()
-                                AppManager.createTables()
-                                codenameTextField.text = Device.codename
-                                if (Device.mode == Mode.ADB) {
-                                    dpiTextField.text = if (Device.dpi != -1)
-                                        Device.dpi.toString()
-                                    else "ERROR"
-                                    widthTextField.text = if (Device.width != -1)
-                                        Device.width.toString()
-                                    else "ERROR"
-                                    heightTextField.text = if (Device.height != -1)
-                                        Device.height.toString()
-                                    else "ERROR"
-                                }
-                                outputTextArea.text = "Device connected in ADB mode!\n"
-                                if (Device.mode == Mode.ADB && (!Device.reinstaller || !Device.disabler))
-                                    outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
-                                loading = false
-                            }
-                            Device.readFastboot() -> {
-                                progressIndicator.isVisible = false
-                                codenameTextField.text = Device.codename
-                                outputTextArea.text = "Device connected in Fastboot mode!\n"
-                                loading = false
-                            }
-                            Device.mode == Mode.AUTH && "Unauthorised" !in outputTextArea.text -> {
-                                outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging!\n"
-                            }
-                            (Device.mode == Mode.ADB_ERROR || Device.mode == Mode.FB_ERROR) && "loaded" !in outputTextArea.text -> {
-                                outputTextArea.text = "ERROR: Device cannot be loaded!\n"
-                            }
+                        Mode.RECOVERY -> {
+                            progressIndicator.isVisible = false
+                            outputTextArea.text = "Device connected in Recovery mode!\n"
                         }
-                        setUI()
+                        Mode.FASTBOOT -> {
+                            progressIndicator.isVisible = false
+                            outputTextArea.text = "Device connected in Fastboot mode!\n"
+                        }
+                        Mode.AUTH -> {
+                            if ("Unauthorised" !in outputTextArea.text)
+                                outputTextArea.appendText("\nUnauthorised device found!\nPlease allow USB debugging!\n")
+                        }
+                        Mode.ERROR -> {
+                            if ("loaded" !in outputTextArea.text)
+                                outputTextArea.appendText("\nERROR: Device cannot be loaded!\n")
+                        }
+                        else -> {
+                            outputTextArea.clear()
+                        }
                     }
-                    try {
-                        delay(1000)
-                    } catch (ie: InterruptedException) {
-                        break
-                    }
+                    setUI()
                 }
-            }
+                delay(1000)
+            } while (Device.mode != Mode.ADB && Device.mode != Mode.FASTBOOT && Device.mode != Mode.RECOVERY)
         }
     }
 
@@ -411,7 +400,7 @@ class MainController : Initializable {
 
         Command.outputTextArea = outputTextArea
         Command.progressIndicator = progressIndicator
-        Command.progressBar = progressBar
+        ROMFlasher.progressBar = progressBar
         AppManager.uninstallerTableView = uninstallerTableView
         AppManager.reinstallerTableView = reinstallerTableView
         AppManager.disablerTableView = disablerTableView
@@ -535,117 +524,88 @@ class MainController : Initializable {
         }
     }
 
-    private inline fun confirm(msg: String = "", func: () -> Unit) {
-        Alert(AlertType.CONFIRMATION).apply {
-            initStyle(StageStyle.UTILITY)
-            isResizable = false
-            headerText = "${msg.trim()}\nAre you sure you want to proceed?".trim()
-            val yes = ButtonType("Yes")
-            val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
-            buttonTypes.setAll(yes, no)
-            val result = showAndWait()
-            if (result.get() == yes)
-                func()
-        }
-    }
-
     private fun checkCamera2(): Boolean = "1" in command.exec("adb shell getprop persist.camera.HAL3.enabled")
 
     private fun checkEIS(): Boolean = "1" in command.exec("adb shell getprop persist.camera.eis.enable")
 
     @FXML
     private fun disableCamera2ButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            if (Device.mode != Mode.RECOVERY) {
-                outputTextArea.text = "ERROR: No device found in recovery mode!"
-                return
-            }
+        if (Device.checkRecovery()) {
             command.exec("adb shell setprop persist.camera.HAL3.enabled 0")
             outputTextArea.text = if (!checkCamera2())
                 "Camera2 disabled!"
             else "ERROR: Couldn't disable Camera2!"
-        }
+        } else checkDevice()
     }
 
     @FXML
     private fun enableCamera2ButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            if (Device.mode != Mode.RECOVERY) {
-                outputTextArea.text = "ERROR: No device found in recovery mode!"
-                return
-            }
+        if (Device.checkRecovery()) {
             command.exec("adb shell setprop persist.camera.HAL3.enabled 1")
             outputTextArea.text = if (checkCamera2())
                 "Camera2 enabled!"
             else "ERROR: Couldn't enable Camera2!"
-        }
+        } else checkDevice()
     }
 
     @FXML
     private fun disableEISButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            if (Device.mode != Mode.RECOVERY) {
-                outputTextArea.text = "ERROR: No device found in recovery mode!"
-                return
-            }
+        if (Device.checkRecovery()) {
             command.exec("adb shell setprop persist.camera.eis.enable 0")
             outputTextArea.text = if (!checkEIS())
                 "EIS disabled!"
             else "ERROR: Couldn't disable EIS!"
-        }
+        } else checkDevice()
     }
 
     @FXML
     private fun enableEISButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            if (Device.mode != Mode.RECOVERY) {
-                outputTextArea.text = "ERROR: No device found in recovery mode!"
-                return
-            }
+        if (Device.checkRecovery()) {
             command.exec("adb shell setprop persist.camera.eis.enable 1")
             outputTextArea.text = if (checkEIS())
                 "EIS enabled!"
             else "ERROR: Couldn't enable EIS!"
-        }
+        } else checkDevice()
     }
 
     @FXML
     private fun openButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
-            val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml")).load())
+        if (Device.checkADB())
             Stage().apply {
-                this.scene = scene
+                this.scene = Scene(FXMLLoader(javaClass.classLoader.getResource("FileExplorer.fxml")).load())
                 initModality(Modality.APPLICATION_MODAL)
                 title = "File Explorer"
                 isResizable = false
                 showAndWait()
             }
-        }
+        else checkDevice()
     }
 
     @FXML
     private fun applyDpiButtonPressed(event: ActionEvent) {
-        if (dpiTextField.text.isNotBlank() && checkADB())
-            GlobalScope.launch(Dispatchers.IO) {
-                val attempt = command.execDisplayed("adb shell wm density ${dpiTextField.text.trim()}")
-                withContext(Dispatchers.Main) {
-                    outputTextArea.text = when {
-                        "permission" in attempt ->
-                            "ERROR: Please allow USB debugging (Security settings)!"
-                        "bad" in attempt ->
-                            "ERROR: Invalid value!"
-                        attempt.isEmpty() ->
-                            "Done!"
-                        else ->
-                            "ERROR: $attempt"
+        if (dpiTextField.text.isNotBlank())
+            if (Device.checkADB())
+                GlobalScope.launch(Dispatchers.IO) {
+                    val attempt = command.execDisplayed("adb shell wm density ${dpiTextField.text.trim()}")
+                    withContext(Dispatchers.Main) {
+                        outputTextArea.text = when {
+                            "permission" in attempt ->
+                                "ERROR: Please allow USB debugging (Security settings)!"
+                            "bad" in attempt ->
+                                "ERROR: Invalid value!"
+                            attempt.isEmpty() ->
+                                "Done!"
+                            else ->
+                                "ERROR: $attempt"
+                        }
                     }
                 }
-            }
+            else checkDevice()
     }
 
     @FXML
     private fun resetDpiButtonPressed(event: ActionEvent) {
-        if (checkADB())
+        if (Device.checkADB())
             GlobalScope.launch(Dispatchers.IO) {
                 val attempt = command.execDisplayed("adb shell wm density reset")
                 withContext(Dispatchers.Main) {
@@ -659,32 +619,34 @@ class MainController : Initializable {
                     }
                 }
             }
+        else checkDevice()
     }
 
     @FXML
     private fun applyResButtonPressed(event: ActionEvent) {
-        if (widthTextField.text.isNotBlank() && heightTextField.text.isNotBlank() && checkADB())
-            GlobalScope.launch(Dispatchers.IO) {
-                val attempt =
-                    command.execDisplayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
-                withContext(Dispatchers.Main) {
-                    outputTextArea.text = when {
-                        "permission" in attempt ->
-                            "ERROR: Please allow USB debugging (Security settings)!"
-                        "bad" in attempt ->
-                            "ERROR: Invalid value!"
-                        attempt.isEmpty() ->
-                            "Done!"
-                        else ->
-                            "ERROR: $attempt"
+        if (widthTextField.text.isNotBlank() && heightTextField.text.isNotBlank())
+            if (Device.checkADB())
+                GlobalScope.launch(Dispatchers.IO) {
+                    val attempt =
+                        command.execDisplayed("adb shell wm size ${widthTextField.text.trim()}x${heightTextField.text.trim()}")
+                    withContext(Dispatchers.Main) {
+                        outputTextArea.text = when {
+                            "permission" in attempt ->
+                                "ERROR: Please allow USB debugging (Security settings)!"
+                            "bad" in attempt ->
+                                "ERROR: Invalid value!"
+                            attempt.isEmpty() ->
+                                "Done!"
+                            else ->
+                                "ERROR: $attempt"
+                        }
                     }
-                }
-            }
+                } else checkDevice()
     }
 
     @FXML
     private fun resetResButtonPressed(event: ActionEvent) {
-        if (checkADB())
+        if (Device.checkADB())
             GlobalScope.launch(Dispatchers.IO) {
                 val attempt = command.execDisplayed("adb shell wm size reset")
                 withContext(Dispatchers.Main) {
@@ -697,16 +659,16 @@ class MainController : Initializable {
                             "ERROR: $attempt"
                     }
                 }
-            }
+            } else checkDevice()
     }
 
     @FXML
     private fun readPropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB())
-                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("adb shell getprop") }
-            Mode.FASTBOOT -> if (checkFastboot())
-                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot getvar all") }
+            Mode.ADB, Mode.RECOVERY -> if (Device.checkADB())
+                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("adb shell getprop") } else checkDevice()
+            Mode.FASTBOOT -> if (Device.checkFastboot())
+                GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot getvar all") } else checkDevice()
             else -> return
         }
     }
@@ -714,7 +676,7 @@ class MainController : Initializable {
     @FXML
     private fun savePropertiesMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB())
+            Mode.ADB, Mode.RECOVERY -> if (Device.checkADB())
                 GlobalScope.launch(Dispatchers.IO) {
                     val props = command.exec("adb shell getprop")
                     withContext(Dispatchers.Main) {
@@ -733,8 +695,8 @@ class MainController : Initializable {
                             }
                         }
                     }
-                }
-            Mode.FASTBOOT -> if (checkFastboot())
+                } else checkDevice()
+            Mode.FASTBOOT -> if (Device.checkFastboot())
                 GlobalScope.launch(Dispatchers.IO) {
                     val props = command.exec("fastboot getvar all")
                     withContext(Dispatchers.Main) {
@@ -753,23 +715,23 @@ class MainController : Initializable {
                             }
                         }
                     }
-                }
+                } else checkDevice()
             else -> return
         }
     }
 
     @FXML
     private fun antirbButtonPressed(event: ActionEvent) {
-        if (checkFastboot()) {
-            val dummy = File("dummy.img")
-            dummy.writeBytes(ByteArray(8192))
-            if ("FAILED" in command.exec("fastboot oem ignore_anti")) {
-                if ("FAILED" in command.exec("fastboot flash antirbpass dummy.img")) {
-                    outputTextArea.text = "Couldn't disable anti-rollback safeguard!"
+        if (Device.checkFastboot())
+            File("dummy.img").apply {
+                writeBytes(ByteArray(8192))
+                if ("FAILED" in command.exec("fastboot oem ignore_anti")) {
+                    if ("FAILED" in command.exec("fastboot flash antirbpass dummy.img")) {
+                        outputTextArea.text = "Couldn't disable anti-rollback safeguard!"
+                    } else outputTextArea.text = "Anti-rollback safeguard disabled!"
                 } else outputTextArea.text = "Anti-rollback safeguard disabled!"
-            } else outputTextArea.text = "Anti-rollback safeguard disabled!"
-            dummy.delete()
-        }
+                delete()
+            } else checkDevice()
     }
 
     @FXML
@@ -786,15 +748,15 @@ class MainController : Initializable {
     private fun flashimageButtonPressed(event: ActionEvent) {
         image?.let {
             partitionComboBox.value?.let { pcb ->
-                if (it.absolutePath.isNotBlank() && pcb.isNotBlank() && checkFastboot()) {
-                    confirm {
-                        GlobalScope.launch(Dispatchers.IO) {
-                            if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
-                                command.exec("fastboot flash ${pcb.trim()}", "fastboot boot", image = it)
-                            else command.exec("fastboot flash ${pcb.trim()}", image = it)
-                        }
-                    }
-                }
+                if (it.absolutePath.isNotBlank() && pcb.isNotBlank())
+                    if (Device.checkFastboot())
+                        confirm {
+                            GlobalScope.launch(Dispatchers.IO) {
+                                if (autobootCheckBox.isSelected && pcb.trim() == "recovery")
+                                    command.exec("fastboot flash ${pcb.trim()}", "fastboot boot", image = it)
+                                else command.exec("fastboot flash ${pcb.trim()}", image = it)
+                            }
+                        } else checkDevice()
             }
         }
     }
@@ -804,25 +766,25 @@ class MainController : Initializable {
         DirectoryChooser().apply {
             title = "Select the root directory of a Fastboot ROM"
             romLabel.text = "-"
-            romDirectory = showDialog((event.source as Node).scene.window)
-        }
-        romDirectory?.let { dir ->
-            when {
-                ' ' in dir.absolutePath -> {
-                    outputTextArea.text = "ERROR: Space found in the pathname!"
-                    romDirectory = null
-                }
-                "images" in dir.list()!! -> {
-                    romLabel.text = dir.name
-                    outputTextArea.text = "Fastboot ROM found!"
-                    dir.listFiles()?.forEach {
-                        if (!it.isDirectory)
-                            it.setExecutable(true, false)
+            romDirectory = showDialog((event.source as Node).scene.window)?.let { dir ->
+                when {
+                    ' ' in dir.absolutePath -> {
+                        outputTextArea.text = "ERROR: Space found in the pathname!"
+                        null
                     }
-                }
-                else -> {
-                    outputTextArea.text = "ERROR: Fastboot ROM not found!"
-                    romDirectory = null
+                    "images" in dir.list()!! -> {
+                        romLabel.text = dir.name
+                        outputTextArea.text = "Fastboot ROM found!"
+                        dir.listFiles()?.forEach {
+                            if (!it.isDirectory)
+                                it.setExecutable(true, false)
+                        }
+                        dir
+                    }
+                    else -> {
+                        outputTextArea.text = "ERROR: Fastboot ROM not found!"
+                        null
+                    }
                 }
             }
         }
@@ -831,22 +793,23 @@ class MainController : Initializable {
     @FXML
     private fun flashromButtonPressed(event: ActionEvent) {
         romDirectory?.let { dir ->
+            ROMFlasher.directory = dir
             scriptComboBox.value?.let { scb ->
-                if (checkFastboot())
+                if (Device.checkFastboot())
                     confirm {
                         setPanels(Mode.NONE)
                         GlobalScope.launch(Dispatchers.IO) {
                             when (scb) {
-                                "Clean install" -> ROMFlasher(dir).flash("flash_all")
-                                "Clean install and lock" -> ROMFlasher(dir).flash("flash_all_lock")
-                                "Update" -> ROMFlasher(dir).flash(
+                                "Clean install" -> ROMFlasher.flash("flash_all")
+                                "Clean install and lock" -> ROMFlasher.flash("flash_all_lock")
+                                "Update" -> ROMFlasher.flash(
                                     dir.list()?.find { "flash_all_except" in it }?.substringBefore(
                                         '.'
                                     )
                                 )
                             }
                         }
-                    }
+                    } else checkDevice()
             }
         }
     }
@@ -854,26 +817,27 @@ class MainController : Initializable {
     @FXML
     private fun bootButtonPressed(event: ActionEvent) {
         image?.let {
-            if (it.absolutePath.isNotBlank() && checkFastboot())
-                GlobalScope.launch(Dispatchers.IO) { command.exec("fastboot boot", image = it) }
+            if (it.absolutePath.isNotBlank())
+                if (Device.checkFastboot())
+                    GlobalScope.launch(Dispatchers.IO) { command.exec("fastboot boot", image = it) } else checkDevice()
         }
     }
 
     @FXML
     private fun cacheButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
-            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase cache") }
+        if (Device.checkFastboot())
+            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase cache") } else checkDevice()
     }
 
     @FXML
     private fun dataButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
-            confirm("All your data will be gone.") { GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase userdata") } }
+        if (Device.checkFastboot())
+            confirm("All your data will be gone.") { GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot erase userdata") } } else checkDevice()
     }
 
     @FXML
     private fun cachedataButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
+        if (Device.checkFastboot())
             confirm("All your data will be gone.") {
                 GlobalScope.launch(Dispatchers.IO) {
                     command.execDisplayed(
@@ -881,67 +845,21 @@ class MainController : Initializable {
                         "fastboot erase userdata"
                     )
                 }
-            }
+            } else checkDevice()
     }
 
     @FXML
     private fun lockButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
+        if (Device.checkFastboot())
             confirm("Your partitions must be intact in order to successfully lock the bootloader.") {
                 GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot oem lock") }
-            }
+            } else checkDevice()
     }
 
     @FXML
     private fun unlockButtonPressed(event: ActionEvent) {
-        if (checkFastboot())
-            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot oem unlock") }
-    }
-
-    private fun getLink(version: String, codename: String): String? {
-        fun getLocation(codename: String, ending: String, region: String): String? {
-            (URL("http://update.miui.com/updates/v1/fullromdownload.php?d=$codename$ending&b=F&r=$region&n=").openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                setRequestProperty("Referer", "http://en.miui.com/a-234.html")
-                instanceFollowRedirects = false
-                try {
-                    connect()
-                    disconnect()
-                } catch (e: IOException) {
-                    return null
-                }
-                return getHeaderField("Location")
-            }
-        }
-        when (version) {
-            "China Stable" ->
-                return getLocation(codename, "", "cn")
-            "EEA Stable" ->
-                return getLocation(codename, "_eea_global", "eea")
-            "Russia Stable" -> {
-                arrayOf("ru", "global").forEach {
-                    val link = getLocation(codename, "_ru_global", it)
-                    if (link != null && "bigota" in link)
-                        return link
-                }
-                return null
-            }
-            "Indonesia Stable" ->
-                return getLocation(codename, "_id_global", "global")
-            "India Stable" -> {
-                arrayOf("in", "global").forEach {
-                    for (ending in arrayOf("_in_global", "_india_global", "_global")) {
-                        if (it == "global" && ending == "_global")
-                            break
-                        val link = getLocation(codename, ending, it)
-                        if (link != null && "bigota" in link)
-                            return link
-                    }
-                }
-                return null
-            }
-            else -> return getLocation(codename, "_global", "global")
-        }
+        if (Device.checkFastboot())
+            GlobalScope.launch(Dispatchers.IO) { command.execDisplayed("fastboot oem unlock") } else checkDevice()
     }
 
     @FXML
@@ -950,7 +868,7 @@ class MainController : Initializable {
             if (codenameTextField.text.isNotBlank()) {
                 outputTextArea.appendText("\nLooking for $it...\n")
                 progressIndicator.isVisible = true
-                GlobalScope.launch {
+                GlobalScope.launch(Dispatchers.IO) {
                     val link = getLink(it, codenameTextField.text.trim())
                     withContext(Dispatchers.Main) {
                         if (link != null && "bigota" in link) {
@@ -1019,22 +937,18 @@ class MainController : Initializable {
         }
     }
 
-    private fun reload() {
-        outputTextArea.clear()
-        infoTextArea.clear()
-        checkDevice()
-    }
-
     @FXML
     private fun systemMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
-                command.exec("adb reboot")
-                reload()
+            Mode.ADB, Mode.RECOVERY -> {
+                if (Device.checkADB())
+                    command.exec("adb reboot")
+                checkDevice()
             }
-            Mode.FASTBOOT -> if (checkFastboot()) {
-                command.exec("fastboot reboot")
-                reload()
+            Mode.FASTBOOT -> {
+                if (Device.checkFastboot())
+                    command.exec("fastboot reboot")
+                checkDevice()
             }
             else -> return
         }
@@ -1043,9 +957,10 @@ class MainController : Initializable {
     @FXML
     private fun recoveryMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
-                command.exec("adb reboot recovery")
-                reload()
+            Mode.ADB, Mode.RECOVERY -> {
+                if (Device.checkADB())
+                    command.exec("adb reboot recovery")
+                checkDevice()
             }
             else -> return
         }
@@ -1054,13 +969,15 @@ class MainController : Initializable {
     @FXML
     private fun fastbootMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
-                command.exec("adb reboot bootloader")
-                reload()
+            Mode.ADB, Mode.RECOVERY -> {
+                if (Device.checkADB())
+                    command.exec("adb reboot bootloader")
+                checkDevice()
             }
-            Mode.FASTBOOT -> if (checkFastboot()) {
-                command.exec("fastboot reboot bootloader")
-                reload()
+            Mode.FASTBOOT -> {
+                if (Device.checkFastboot())
+                    command.exec("fastboot reboot bootloader")
+                checkDevice()
             }
             else -> return
         }
@@ -1069,30 +986,26 @@ class MainController : Initializable {
     @FXML
     private fun edlMenuItemPressed(event: ActionEvent) {
         when (Device.mode) {
-            Mode.ADB, Mode.RECOVERY -> if (checkADB()) {
-                command.exec("adb reboot edl")
-                reload()
+            Mode.ADB, Mode.RECOVERY -> {
+                if (Device.checkADB())
+                    command.exec("adb reboot edl")
+                checkDevice()
             }
-            Mode.FASTBOOT -> if (checkFastboot()) {
-                command.exec("fastboot oem edl")
-                reload()
+            Mode.FASTBOOT -> {
+                if (Device.checkFastboot())
+                    command.exec("fastboot oem edl")
+                checkDevice()
             }
             else -> return
         }
     }
 
     @FXML
-    private fun reloadMenuItemPressed(event: ActionEvent) = reload()
-
-    private fun isAppSelected(list: ObservableList<App>): Boolean {
-        return if (list.isNotEmpty()) {
-            list.any { it.selectedProperty().get() }
-        } else false
-    }
+    private fun reloadMenuItemPressed(event: ActionEvent) = checkDevice()
 
     @FXML
     private fun uninstallButtonPressed(event: ActionEvent) {
-        if (isAppSelected(uninstallerTableView.items) && checkADB())
+        if (isAppSelected(uninstallerTableView.items) && Device.checkADB())
             confirm {
                 setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
@@ -1105,7 +1018,7 @@ class MainController : Initializable {
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     AppManager.uninstall(selected, n) {
-                        setPanels()
+                        setPanels(Device.mode)
                     }
                 }
             }
@@ -1113,7 +1026,7 @@ class MainController : Initializable {
 
     @FXML
     private fun reinstallButtonPressed(event: ActionEvent) {
-        if (isAppSelected(reinstallerTableView.items) && checkADB())
+        if (isAppSelected(reinstallerTableView.items) && Device.checkADB())
             confirm {
                 setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
@@ -1126,7 +1039,7 @@ class MainController : Initializable {
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     AppManager.reinstall(selected, n) {
-                        setPanels()
+                        setPanels(Device.mode)
                     }
                 }
             }
@@ -1134,7 +1047,7 @@ class MainController : Initializable {
 
     @FXML
     private fun disableButtonPressed(event: ActionEvent) {
-        if (isAppSelected(disablerTableView.items) && checkADB())
+        if (isAppSelected(disablerTableView.items) && Device.checkADB())
             confirm {
                 setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
@@ -1147,7 +1060,7 @@ class MainController : Initializable {
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     AppManager.disable(selected, n) {
-                        setPanels()
+                        setPanels(Device.mode)
                     }
                 }
             }
@@ -1155,7 +1068,7 @@ class MainController : Initializable {
 
     @FXML
     private fun enableButtonPressed(event: ActionEvent) {
-        if (isAppSelected(enablerTableView.items) && checkADB())
+        if (isAppSelected(enablerTableView.items) && Device.checkADB())
             confirm {
                 setPanels(Mode.NONE)
                 val selected = FXCollections.observableArrayList<App>()
@@ -1168,7 +1081,7 @@ class MainController : Initializable {
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     AppManager.enable(selected, n) {
-                        setPanels()
+                        setPanels(Device.mode)
                     }
                 }
             }
@@ -1186,7 +1099,7 @@ class MainController : Initializable {
 
     @FXML
     private fun addAppsButtonPressed(event: ActionEvent) {
-        if (checkADB()) {
+        if (Device.checkADB()) {
             val scene = Scene(FXMLLoader(javaClass.classLoader.getResource("AppAdder.fxml")).load())
             Stage().apply {
                 initModality(Modality.APPLICATION_MODAL)
