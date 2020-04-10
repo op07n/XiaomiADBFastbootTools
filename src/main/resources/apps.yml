@@ -69,6 +69,7 @@ com.miui.daemon: MiuiDaemon
 com.miui.fm: FM Radio
 com.miui.freeform: Freeform
 com.miui.global.packageinstaller: Package Installer
+com.miui.huanji: Mi Mover
 com.miui.hybrid: Quick Apps
 com.miui.hybrid.accessory: HybridAccessory
 com.miui.klo.bugreport: KLO Bugreport

@@ -12,18 +12,17 @@ object Device {
     var mode = Mode.NONE
     var reinstaller = true
     var disabler = true
-    private val command = Command()
 
-    fun checkADB() = command.exec("adb devices").let {
+    suspend fun checkADB() = Command.exec(mutableListOf("adb", "devices")).let {
         serial in it && "recovery" !in it
     }
 
-    fun checkRecovery() = command.exec("adb devices").let {
+    suspend fun checkRecovery() = Command.exec(mutableListOf("adb", "devices")).let {
         serial in it && "recovery" in it
     }
 
-    fun readADB() {
-        command.exec("adb shell getprop").let { propString ->
+    suspend fun readADB() {
+        Command.exec(mutableListOf("adb", "shell", "getprop")).let { propString ->
             when {
                 "unauthorized" in propString -> mode = Mode.AUTH
                 "no devices" !in propString -> {
@@ -40,19 +39,30 @@ object Device {
                         codename = props["ro.build.product"] ?: ""
                         bootloader = props["ro.boot.flash.locked"]?.contains("0") ?: false
                         camera2 = props["persist.sys.camera.camera2"]?.contains("true") ?: false
-                        if ("recovery" in command.exec("adb devices"))
+                        if ("recovery" in Command.exec(mutableListOf("adb", "devices")))
                             Mode.RECOVERY
                         else {
-                            reinstaller = command.exec("adb shell cmd package install-existing xaft").let {
-                                !("not found" in it || "Unknown command" in it)
-                            }
-                            disabler = "enabled" in command.exec("adb shell pm enable com.android.settings")
+                            reinstaller =
+                                Command.exec(mutableListOf("adb", "shell", "cmd", "package", "install-existing xaft"))
+                                    .let {
+                                        !("not found" in it || "Unknown command" in it)
+                                    }
+                            disabler = "enabled" in Command.exec(
+                                mutableListOf(
+                                    "adb",
+                                    "shell",
+                                    "pm",
+                                    "enable",
+                                    "com.android.settings"
+                                )
+                            )
                             dpi = try {
-                                command.exec("adb shell wm density").substringAfterLast(':').trim().toInt()
+                                Command.exec(mutableListOf("adb", "shell", "wm", "density")).substringAfterLast(':')
+                                    .trim().toInt()
                             } catch (e: Exception) {
                                 -1
                             }
-                            command.exec("adb shell wm size").let {
+                            Command.exec(mutableListOf("adb", "shell", "wm", "size")).let {
                                 width = try {
                                     it.substringAfterLast(':').substringBefore('x').trim().toInt()
                                 } catch (e: Exception) {
@@ -72,12 +82,13 @@ object Device {
         }
     }
 
-    fun checkFastboot() = serial in command.exec("fastboot devices", err = false)
+    suspend fun checkFastboot() =
+        serial in Command.exec(mutableListOf("fastboot", "devices"), redirectErrorStream = false)
 
-    fun readFastboot() {
-        if (command.exec("fastboot devices", err = false).isNotEmpty()) {
+    suspend fun readFastboot() {
+        if (Command.exec(mutableListOf("fastboot", "devices"), redirectErrorStream = false).isNotEmpty()) {
             props.clear()
-            command.exec("fastboot getvar all").trim().lines().forEach {
+            Command.exec(mutableListOf("fastboot", "getvar", "all")).trim().lines().forEach {
                 if (it[0] == '(')
                     props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
             }

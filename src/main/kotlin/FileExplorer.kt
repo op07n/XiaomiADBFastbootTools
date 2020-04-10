@@ -1,25 +1,26 @@
+import Command.prefix
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-class FileExplorer(val statusTextField: TextField, val statusProgressBar: ProgressBar) : Command() {
+class FileExplorer(val statusTextField: TextField, val statusProgressBar: ProgressBar) {
 
     var path = "/"
 
     private fun makeFile(out: String): AndroidFile? {
-        val bits = mutableListOf<String>()
-        for (bit in out.split(' '))
-            if (bit.isNotBlank()) {
-                if (bit == "->")
-                    break
-                bits.add(bit)
-            }
+        val bits = mutableListOf<String>().also {
+            for (bit in out.split(' '))
+                if (bit.isNotBlank()) {
+                    if (bit == "->")
+                        break
+                    it.add(bit)
+                }
+        }
         return when {
             bits.size < 6 -> null
             bits[5].length == 10 && bits[6].length == 5 -> AndroidFile(
@@ -53,102 +54,90 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
         } else path += "$where/"
     }
 
-    fun getFiles(): ObservableList<AndroidFile> {
-        val files = FXCollections.observableArrayList<AndroidFile>()
-        exec("adb shell ls -l $path", lim = 5).trim().lines().forEach {
-            if ("ls:" !in it && ':' in it)
-                makeFile(it)?.let { file ->
-                    files.add(file)
-                }
+    suspend fun getFiles(): ObservableList<AndroidFile> =
+        FXCollections.observableArrayList<AndroidFile>().also { list ->
+            Command.exec(mutableListOf("adb", "shell", "ls", "-l", path)).trim().lines().forEach {
+                if ("ls:" !in it && ':' in it)
+                    makeFile(it)?.let { file ->
+                        list.add(file)
+                    }
+            }
         }
-        return files
-    }
 
-    fun String.fmt(): String = "'$this'"
-
-    fun init(command: String = "adb") = runBlocking(Dispatchers.IO) {
-        pb.redirectErrorStream(false)
-        statusTextField.text = ""
-        val proc = pb.start()
-        Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-            while (scanner.hasNextLine()) {
-                val output = scanner.nextLine()
-                withContext(Dispatchers.Main) {
-                    if ('%' in output)
-                        statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
-                    else if (command in output)
-                        statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
+    suspend fun exec(command: MutableList<String>) {
+        withContext(Dispatchers.Main) {
+            statusTextField.text = ""
+        }
+        command[0] = prefix + command[0]
+        withContext(Dispatchers.IO) {
+            Scanner(startProcess(command).inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                while (scanner.hasNextLine()) {
+                    val output = scanner.nextLine()
+                    withContext(Dispatchers.Main) {
+                        if ('%' in output)
+                            statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
+                        else if ((command[1] == "shell" && command[2] in output) || "adb" in output)
+                            statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
+                    }
                 }
             }
         }
-        proc.waitFor()
     }
 
-    suspend inline fun pull(selected: List<AndroidFile>, to: File, crossinline func: () -> Unit) {
+    suspend fun pull(selected: List<AndroidFile>, to: File) {
         if (selected.isEmpty()) {
-            pb.command("${prefix}adb", "pull", path, to.absolutePath)
-            init()
+            exec(mutableListOf("adb", "pull", path, to.absolutePath))
         } else {
             selected.forEach {
-                pb.command("${prefix}adb", "pull", path + it.name, to.absolutePath)
-                init()
+                exec(mutableListOf("adb", "pull", path + it.name, to.absolutePath))
             }
         }
         withContext(Dispatchers.Main) {
             if (statusTextField.text.isEmpty())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
-            func()
         }
     }
 
-    suspend inline fun push(selected: List<File>, crossinline func: () -> Unit) {
+    suspend fun push(selected: List<File>) {
         selected.forEach {
-            pb.command("${prefix}adb", "push", it.absolutePath, path)
-            init()
+            exec(mutableListOf("adb", "push", it.absolutePath, path))
         }
         withContext(Dispatchers.Main) {
             if (statusTextField.text.isEmpty())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
-            func()
         }
     }
 
-    suspend inline fun delete(selected: List<AndroidFile>, crossinline func: () -> Unit) {
+    suspend fun delete(selected: List<AndroidFile>) {
         selected.forEach {
             if (it.dir)
-                pb.command("${prefix}adb", "shell", "rm", "-rf", (path + it.name).fmt())
-            else pb.command("${prefix}adb", "shell", "rm", "-f", (path + it.name).fmt())
-            init("rm")
+                exec(mutableListOf("adb", "shell", "rm", "-rf", (path + it.name).escape()))
+            else exec(mutableListOf("adb", "shell", "rm", "-f", (path + it.name).escape()))
         }
         withContext(Dispatchers.Main) {
             if (statusTextField.text.isEmpty())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
-            func()
         }
     }
 
-    suspend inline fun mkdir(name: String, crossinline func: () -> Unit) {
-        pb.command("${prefix}adb", "shell", "mkdir", (path + name).fmt())
-        init("mkdir")
+    suspend fun mkdir(name: String) {
+        exec(mutableListOf("adb", "shell", "mkdir", (path + name).escape()))
         withContext(Dispatchers.Main) {
             if (statusTextField.text.isEmpty())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
-            func()
         }
     }
 
-    suspend inline fun rename(selected: AndroidFile, to: String, crossinline func: () -> Unit) {
-        pb.command("${prefix}adb", "shell", "mv", (path + selected.name).fmt(), (path + to).fmt())
-        init("mv")
+    suspend fun rename(selected: AndroidFile, to: String) {
+        exec(mutableListOf("adb", "shell", "mv", (path + selected.name).escape(), (path + to).escape()))
         withContext(Dispatchers.Main) {
             if (statusTextField.text.isEmpty())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
-            func()
         }
     }
 

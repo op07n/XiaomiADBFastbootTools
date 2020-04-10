@@ -7,6 +7,8 @@ import javafx.scene.control.TextArea
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 import java.util.*
 
@@ -16,33 +18,33 @@ class AppAdderController : Initializable {
     private lateinit var appTextArea: TextArea
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        if (AppManager.customApps.exists())
-            appTextArea.text = AppManager.customApps.readText()
+        appTextArea.text = AppManager.customApps.readText()
     }
 
     @FXML
     private fun loadButtonPressed(event: ActionEvent) {
-        val fc = FileChooser()
-        fc.extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
-        fc.title = "Select a text file"
-        appTextArea.text = fc.showOpenDialog((event.source as Node).scene.window)?.readText()
+        FileChooser().apply {
+            extensionFilters.add(FileChooser.ExtensionFilter("Text File", "*"))
+            title = "Select a text file"
+            appTextArea.text = showOpenDialog((event.source as Node).scene.window)?.readText()
+        }
     }
 
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
-        if (appTextArea.text != null) {
-            if (appTextArea.text.isNotBlank()) {
-                Alert(Alert.AlertType.WARNING).apply {
-                    initStyle(StageStyle.UTILITY)
-                    isResizable = false
-                    headerText = "Uninstalling apps which aren't listed by default may brick your device."
-                    showAndWait()
-                }
+        if (appTextArea.text.isNullOrBlank()) {
+            Alert(Alert.AlertType.WARNING).apply {
+                initStyle(StageStyle.UTILITY)
+                isResizable = false
+                headerText = "Uninstalling apps which aren't listed by default may brick your device."
+                showAndWait()
             }
-            AppManager.apply {
-                customApps.writeText(appTextArea.text.trim())
-                readPotentialApps()
-                createTables()
+            GlobalScope.launch {
+                AppManager.apply {
+                    customApps.writeText(appTextArea.text.trim())
+                    readPotentialApps()
+                    createTables()
+                }
             }
         }
         ((event.source as Node).scene.window as Stage).close()

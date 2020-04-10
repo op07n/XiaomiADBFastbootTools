@@ -9,9 +9,7 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.net.URL
 import java.util.*
 
@@ -44,7 +42,7 @@ class FileExplorerController : Initializable {
             if (!pathTextField.text.endsWith('/'))
                 pathTextField.text += '/'
             fileExplorer.path = pathTextField.text
-            listView.items = fileExplorer.getFiles()
+            listView.items = runBlocking { fileExplorer.getFiles() }
             listView.refresh()
         }
         fileExplorer = FileExplorer(statusTextField, progressBar)
@@ -52,14 +50,14 @@ class FileExplorerController : Initializable {
         listView.apply {
             selectionModel.selectionMode = SelectionMode.MULTIPLE
             setCellFactory { FileListCell() }
-            items = fileExplorer.getFiles()
+            items = runBlocking { fileExplorer.getFiles() }
             refresh()
         }
     }
 
     private fun loadList() {
         pathTextField.text = fileExplorer.path
-        listView.items = fileExplorer.getFiles()
+        listView.items = runBlocking { fileExplorer.getFiles() }
         listView.refresh()
     }
 
@@ -70,119 +68,124 @@ class FileExplorerController : Initializable {
 
     @FXML
     private fun pushButtonPressed(event: ActionEvent) {
-        if (Device.checkADB()) {
-            FileChooser().apply {
-                title = "Select files to copy"
-                showOpenMultipleDialog((event.source as Node).scene.window)?.let {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        fileExplorer.push(it) {
+        GlobalScope.launch {
+            if (Device.checkADB()) {
+                withContext(Dispatchers.Main) {
+                    FileChooser().apply {
+                        title = "Select files to copy"
+                        showOpenMultipleDialog((event.source as Node).scene.window)?.let {
+                            fileExplorer.push(it)
                             loadList()
                         }
                     }
                 }
-            }
-        } else close(event)
+            } else close(event)
+        }
     }
 
     @FXML
     private fun pullButtonPressed(event: ActionEvent) {
-        if (Device.checkADB()) {
-            val dc = DirectoryChooser()
-            dc.title = "Select the destination"
-            dc.showDialog((event.source as Node).scene.window)?.let {
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileExplorer.pull(listView.selectionModel.selectedItems, it) {
-                        loadList()
+        GlobalScope.launch {
+            if (Device.checkADB()) {
+                withContext(Dispatchers.Main) {
+                    DirectoryChooser().apply {
+                        title = "Select the destination"
+                        showDialog((event.source as Node).scene.window)?.let {
+                            fileExplorer.pull(listView.selectionModel.selectedItems, it)
+                            loadList()
+                        }
                     }
                 }
-            }
-        } else close(event)
+            } else close(event)
+        }
     }
 
     @FXML
     private fun newFolderButtonPressed(event: ActionEvent) {
-        if (Device.checkADB()) {
-            val dialog = TextInputDialog().apply {
-                initStyle(StageStyle.UTILITY)
-                isResizable = false
-                title = "New Folder"
-                contentText = "Folder name:"
-                headerText = null
-                graphic = null
-            }
-            val result = dialog.showAndWait()
-            if (result.isPresent && result.get().isNotBlank())
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileExplorer.mkdir(result.get().trim()) {
-                        loadList()
+        GlobalScope.launch {
+            if (Device.checkADB()) {
+                withContext(Dispatchers.Main) {
+                    TextInputDialog().apply {
+                        initStyle(StageStyle.UTILITY)
+                        isResizable = false
+                        title = "New Folder"
+                        contentText = "Folder name:"
+                        headerText = null
+                        graphic = null
+                        val result = showAndWait()
+                        if (result.isPresent && result.get().isNotBlank()) {
+                            fileExplorer.mkdir(result.get().trim())
+                            loadList()
+                        }
                     }
                 }
-        } else close(event)
+            } else close(event)
+        }
     }
 
     @FXML
     private fun deleteButtonPressed(event: ActionEvent) {
-        if (Device.checkADB()) {
-            if (listView.selectionModel.selectedItems.isEmpty())
-                return
-            val alert = Alert(Alert.AlertType.CONFIRMATION).apply {
-                initStyle(StageStyle.UTILITY)
-                isResizable = false
-                dialogPane.prefWidth *= 0.6
-                dialogPane.prefHeight *= 0.6
-                title = "Delete"
-                headerText = "Are you sure?"
-                graphic = ImageView("delete.png")
+        if (listView.selectionModel.selectedItems.isNotEmpty())
+            GlobalScope.launch {
+                if (Device.checkADB())
+                    withContext(Dispatchers.Main) {
+                        Alert(Alert.AlertType.CONFIRMATION).apply {
+                            initStyle(StageStyle.UTILITY)
+                            isResizable = false
+                            dialogPane.prefWidth *= 0.6
+                            dialogPane.prefHeight *= 0.6
+                            title = "Delete"
+                            headerText = "Are you sure?"
+                            graphic = ImageView("delete.png")
+                            val yes = ButtonType("Yes")
+                            val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
+                            buttonTypes.setAll(yes, no)
+                            val result = showAndWait()
+                            if (result.get() == yes) {
+                                fileExplorer.delete(listView.selectionModel.selectedItems)
+                                loadList()
+                            }
+                        }
+                    } else close(event)
             }
-            val yes = ButtonType("Yes")
-            val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
-            alert.buttonTypes.setAll(yes, no)
-            val result = alert.showAndWait()
-            if (result.get() == yes)
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileExplorer.delete(listView.selectionModel.selectedItems) {
-                        loadList()
-                    }
-                }
-        } else close(event)
     }
 
     @FXML
     private fun renameButtonPressed(event: ActionEvent) {
-        if (Device.checkADB()) {
-            if (listView.selectionModel.selectedItems.size != 1)
-                return
-            val item = listView.selectionModel.selectedItems[0]
-            val dialog = TextInputDialog(item.name).apply {
-                initStyle(StageStyle.UTILITY)
-                isResizable = false
-                title = "Rename"
-                contentText = if (item.dir)
-                    "Folder name:"
-                else "File name:"
-                headerText = null
-                graphic = null
-            }
-            val result = dialog.showAndWait()
-            if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name)
-                GlobalScope.launch(Dispatchers.IO) {
-                    fileExplorer.rename(item, result.get().trim()) {
-                        loadList()
+        if (listView.selectionModel.selectedItems.size == 1)
+            GlobalScope.launch {
+                if (Device.checkADB()) {
+                    val item = listView.selectionModel.selectedItems[0]
+                    withContext(Dispatchers.Main) {
+                        TextInputDialog(item.name).apply {
+                            initStyle(StageStyle.UTILITY)
+                            isResizable = false
+                            title = "Rename"
+                            contentText = if (item.dir)
+                                "Folder name:"
+                            else "File name:"
+                            headerText = null
+                            graphic = null
+                            val result = showAndWait()
+                            if (result.isPresent && result.get().isNotBlank() && result.get().trim() != item.name) {
+                                fileExplorer.rename(item, result.get().trim())
+                                loadList()
+                            }
+                        }
                     }
-                }
-        } else close(event)
+                } else close(event)
+            }
     }
 
     @FXML
     private fun listViewMouseClicked(event: MouseEvent) {
-        if (event.clickCount > 1) {
-            val item = listView.selectionModel.selectedItem
-            if (item.dir)
-                navigate(item.name)
-        }
+        if (event.clickCount > 1)
+            listView.selectionModel.selectedItem.also {
+                if (it.dir)
+                    navigate(it.name)
+            }
     }
 
-    private fun close(event: ActionEvent) {
-        ((event.source as Node).scene.window as Stage).close()
-    }
+    private suspend fun close(event: ActionEvent) =
+        withContext(Dispatchers.Main) { ((event.source as Node).scene.window as Stage).close() }
 }

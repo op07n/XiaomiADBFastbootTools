@@ -9,22 +9,31 @@ import javafx.scene.layout.VBox
 import javafx.stage.StageStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
-fun File.getCmdCount() = this.readText().split("fastboot").size - 1
+enum class Mode {
+    NONE, ADB, FASTBOOT, AUTH, RECOVERY, ERROR
+}
 
 fun isAppSelected(list: ObservableList<App>) = list.isNotEmpty() && list.any { it.selectedProperty().get() }
+
+fun String.escape(): String = "'$this'"
 
 fun MutableMap<String, MutableList<String>>.add(key: String, value: String) {
     if (this[key] == null) {
         this[key] = mutableListOf(value)
     } else this[key]!!.add(value)
 }
+
+fun startProcess(vararg command: String, redirectErrorStream: Boolean = false) =
+    ProcessBuilder(*command).directory(XiaomiADBFastbootTools.dir).redirectErrorStream(redirectErrorStream).start()
+
+fun startProcess(command: List<String?>, redirectErrorStream: Boolean = false) =
+    ProcessBuilder(command).directory(XiaomiADBFastbootTools.dir).redirectErrorStream(redirectErrorStream).start()
 
 suspend fun Exception.alert() {
     val stringWriter = StringWriter()
@@ -49,12 +58,12 @@ suspend fun Exception.alert() {
             isResizable = false
             showAndWait()
         }
+        Platform.exit()
     }
-    Platform.exit()
 }
 
-inline fun confirm(msg: String = "", func: () -> Unit) {
-    Alert(Alert.AlertType.CONFIRMATION).apply {
+suspend fun confirm(msg: String = ""): Boolean = withContext(Dispatchers.Main) {
+    Alert(Alert.AlertType.CONFIRMATION).run {
         initStyle(StageStyle.UTILITY)
         isResizable = false
         headerText = "${msg.trim()}\nAre you sure you want to proceed?".trim()
@@ -62,8 +71,7 @@ inline fun confirm(msg: String = "", func: () -> Unit) {
         val no = ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE)
         buttonTypes.setAll(yes, no)
         val result = showAndWait()
-        if (result.get() == yes)
-            func()
+        result.get() == yes
     }
 }
 

@@ -5,33 +5,29 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-open class Command {
+object Command {
 
-    var pb = ProcessBuilder().directory(MainController.dir)
+    var prefix = ""
+    lateinit var outputTextArea: TextInputControl
+    lateinit var progressIndicator: ProgressIndicator
 
-    companion object {
-        var prefix = ""
-        lateinit var outputTextArea: TextInputControl
-        lateinit var progressIndicator: ProgressIndicator
-    }
-
-    private fun setup(pref: String) {
+    private suspend fun setup(pref: String) {
         prefix = pref
-        pb.apply {
-            command("${prefix}adb", "--version").start()
-            command("${prefix}fastboot", "--version").start()
-            command("${prefix}adb", "start-server").start()
+        withContext(Dispatchers.IO) {
+            startProcess("${prefix}adb", "--version")
+            startProcess("${prefix}fastboot", "--version")
+            startProcess("${prefix}adb", "start-server")
         }
     }
 
-    fun check(win: Boolean, printErr: Boolean = false): Boolean {
+    suspend fun check(printErr: Boolean = false): Boolean {
         try {
             setup("")
         } catch (e: Exception) {
             try {
-                if (win)
-                    setup("${MainController.dir.absolutePath}\\platform-tools\\")
-                else setup("${MainController.dir.absolutePath}/platform-tools/")
+                if (XiaomiADBFastbootTools.win)
+                    setup("${XiaomiADBFastbootTools.dir.absolutePath}\\platform-tools\\")
+                else setup("${XiaomiADBFastbootTools.dir.absolutePath}/platform-tools/")
             } catch (ex: Exception) {
                 if (printErr)
                     ex.printStackTrace()
@@ -41,67 +37,62 @@ open class Command {
         return true
     }
 
-    fun exec(vararg args: String, err: Boolean = true, lim: Int = 0): String {
-        pb.redirectErrorStream(err)
+    suspend fun exec(vararg args: MutableList<String>, redirectErrorStream: Boolean = true): String {
         val sb = StringBuilder()
         args.forEach {
-            val bits = it.split(' ', limit = lim).toMutableList()
-            bits[0] = prefix + bits[0]
-            val proc = pb.command(bits).start()
-            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNextLine())
-                    sb.append(scanner.nextLine() + '\n')
+            it[0] = prefix + it[0]
+            withContext(Dispatchers.IO) {
+                Scanner(startProcess(it, redirectErrorStream).inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNextLine())
+                        sb.append(scanner.nextLine() + '\n')
+                }
             }
-            proc.waitFor()
         }
         return sb.toString()
     }
 
-    suspend fun exec(vararg args: String, image: File?) {
-        pb.redirectErrorStream(true)
+    suspend fun exec(vararg args: MutableList<String>, image: File?) {
         withContext(Dispatchers.Main) {
             progressIndicator.isVisible = true
             outputTextArea.text = ""
         }
         args.forEach {
-            val bits = it.split(' ').toMutableList()
-            bits[0] = prefix + bits[0]
-            val proc = pb.command(bits + image?.absolutePath).start()
-            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNextLine()) {
-                    val next = scanner.nextLine() + '\n'
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.appendText(next)
+            it[0] = prefix + it[0]
+            withContext(Dispatchers.IO) {
+                Scanner(startProcess(it + image?.absolutePath, true).inputStream, "UTF-8").useDelimiter("")
+                    .use { scanner ->
+                        while (scanner.hasNextLine()) {
+                            val next = scanner.nextLine() + '\n'
+                            withContext(Dispatchers.Main) {
+                                outputTextArea.appendText(next)
+                            }
+                        }
                     }
-                }
             }
-            proc.waitFor()
         }
         withContext(Dispatchers.Main) {
             progressIndicator.isVisible = false
         }
     }
 
-    suspend fun execDisplayed(vararg args: String, err: Boolean = true, lim: Int = 0): String {
-        pb.redirectErrorStream(err)
+    suspend fun execDisplayed(vararg args: MutableList<String>, redirectErrorStream: Boolean = true): String {
         val sb = StringBuilder()
         withContext(Dispatchers.Main) {
             outputTextArea.text = ""
         }
         args.forEach {
-            val bits = it.split(' ', limit = lim).toMutableList()
-            bits[0] = prefix + bits[0]
-            val proc = pb.command(bits).start()
-            Scanner(proc.inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNextLine()) {
-                    val next = scanner.nextLine() + '\n'
-                    sb.append(next)
-                    withContext(Dispatchers.Main) {
-                        outputTextArea.appendText(next)
+            it[0] = prefix + it[0]
+            withContext(Dispatchers.IO) {
+                Scanner(startProcess(it, redirectErrorStream).inputStream, "UTF-8").useDelimiter("").use { scanner ->
+                    while (scanner.hasNextLine()) {
+                        val next = scanner.nextLine() + '\n'
+                        sb.append(next)
+                        withContext(Dispatchers.Main) {
+                            outputTextArea.appendText(next)
+                        }
                     }
                 }
             }
-            proc.waitFor()
         }
         return sb.toString()
     }
