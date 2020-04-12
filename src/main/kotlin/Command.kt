@@ -62,10 +62,8 @@ object Command {
                 Scanner(startProcess(it + image?.absolutePath, true).inputStream, "UTF-8").useDelimiter("")
                     .use { scanner ->
                         withContext(Dispatchers.Main) {
-                            while (scanner.hasNextLine()) {
-                                val next = scanner.nextLine() + '\n'
-                                outputTextArea.appendText(next)
-                            }
+                            while (scanner.hasNextLine())
+                                outputTextArea.appendText(scanner.nextLine() + '\n')
                         }
                     }
             }

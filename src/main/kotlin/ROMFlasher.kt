@@ -38,10 +38,10 @@ object ROMFlasher {
     suspend fun flash(arg: String?) {
         if (arg == null)
             return
-        val sb = StringBuilder()
         withContext(Dispatchers.Main) {
             progressBar.progress = 0.0
             progressIndicator.isVisible = true
+            outputTextArea.text = ""
         }
         withContext(Dispatchers.IO) {
             val script = setupScript(arg)
@@ -50,15 +50,17 @@ object ROMFlasher {
             else mutableListOf("sh", "-c", script.absolutePath)
             Scanner(startProcess(command, redirectErrorStream = true).inputStream, "UTF-8").useDelimiter("")
                 .use { scanner ->
+                    val sb = StringBuilder()
+                    var full: String
                     val n = script.readText().split("fastboot").size - 1
                     withContext(Dispatchers.Main) {
-                        while (scanner.hasNextLine()) {
-                            sb.append(scanner.nextLine() + '\n')
-                            val full = sb.toString()
+                        while (scanner.hasNext()) {
+                            val next = scanner.next()
+                            sb.append(next)
+                            full = sb.toString()
                             if ("pause" in full)
                                 break
-                            outputTextArea.text = full
-                            outputTextArea.appendText("")
+                            outputTextArea.appendText(next)
                             progressBar.progress = 1.0 * (full.toLowerCase().split("finished.").size - 1) / n
                         }
                     }
