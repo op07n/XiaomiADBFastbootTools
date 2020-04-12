@@ -337,7 +337,7 @@ class MainController : Initializable {
                     Mode.ADB_ERROR -> {
                         if ("loaded" !in outputTextArea.text)
                             outputTextArea.text =
-                                "ERROR: The device cannot be loaded!\nPlease set the USB configuration to data transfer!\n\n"
+                                "ERROR: The device cannot be loaded!\nTry setting the USB configuration to data transfer!\n\n"
                     }
                     Mode.FASTBOOT_ERROR -> {
                         if ("loaded" !in outputTextArea.text)

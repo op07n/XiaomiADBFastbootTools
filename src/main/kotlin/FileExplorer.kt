@@ -93,7 +93,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             }
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isEmpty())
+            if (statusTextField.text.isBlank())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
@@ -104,7 +104,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             exec(mutableListOf("adb", "push", it.absolutePath, path))
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isEmpty())
+            if (statusTextField.text.isBlank())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
@@ -117,7 +117,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             else exec(mutableListOf("adb", "shell", "rm", "-f", (path + it.name).escape()))
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isEmpty())
+            if (statusTextField.text.isBlank())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
@@ -126,7 +126,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     suspend fun mkdir(name: String) {
         exec(mutableListOf("adb", "shell", "mkdir", (path + name).escape()))
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isEmpty())
+            if (statusTextField.text.isBlank())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
@@ -135,7 +135,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     suspend fun rename(selected: AndroidFile, to: String) {
         exec(mutableListOf("adb", "shell", "mv", (path + selected.name).escape(), (path + to).escape()))
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isEmpty())
+            if (statusTextField.text.isBlank())
                 statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }

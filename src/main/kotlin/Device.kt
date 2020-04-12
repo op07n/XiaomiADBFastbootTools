@@ -25,7 +25,7 @@ object Device {
         val propString = Command.exec(mutableListOf("adb", "shell", "getprop"))
         when {
             "unauthorized" in propString -> mode = Mode.AUTH
-            "permissions" in propString -> mode = Mode.ADB_ERROR
+            "no permissions" in propString -> mode = Mode.ADB_ERROR
             "no devices" !in propString -> {
                 props.clear()
                 propString.trim().lines().forEach {
@@ -86,20 +86,25 @@ object Device {
         serial in Command.exec(mutableListOf("fastboot", "devices"), redirectErrorStream = false)
 
     suspend fun readFastboot() {
-        if (Command.exec(mutableListOf("fastboot", "devices"), redirectErrorStream = false).isNotEmpty()) {
-            props.clear()
-            Command.exec(mutableListOf("fastboot", "getvar", "all")).trim().lines().forEach {
-                if (it[0] == '(')
-                    props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
-            }
-            if (props["product"].isNullOrEmpty() || (props["serialno"].isNullOrEmpty() && props["serial"].isNullOrEmpty()))
-                mode = Mode.FASTBOOT_ERROR
-            else {
-                serial = props["serialno"] ?: props["serial"] ?: ""
-                codename = props["product"] ?: ""
-                bootloader = props["unlocked"]?.contains("yes") ?: false
-                anti = props["anti"]?.toInt() ?: -1
-                mode = Mode.FASTBOOT
+        val devices = Command.exec(mutableListOf("fastboot", "devices"), redirectErrorStream = false)
+        when {
+            "no permissions" in devices -> mode = Mode.FASTBOOT_ERROR
+            devices.isNotEmpty() -> {
+                props.clear()
+                Command.exec(mutableListOf("fastboot", "getvar", "all")).trim().lines().forEach {
+                    if (it[0] == '(')
+                        props[it.substringAfter(')').substringBeforeLast(':').trim()] =
+                            it.substringAfterLast(':').trim()
+                }
+                if (props["product"].isNullOrEmpty() || (props["serialno"].isNullOrEmpty() && props["serial"].isNullOrEmpty()))
+                    mode = Mode.FASTBOOT_ERROR
+                else {
+                    serial = props["serialno"] ?: props["serial"] ?: ""
+                    codename = props["product"] ?: ""
+                    bootloader = props["unlocked"]?.contains("yes") ?: false
+                    anti = props["anti"]?.toInt() ?: -1
+                    mode = Mode.FASTBOOT
+                }
             }
         }
     }
