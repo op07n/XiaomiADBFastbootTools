@@ -57,6 +57,9 @@ class MainController : Initializable {
     private lateinit var progressIndicator: ProgressIndicator
 
     @FXML
+    private lateinit var tabPane: TabPane
+
+    @FXML
     private lateinit var uninstallerTableView: TableView<App>
 
     @FXML
@@ -253,6 +256,7 @@ class MainController : Initializable {
         withContext(Dispatchers.Main) {
             when (Device.mode) {
                 Mode.ADB -> {
+                    tabPane.selectionModel.select(0)
                     infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
                             "Codename:\t\t${Device.codename}\n"
                     if (Device.bootloader)
@@ -269,8 +273,10 @@ class MainController : Initializable {
                     heightTextField.text = if (Device.height != -1)
                         Device.height.toString()
                     else "ERROR"
+
                 }
                 Mode.RECOVERY -> {
+                    tabPane.selectionModel.select(0)
                     infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
                             "Codename:\t\t${Device.codename}\n"
                     if (Device.bootloader)
@@ -280,6 +286,7 @@ class MainController : Initializable {
                     codenameTextField.text = Device.codename
                 }
                 Mode.FASTBOOT -> {
+                    tabPane.selectionModel.select(1)
                     infoTextArea.text = "Serial number:\t\t${Device.serial}\n" +
                             "Codename:\t\t${Device.codename}\n" +
                             "Bootloader:\t\t"

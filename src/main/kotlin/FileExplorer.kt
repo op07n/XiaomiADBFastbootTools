@@ -64,19 +64,20 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             }
         }
 
-    suspend fun exec(command: MutableList<String>) {
+    private suspend fun exec(command: MutableList<String>) {
         withContext(Dispatchers.Main) {
             statusTextField.text = ""
         }
         command[0] = prefix + command[0]
         withContext(Dispatchers.IO) {
             Scanner(startProcess(command).inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                withContext(Dispatchers.Main) {
-                    while (scanner.hasNextLine()) {
-                        val output = scanner.nextLine()
-                        if ('%' in output)
+                while (scanner.hasNextLine()) {
+                    val output = scanner.nextLine()
+                    withContext(Dispatchers.Main) {
+                        if ('%' in output) {
                             statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
-                        else if ((command[1] == "shell" && command[2] in output) || "adb" in output)
+                            statusTextField.text = output
+                        } else if ((command[1] == "shell" && command[2] in output) || "adb" in output)
                             statusTextField.text = "ERROR: ${output.substringAfterLast(':').trim()}"
                     }
                 }
@@ -93,8 +94,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             }
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isBlank())
-                statusTextField.text = "Done!"
+            statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
     }
@@ -104,8 +104,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             exec(mutableListOf("adb", "push", it.absolutePath, path))
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isBlank())
-                statusTextField.text = "Done!"
+            statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
     }
@@ -117,8 +116,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
             else exec(mutableListOf("adb", "shell", "rm", "-f", (path + it.name).escape()))
         }
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isBlank())
-                statusTextField.text = "Done!"
+            statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
     }
@@ -126,8 +124,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     suspend fun mkdir(name: String) {
         exec(mutableListOf("adb", "shell", "mkdir", (path + name).escape()))
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isBlank())
-                statusTextField.text = "Done!"
+            statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
     }
@@ -135,8 +132,7 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
     suspend fun rename(selected: AndroidFile, to: String) {
         exec(mutableListOf("adb", "shell", "mv", (path + selected.name).escape(), (path + to).escape()))
         withContext(Dispatchers.Main) {
-            if (statusTextField.text.isBlank())
-                statusTextField.text = "Done!"
+            statusTextField.text = "Done!"
             statusProgressBar.progress = 0.0
         }
     }
