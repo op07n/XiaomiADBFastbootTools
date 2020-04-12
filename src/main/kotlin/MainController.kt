@@ -331,17 +331,20 @@ class MainController : Initializable {
                     }
                     Mode.AUTH -> {
                         if ("Unauthorised" !in outputTextArea.text)
-                            outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging on the device!\n\n"
+                            outputTextArea.text =
+                                "Unauthorised device found!\nPlease allow USB debugging on the device!\n\n"
                     }
                     Mode.ADB_ERROR -> {
                         if ("loaded" !in outputTextArea.text)
-                            outputTextArea.text = "ERROR: The device cannot be loaded!\nPlease set the USB configuration to data transfer!\n\n"
+                            outputTextArea.text =
+                                "ERROR: The device cannot be loaded!\nPlease set the USB configuration to data transfer!\n\n"
                     }
                     Mode.FASTBOOT_ERROR -> {
                         if ("loaded" !in outputTextArea.text)
                             outputTextArea.text = "ERROR: The device cannot be loaded!\n\n"
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
             setUI()
