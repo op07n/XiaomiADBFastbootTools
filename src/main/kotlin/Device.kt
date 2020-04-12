@@ -25,7 +25,7 @@ object Device {
         val propString = Command.exec(mutableListOf("adb", "shell", "getprop"))
         when {
             "unauthorized" in propString -> mode = Mode.AUTH
-            "permissions" in propString -> mode = Mode.PERM
+            "permissions" in propString -> mode = Mode.ADB_ERROR
             "no devices" !in propString -> {
                 props.clear()
                 propString.trim().lines().forEach {
