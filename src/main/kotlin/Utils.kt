@@ -16,7 +16,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 enum class Mode {
-    NONE, ADB, FASTBOOT, AUTH, RECOVERY, ERROR
+    ADB, FASTBOOT, AUTH, RECOVERY, ADB_ERROR, FASTBOOT_ERROR
 }
 
 fun isAppSelected(list: ObservableList<App>) = list.isNotEmpty() && list.any { it.selectedProperty().get() }

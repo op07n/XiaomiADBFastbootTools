@@ -179,7 +179,7 @@ class MainController : Initializable {
     private var image: File? = null
     private var romDirectory: File? = null
 
-    private suspend fun setPanels(mode: Mode) {
+    private suspend fun setPanels(mode: Mode?) {
         withContext(Dispatchers.Main) {
             when (mode) {
                 Mode.ADB -> {
@@ -302,7 +302,7 @@ class MainController : Initializable {
     }
 
     private suspend fun checkDevice() {
-        Device.mode = Mode.NONE
+        Device.mode = null
         setUI()
         withContext(Dispatchers.Main) {
             outputTextArea.text = "Looking for devices...\n"
@@ -317,25 +317,29 @@ class MainController : Initializable {
                         progressIndicator.isVisible = false
                         outputTextArea.text = "Device connected in ADB mode!\n"
                         if (!Device.reinstaller || !Device.disabler)
-                            outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n")
+                            outputTextArea.appendText("Note:\nThis device isn't fully supported by the App Manager.\nAs a result, some modules have been disabled.\n\n")
                         AppManager.readPotentialApps()
                         AppManager.createTables()
                     }
                     Mode.RECOVERY -> {
                         progressIndicator.isVisible = false
-                        outputTextArea.text = "Device connected in Recovery mode!\n"
+                        outputTextArea.text = "Device connected in Recovery mode!\n\n"
                     }
                     Mode.FASTBOOT -> {
                         progressIndicator.isVisible = false
-                        outputTextArea.text = "Device connected in Fastboot mode!\n"
+                        outputTextArea.text = "Device connected in Fastboot mode!\n\n"
                     }
                     Mode.AUTH -> {
                         if ("Unauthorised" !in outputTextArea.text)
-                            outputTextArea.appendText("\nUnauthorised device found!\nPlease allow USB debugging!\n")
+                            outputTextArea.text = "Unauthorised device found!\nPlease allow USB debugging on the device!\n\n"
                     }
-                    Mode.ERROR -> {
+                    Mode.ADB_ERROR -> {
                         if ("loaded" !in outputTextArea.text)
-                            outputTextArea.appendText("\nERROR: Device cannot be loaded!\n")
+                            outputTextArea.text = "ERROR: The device cannot be loaded!\nPlease set the USB configuration to data transfer!\n\n"
+                    }
+                    Mode.FASTBOOT_ERROR -> {
+                        if ("loaded" !in outputTextArea.text)
+                            outputTextArea.text = "ERROR: The device cannot be loaded!\n\n"
                     }
                     else -> {
                         outputTextArea.clear()
@@ -842,7 +846,7 @@ class MainController : Initializable {
                 GlobalScope.launch {
                     if (Device.checkFastboot()) {
                         if (confirm()) {
-                            setPanels(Mode.NONE)
+                            setPanels(null)
                             when (scb) {
                                 "Clean install" -> ROMFlasher.flash("flash_all")
                                 "Clean install and lock" -> ROMFlasher.flash("flash_all_lock")
@@ -1073,7 +1077,7 @@ class MainController : Initializable {
             GlobalScope.launch {
                 if (Device.checkADB()) {
                     if (confirm()) {
-                        setPanels(Mode.NONE)
+                        setPanels(null)
                         val selected = FXCollections.observableArrayList<App>()
                         var n = 0
                         uninstallerTableView.items.forEach {
@@ -1095,7 +1099,7 @@ class MainController : Initializable {
             GlobalScope.launch {
                 if (Device.checkADB()) {
                     if (confirm()) {
-                        setPanels(Mode.NONE)
+                        setPanels(null)
                         val selected = FXCollections.observableArrayList<App>()
                         var n = 0
                         reinstallerTableView.items.forEach {
@@ -1117,7 +1121,7 @@ class MainController : Initializable {
             GlobalScope.launch {
                 if (Device.checkADB()) {
                     if (confirm()) {
-                        setPanels(Mode.NONE)
+                        setPanels(null)
                         val selected = FXCollections.observableArrayList<App>()
                         var n = 0
                         disablerTableView.items.forEach {
@@ -1139,7 +1143,7 @@ class MainController : Initializable {
             GlobalScope.launch {
                 if (Device.checkADB()) {
                     if (confirm()) {
-                        setPanels(Mode.NONE)
+                        setPanels(null)
                         val selected = FXCollections.observableArrayList<App>()
                         var n = 0
                         enablerTableView.items.forEach {

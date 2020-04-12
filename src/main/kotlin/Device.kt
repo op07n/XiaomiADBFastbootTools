@@ -9,7 +9,7 @@ object Device {
     var width = -1
     var height = -1
     private var props = mutableMapOf<String, String>()
-    var mode = Mode.NONE
+    var mode: Mode? = null
     var reinstaller = true
     var disabler = true
 
@@ -22,60 +22,60 @@ object Device {
     }
 
     suspend fun readADB() {
-        Command.exec(mutableListOf("adb", "shell", "getprop")).let { propString ->
-            when {
-                "unauthorized" in propString -> mode = Mode.AUTH
-                "no devices" !in propString -> {
-                    props.clear()
-                    propString.trim().lines().forEach {
-                        val parts = it.split("]: [")
-                        if (parts.size == 2)
-                            props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
-                    }
-                    mode = if (props["ro.serialno"].isNullOrEmpty() || props["ro.build.product"].isNullOrEmpty())
-                        Mode.ERROR
+        val propString = Command.exec(mutableListOf("adb", "shell", "getprop"))
+        when {
+            "unauthorized" in propString -> mode = Mode.AUTH
+            "permissions" in propString -> mode = Mode.PERM
+            "no devices" !in propString -> {
+                props.clear()
+                propString.trim().lines().forEach {
+                    val parts = it.split("]: [")
+                    if (parts.size == 2)
+                        props[parts[0].trimStart('[')] = parts[1].trimEnd(']')
+                }
+                mode = if (props["ro.serialno"].isNullOrEmpty() || props["ro.build.product"].isNullOrEmpty())
+                    Mode.ADB_ERROR
+                else {
+                    serial = props["ro.serialno"] ?: ""
+                    codename = props["ro.build.product"] ?: ""
+                    bootloader = props["ro.boot.flash.locked"]?.contains("0") ?: false
+                    camera2 = props["persist.sys.camera.camera2"]?.contains("true") ?: false
+                    if ("recovery" in Command.exec(mutableListOf("adb", "devices")))
+                        Mode.RECOVERY
                     else {
-                        serial = props["ro.serialno"] ?: ""
-                        codename = props["ro.build.product"] ?: ""
-                        bootloader = props["ro.boot.flash.locked"]?.contains("0") ?: false
-                        camera2 = props["persist.sys.camera.camera2"]?.contains("true") ?: false
-                        if ("recovery" in Command.exec(mutableListOf("adb", "devices")))
-                            Mode.RECOVERY
-                        else {
-                            reinstaller =
-                                Command.exec(mutableListOf("adb", "shell", "cmd", "package", "install-existing xaft"))
-                                    .let {
-                                        !("not found" in it || "Unknown command" in it)
-                                    }
-                            disabler = "enabled" in Command.exec(
-                                mutableListOf(
-                                    "adb",
-                                    "shell",
-                                    "pm",
-                                    "enable",
-                                    "com.android.settings"
-                                )
+                        reinstaller =
+                            Command.exec(mutableListOf("adb", "shell", "cmd", "package", "install-existing xaft"))
+                                .let {
+                                    !("not found" in it || "Unknown command" in it)
+                                }
+                        disabler = "enabled" in Command.exec(
+                            mutableListOf(
+                                "adb",
+                                "shell",
+                                "pm",
+                                "enable",
+                                "com.android.settings"
                             )
-                            dpi = try {
-                                Command.exec(mutableListOf("adb", "shell", "wm", "density")).substringAfterLast(':')
-                                    .trim().toInt()
+                        )
+                        dpi = try {
+                            Command.exec(mutableListOf("adb", "shell", "wm", "density")).substringAfterLast(':')
+                                .trim().toInt()
+                        } catch (e: Exception) {
+                            -1
+                        }
+                        Command.exec(mutableListOf("adb", "shell", "wm", "size")).let {
+                            width = try {
+                                it.substringAfterLast(':').substringBefore('x').trim().toInt()
                             } catch (e: Exception) {
                                 -1
                             }
-                            Command.exec(mutableListOf("adb", "shell", "wm", "size")).let {
-                                width = try {
-                                    it.substringAfterLast(':').substringBefore('x').trim().toInt()
-                                } catch (e: Exception) {
-                                    -1
-                                }
-                                height = try {
-                                    it.substringAfterLast('x').trim().toInt()
-                                } catch (e: Exception) {
-                                    -1
-                                }
+                            height = try {
+                                it.substringAfterLast('x').trim().toInt()
+                            } catch (e: Exception) {
+                                -1
                             }
-                            Mode.ADB
                         }
+                        Mode.ADB
                     }
                 }
             }
@@ -93,7 +93,7 @@ object Device {
                     props[it.substringAfter(')').substringBeforeLast(':').trim()] = it.substringAfterLast(':').trim()
             }
             if (props["product"].isNullOrEmpty() || (props["serialno"].isNullOrEmpty() && props["serial"].isNullOrEmpty()))
-                mode = Mode.ERROR
+                mode = Mode.FASTBOOT_ERROR
             else {
                 serial = props["serialno"] ?: props["serial"] ?: ""
                 codename = props["product"] ?: ""
