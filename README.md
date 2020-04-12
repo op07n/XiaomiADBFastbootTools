@@ -70,7 +70,7 @@ Yes, the Xiaomi ADB/Fastboot Tools was developed in Kotlin for the Java Virtual 
 
 On Windows/MacOS, install Oracle Java from [here](https://www.oracle.com/technetwork/java/javase/downloads/index.html) or OpenJDK from [here](https://adoptopenjdk.net/).
 
-On Linux distributions, install `openjdk-11-jdk`, `openjdk-11-jre` or later.
+On Linux distributions, install `openjdk-11-jdk`, `openjdk-11-jre` or later versions of OpenJDK.
 
 If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar XiaomiADBFastbootTools.jar`.
 
@@ -80,11 +80,15 @@ Windows most likely doesn't recognise your device in ADB mode. Install the unive
 
 **Do I need an unlocked bootloader or root access to use the app?**
 
-The Flasher, Wiper and Camera2 modules require an unlocked bootloader but everything else works without rooting or unlocking.
+The Flasher, Wiper and Camera2 modules in Fastboot mode require an unlocked bootloader but everything else works without rooting or unlocking.
 
 **What apps are safe to uninstall?**
 
-All applications in the list are safe to uninstall. You might lose access to some services but the device will keep working just fine. Some apps, like Gallery, aren't listed because uninstalling them would soft brick your device.
+All applications in the list are safe to uninstall. You might lose access to some services but the device will keep working just fine. Some other apps, like Gallery or Security, aren't listed because uninstalling them would soft brick your device.
+
+**What's the difference between uninstalling and disabling?**
+
+The OS sees which apps have been disabled and it can re-enable them whenever it pleases but it cannot do the same with uninstalled apps. Apps you disable may come back anytime and you can also re-enable them in the Settings, while uninstalled apps will only return if you reinstall them (using ADB or an APK) or factory reset the device. There's no difference when it comes to their impact on the system, however, functionality or performance wise, so I recommend uninstalling apps which you believe pose a security/privacy risk and disabling everything else.
 
 **Do uninstalled system apps affect OTA updates?**
 
@@ -96,16 +100,16 @@ No, uninstalled apps should only come back when you reinstall them or factory re
 
 **Why does the Uninstaller hang on some apps?**
 
-There are many factory apps Global MIUI doesn't let you uninstall but China MIUI does. If you try to uninstall an app like that, the tool will hang. If that happens, close the tools, disconnect your device, uninstall the app manually, then launch the tools again and reconnect your device to proceed.
+There are some apps Global MIUI doesn't let you uninstall but Chinese MIUI does. If you try to uninstall an app like that, the tool might hang. If that happens, close the tools, disconnect your device, uninstall the app manually, then launch the tools again and reconnect your device to proceed.
 
 **How do I regain uninstalled system apps?**
 
-Simply reinstall them using the Reinstaller module when connected in ADB mode.
+Simply reinstall them using the Reinstaller module when connected in ADB mode. In case the Reinstaller module is disabled because your device doesn't support it, you must perform a factory reset.
 
 **The app is called Xiaomi ADB/Fastboot Tools. Does that mean that it only works with Xiaomi devices?**
 
-ADB and Fastboot are universal interfaces on Android but some of the algorithms and methods used in the app are specific to Xiaomi devices, so yes.
+ADB and Fastboot are universal interfaces on Android but some of the algorithms and methods of the app are specific to Xiaomi devices, so mostly yes.
 
 **Does this replace MiFlash or MiUnlock?**
 
-No. Fastboot ROM flashing is available so MiFlash can mostly be substituted but implementing EDL flashing or MIUI unlocking would only make the program unnecessarily complex.
+No. Fastboot ROM flashing is available so MiFlash can mostly be replaced but implementing EDL flashing or bootloader unlocking on MIUI would only make the program unnecessarily complex.
