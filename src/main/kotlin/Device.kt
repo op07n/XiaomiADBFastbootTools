@@ -1,5 +1,6 @@
 object Device {
 
+    var mode: Mode? = null
     var serial = ""
     var codename = ""
     var bootloader = false
@@ -8,10 +9,9 @@ object Device {
     var dpi = -1
     var width = -1
     var height = -1
-    private var props = mutableMapOf<String, String>()
-    var mode: Mode? = null
     var reinstaller = true
     var disabler = true
+    private var props = mutableMapOf<String, String>()
 
     suspend fun checkADB() = Command.exec(mutableListOf("adb", "devices")).let {
         serial in it && "recovery" !in it
