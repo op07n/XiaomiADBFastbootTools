@@ -71,9 +71,9 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
         command[0] = prefix + command[0]
         withContext(Dispatchers.IO) {
             Scanner(startProcess(command).inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                while (scanner.hasNextLine()) {
-                    val output = scanner.nextLine()
-                    withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
+                    while (scanner.hasNextLine()) {
+                        val output = scanner.nextLine()
                         if ('%' in output)
                             statusProgressBar.progress = output.substringBefore('%').trim('[', ' ').toInt() / 100.0
                         else if ((command[1] == "shell" && command[2] in output) || "adb" in output)

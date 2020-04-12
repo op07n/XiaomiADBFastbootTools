@@ -341,9 +341,7 @@ class MainController : Initializable {
                         if ("loaded" !in outputTextArea.text)
                             outputTextArea.text = "ERROR: The device cannot be loaded!\n\n"
                     }
-                    else -> {
-                        outputTextArea.clear()
-                    }
+                    else -> {}
                 }
             }
             setUI()
@@ -396,15 +394,50 @@ class MainController : Initializable {
 
         Command.outputTextArea = outputTextArea
         Command.progressIndicator = progressIndicator
+        ROMFlasher.outputTextArea = outputTextArea
         ROMFlasher.progressBar = progressBar
+        ROMFlasher.progressIndicator = progressIndicator
         AppManager.uninstallerTableView = uninstallerTableView
         AppManager.reinstallerTableView = reinstallerTableView
         AppManager.disablerTableView = disablerTableView
         AppManager.enablerTableView = enablerTableView
         AppManager.progress = progressBar
         AppManager.progressInd = progressIndicator
+        AppManager.outputTextArea = outputTextArea
 
         GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val link =
+                        URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                            .substringAfter("\"html_url\":\"").substringBefore('"')
+                    val latest = link.substringAfterLast('/')
+                    if (latest > XiaomiADBFastbootTools.version)
+                        withContext(Dispatchers.Main) {
+                            val vb = VBox()
+                            val download = Hyperlink("Download")
+                            Alert(AlertType.INFORMATION).apply {
+                                initStyle(StageStyle.UTILITY)
+                                title = "New version available!"
+                                graphic = ImageView("mitu.png")
+                                headerText =
+                                    "Version $latest is available!"
+                                vb.alignment = Pos.CENTER
+                                download.onAction = EventHandler {
+                                    if (XiaomiADBFastbootTools.linux)
+                                        Runtime.getRuntime().exec("xdg-open $link")
+                                    else Desktop.getDesktop().browse(URI(link))
+                                }
+                                download.font = Font(15.0)
+                                vb.children.add(download)
+                                dialogPane.content = vb
+                                showAndWait()
+                            }
+                        }
+                } catch (ex: Exception) {
+                    // OK
+                }
+            }
             if (!Command.check()) {
                 withContext(Dispatchers.Main) {
                     val hb = HBox(15.0)
@@ -472,38 +505,6 @@ class MainController : Initializable {
                         }
                         Platform.exit()
                     }
-            }
-            withContext(Dispatchers.IO) {
-                try {
-                    val link =
-                        URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
-                            .substringAfter("\"html_url\":\"").substringBefore('"')
-                    val latest = link.substringAfterLast('/')
-                    if (latest > XiaomiADBFastbootTools.version)
-                        withContext(Dispatchers.Main) {
-                            val vb = VBox()
-                            val download = Hyperlink("Download")
-                            Alert(AlertType.INFORMATION).apply {
-                                initStyle(StageStyle.UTILITY)
-                                title = "New version available!"
-                                graphic = ImageView("mitu.png")
-                                headerText =
-                                    "Version $latest is available!"
-                                vb.alignment = Pos.CENTER
-                                download.onAction = EventHandler {
-                                    if (XiaomiADBFastbootTools.linux)
-                                        Runtime.getRuntime().exec("xdg-open $link")
-                                    else Desktop.getDesktop().browse(URI(link))
-                                }
-                                download.font = Font(15.0)
-                                vb.children.add(download)
-                                dialogPane.content = vb
-                                showAndWait()
-                            }
-                        }
-                } catch (ex: Exception) {
-                    // OK
-                }
             }
             checkDevice()
         }

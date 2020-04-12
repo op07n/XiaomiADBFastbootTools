@@ -51,12 +51,12 @@ object ROMFlasher {
             Scanner(startProcess(command, redirectErrorStream = true).inputStream, "UTF-8").useDelimiter("")
                 .use { scanner ->
                     val n = script.readText().split("fastboot").size - 1
-                    while (scanner.hasNextLine()) {
-                        sb.append(scanner.nextLine() + '\n')
-                        val full = sb.toString()
-                        if ("pause" in full)
-                            break
-                        withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) {
+                        while (scanner.hasNextLine()) {
+                            sb.append(scanner.nextLine() + '\n')
+                            val full = sb.toString()
+                            if ("pause" in full)
+                                break
                             outputTextArea.text = full
                             outputTextArea.appendText("")
                             progressBar.progress = 1.0 * (full.toLowerCase().split("finished.").size - 1) / n

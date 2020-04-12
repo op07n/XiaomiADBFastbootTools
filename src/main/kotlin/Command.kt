@@ -61,9 +61,9 @@ object Command {
             withContext(Dispatchers.IO) {
                 Scanner(startProcess(it + image?.absolutePath, true).inputStream, "UTF-8").useDelimiter("")
                     .use { scanner ->
-                        while (scanner.hasNextLine()) {
-                            val next = scanner.nextLine() + '\n'
-                            withContext(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
+                            while (scanner.hasNextLine()) {
+                                val next = scanner.nextLine() + '\n'
                                 outputTextArea.appendText(next)
                             }
                         }
@@ -84,10 +84,10 @@ object Command {
             it[0] = prefix + it[0]
             withContext(Dispatchers.IO) {
                 Scanner(startProcess(it, redirectErrorStream).inputStream, "UTF-8").useDelimiter("").use { scanner ->
-                    while (scanner.hasNextLine()) {
-                        val next = scanner.nextLine() + '\n'
-                        sb.append(next)
-                        withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) {
+                        while (scanner.hasNextLine()) {
+                            val next = scanner.nextLine() + '\n'
+                            sb.append(next)
                             outputTextArea.appendText(next)
                         }
                     }
