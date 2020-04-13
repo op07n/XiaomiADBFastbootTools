@@ -1169,12 +1169,13 @@ class MainController : Initializable {
     @FXML
     private fun secondSpaceButtonPressed(event: ActionEvent) {
         GlobalScope.launch {
-            AppManager.apply {
-                user = if (secondSpaceButton.isSelected)
-                    "10"
-                else "0"
-                createTables()
-            }
+            if (Device.checkADB())
+                AppManager.apply {
+                    user = if (secondSpaceButton.isSelected)
+                        "10"
+                    else "0"
+                    createTables()
+                }
         }
     }
 
@@ -1191,7 +1192,7 @@ class MainController : Initializable {
                         showAndWait()
                     }
                 }
-            }
+            } else checkDevice()
         }
     }
 

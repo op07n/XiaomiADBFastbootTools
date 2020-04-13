@@ -32,7 +32,7 @@ class AppAdderController : Initializable {
 
     @FXML
     private fun okButtonPressed(event: ActionEvent) {
-        if (appTextArea.text.isNullOrBlank()) {
+        if (!appTextArea.text.isNullOrBlank()) {
             Alert(Alert.AlertType.WARNING).apply {
                 initStyle(StageStyle.UTILITY)
                 isResizable = false

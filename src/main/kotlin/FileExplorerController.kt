@@ -38,7 +38,11 @@ class FileExplorerController : Initializable {
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         backButton.graphic = ImageView("back.png")
         backButton.setOnMouseClicked {
-            navigate("..")
+            GlobalScope.launch {
+                if (Device.checkADB())
+                    navigate("..")
+                else close(it)
+            }
         }
         pathTextField.setOnAction {
             pathTextField.text = pathTextField.text.trim()
@@ -64,9 +68,11 @@ class FileExplorerController : Initializable {
         listView.refresh()
     }
 
-    private fun navigate(where: String) {
+    private suspend fun navigate(where: String) {
         fileExplorer.navigate(where)
-        loadList()
+        withContext(Dispatchers.Main) {
+            loadList()
+        }
     }
 
     @FXML
@@ -185,10 +191,14 @@ class FileExplorerController : Initializable {
         if (event.clickCount > 1)
             listView.selectionModel.selectedItem.also {
                 if (it.dir)
-                    navigate(it.name)
+                    GlobalScope.launch {
+                        if (Device.checkADB())
+                            navigate(it.name)
+                        else close(event)
+                    }
             }
     }
 
-    private suspend fun close(event: ActionEvent) =
+    private suspend fun close(event: EventObject) =
         withContext(Dispatchers.Main) { ((event.source as Node).scene.window as Stage).close() }
 }

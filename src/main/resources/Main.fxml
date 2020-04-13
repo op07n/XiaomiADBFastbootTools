@@ -434,7 +434,7 @@
                                                                   <Font size="15.0" />
                                                                </font>
                                                             </Button>
-                                                            <CheckBox fx:id="autobootCheckBox" mnemonicParsing="false" text="Autoboot to Recovery when it's flashed">
+                                                            <CheckBox fx:id="autobootCheckBox" mnemonicParsing="false" text="Autoboot to Recovery after it's flashed">
                                                                <font>
                                                                   <Font size="15.0" />
                                                                </font>

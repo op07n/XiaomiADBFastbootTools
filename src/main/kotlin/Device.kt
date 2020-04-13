@@ -13,9 +13,7 @@ object Device {
     var disabler = true
     private var props = mutableMapOf<String, String>()
 
-    suspend fun checkADB() = Command.exec(mutableListOf("adb", "devices")).let {
-        serial in it && "recovery" !in it
-    }
+    suspend fun checkADB() = serial in Command.exec(mutableListOf("adb", "devices"))
 
     suspend fun checkRecovery() = Command.exec(mutableListOf("adb", "devices")).let {
         serial in it && "recovery" in it
