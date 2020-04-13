@@ -4,6 +4,7 @@ import javafx.collections.ObservableList
 import javafx.scene.control.ProgressBar
 import javafx.scene.control.TextField
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
@@ -54,9 +55,10 @@ class FileExplorer(val statusTextField: TextField, val statusProgressBar: Progre
         } else path += "$where/"
     }
 
-    suspend fun getFiles(): ObservableList<AndroidFile> =
+    fun getFiles(): ObservableList<AndroidFile> =
         FXCollections.observableArrayList<AndroidFile>().also { list ->
-            Command.exec(mutableListOf("adb", "shell", "ls", "-l", path)).trim().lines().forEach {
+            val files = runBlocking { Command.exec(mutableListOf("adb", "shell", "ls", "-l", path)) }
+            files.trim().lines().forEach {
                 if ("ls:" !in it && ':' in it)
                     makeFile(it)?.let { file ->
                         list.add(file)

@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox
 import javafx.stage.StageStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -34,6 +35,12 @@ fun startProcess(vararg command: String, redirectErrorStream: Boolean = false) =
 
 fun startProcess(command: List<String?>, redirectErrorStream: Boolean = false) =
     ProcessBuilder(command).directory(XiaomiADBFastbootTools.dir).redirectErrorStream(redirectErrorStream).start()
+
+fun runScript(file: File, redirectErrorStream: Boolean = false) = if (XiaomiADBFastbootTools.win)
+    ProcessBuilder("cmd.exe", "/c", file.absolutePath).directory(XiaomiADBFastbootTools.dir)
+        .redirectErrorStream(redirectErrorStream).start()
+else ProcessBuilder("sh", "-c", file.absolutePath).directory(XiaomiADBFastbootTools.dir)
+    .redirectErrorStream(redirectErrorStream).start()
 
 suspend fun Exception.alert() {
     val stringWriter = StringWriter()

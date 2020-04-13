@@ -356,27 +356,10 @@ class MainController : Initializable {
             }
             setUI()
             delay(1000)
-        } while (Device.mode != Mode.ADB && Device.mode != Mode.FASTBOOT && Device.mode != Mode.RECOVERY)
+        } while (!(Device.mode == Mode.ADB || Device.mode == Mode.FASTBOOT || Device.mode == Mode.RECOVERY))
     }
 
     override fun initialize(url: URL, rb: ResourceBundle?) {
-        outputTextArea.text = "Looking for devices...\n"
-        progressIndicator.isVisible = true
-        partitionComboBox.items.addAll(
-            "boot", "cust", "modem", "persist", "recovery", "system"
-        )
-        scriptComboBox.items.addAll(
-            "Clean install", "Clean install and lock", "Update"
-        )
-        branchComboBox.items.addAll(
-            "China Stable",
-            "EEA Stable",
-            "Global Stable",
-            "India Stable",
-            "Indonesia Stable",
-            "Russia Stable"
-        )
-
         uncheckTableColumn.cellValueFactory = PropertyValueFactory("selected")
         uncheckTableColumn.setCellFactory { CheckBoxTableCell() }
         unappTableColumn.cellValueFactory = PropertyValueFactory("appname")
@@ -397,6 +380,21 @@ class MainController : Initializable {
         enappTableColumn.cellValueFactory = PropertyValueFactory("appname")
         enpackageTableColumn.cellValueFactory = PropertyValueFactory("packagename")
 
+        partitionComboBox.items.addAll(
+            "boot", "cust", "modem", "persist", "recovery", "system"
+        )
+        scriptComboBox.items.addAll(
+            "Clean install", "Clean install and lock", "Update"
+        )
+        branchComboBox.items.addAll(
+            "China Stable",
+            "EEA Stable",
+            "Global Stable",
+            "India Stable",
+            "Indonesia Stable",
+            "Russia Stable"
+        )
+
         uninstallerTableView.columns.setAll(uncheckTableColumn, unappTableColumn, unpackageTableColumn)
         reinstallerTableView.columns.setAll(recheckTableColumn, reappTableColumn, repackageTableColumn)
         disablerTableView.columns.setAll(discheckTableColumn, disappTableColumn, dispackageTableColumn)
@@ -415,38 +413,36 @@ class MainController : Initializable {
         AppManager.progressInd = progressIndicator
         AppManager.outputTextArea = outputTextArea
 
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val link =
-                        URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
-                            .substringAfter("\"html_url\":\"").substringBefore('"')
-                    val latest = link.substringAfterLast('/')
-                    if (latest > XiaomiADBFastbootTools.version)
-                        withContext(Dispatchers.Main) {
-                            val vb = VBox()
-                            val download = Hyperlink("Download")
-                            Alert(AlertType.INFORMATION).apply {
-                                initStyle(StageStyle.UTILITY)
-                                title = "New version available!"
-                                graphic = ImageView("mitu.png")
-                                headerText =
-                                    "Version $latest is available!"
-                                vb.alignment = Pos.CENTER
-                                download.onAction = EventHandler {
-                                    if (XiaomiADBFastbootTools.linux)
-                                        Runtime.getRuntime().exec("xdg-open $link")
-                                    else Desktop.getDesktop().browse(URI(link))
-                                }
-                                download.font = Font(15.0)
-                                vb.children.add(download)
-                                dialogPane.content = vb
-                                showAndWait()
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val link =
+                    URL("https://api.github.com/repos/Szaki/XiaomiADBFastbootTools/releases/latest").readText()
+                        .substringAfter("\"html_url\":\"").substringBefore('"')
+                val latest = link.substringAfterLast('/')
+                if (latest > XiaomiADBFastbootTools.version)
+                    withContext(Dispatchers.Main) {
+                        val vb = VBox()
+                        val download = Hyperlink("Download")
+                        Alert(AlertType.INFORMATION).apply {
+                            initStyle(StageStyle.UTILITY)
+                            title = "New version available!"
+                            graphic = ImageView("mitu.png")
+                            headerText =
+                                "Version $latest is available!"
+                            vb.alignment = Pos.CENTER
+                            download.onAction = EventHandler {
+                                if (XiaomiADBFastbootTools.linux)
+                                    Runtime.getRuntime().exec("xdg-open $link")
+                                else Desktop.getDesktop().browse(URI(link))
                             }
+                            download.font = Font(15.0)
+                            vb.children.add(download)
+                            dialogPane.content = vb
+                            showAndWait()
                         }
-                } catch (ex: Exception) {
-                    // OK
-                }
+                    }
+            } catch (ex: Exception) {
+                // OK
             }
             if (!Command.check()) {
                 withContext(Dispatchers.Main) {
@@ -1207,7 +1203,7 @@ class MainController : Initializable {
             graphic = ImageView("icon.png")
             headerText =
                 "Xiaomi ADB/Fastboot Tools\nVersion ${XiaomiADBFastbootTools.version}\nCreated by Szaki\n\n" +
-                        "SDK Platform Tools\n${runBlocking(Dispatchers.IO) {
+                        "SDK Platform Tools\n${runBlocking {
                             Command.exec(
                                 mutableListOf(
                                     "adb",

@@ -9,7 +9,10 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.stage.StageStyle
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.URL
 import java.util.*
 
@@ -42,7 +45,7 @@ class FileExplorerController : Initializable {
             if (!pathTextField.text.endsWith('/'))
                 pathTextField.text += '/'
             fileExplorer.path = pathTextField.text
-            listView.items = runBlocking { fileExplorer.getFiles() }
+            listView.items = fileExplorer.getFiles()
             listView.refresh()
         }
         fileExplorer = FileExplorer(statusTextField, progressBar)
@@ -50,14 +53,14 @@ class FileExplorerController : Initializable {
         listView.apply {
             selectionModel.selectionMode = SelectionMode.MULTIPLE
             setCellFactory { FileListCell() }
-            items = runBlocking { fileExplorer.getFiles() }
+            items = fileExplorer.getFiles()
             refresh()
         }
     }
 
     private fun loadList() {
         pathTextField.text = fileExplorer.path
-        listView.items = runBlocking { fileExplorer.getFiles() }
+        listView.items = fileExplorer.getFiles()
         listView.refresh()
     }
 

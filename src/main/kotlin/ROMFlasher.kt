@@ -45,10 +45,7 @@ object ROMFlasher {
         }
         withContext(Dispatchers.IO) {
             val script = setupScript(arg)
-            val command = if (XiaomiADBFastbootTools.win)
-                mutableListOf("cmd.exe", "/c", script.absolutePath)
-            else mutableListOf("sh", "-c", script.absolutePath)
-            Scanner(startProcess(command, redirectErrorStream = true).inputStream, "UTF-8").useDelimiter("")
+            Scanner(runScript(script, redirectErrorStream = true).inputStream, "UTF-8").useDelimiter("")
                 .use { scanner ->
                     val sb = StringBuilder()
                     var full: String

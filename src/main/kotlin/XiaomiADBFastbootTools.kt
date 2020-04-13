@@ -3,8 +3,7 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 
@@ -35,7 +34,7 @@ class XiaomiADBFastbootTools : Application() {
     }
 
     override fun stop() {
-        GlobalScope.launch {
+        runBlocking {
             try {
                 Command.exec(mutableListOf("adb", "kill-server"))
             } catch (e: Exception) {
