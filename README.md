@@ -63,8 +63,6 @@ On Windows/MacOS, install Oracle Java from [here](https://www.oracle.com/technet
 
 On Linux distributions, install `openjdk-11-jdk`, `openjdk-11-jre` or later versions of OpenJDK.
 
-If the application says that it cannot find ADB/Fastboot even though you have downloaded the OS-specific ZIP, open a terminal inside the extracted folder and enter `java -jar XiaomiADBFastbootTools.jar`.
-
 **The app on Windows doesn't detect my device even though it's connected and USB debugging is enabled. What could be the issue?**
 
 Windows most likely doesn't recognise your device in ADB mode. Install the universal ADB drivers from [here](http://dl.adbdriver.com/upload/adbdriver.zip), reboot your PC and try again.
