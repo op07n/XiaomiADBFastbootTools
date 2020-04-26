@@ -20,3 +20,7 @@ jobs:
     - name: Build with Gradle
       run: |
           ./gradlew.bat build
+    - uses: actions/upload-artifact@v1
+      with:
+        name: artifact
+        path: .
