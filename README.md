@@ -1,3 +1,7 @@
+Duplicate of https://github.com/Szaki/XiaomiADBFastbootTools.git
+
+
+
 # Xiaomi ADB/Fastboot Tools 😊
 
 ![](https://img.shields.io/github/downloads/Szaki/XiaomiADBFastbootTools/total.svg)
