@@ -24,4 +24,4 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: artifact
-        path: .
+        path: ./build/distributions/XiaomiADBFastbootTools.zip
